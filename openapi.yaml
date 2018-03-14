@@ -1,0 +1,105 @@
+openapi: 3.0.0
+info:
+  version: '0.0.1'
+  title: 'Back2School API'
+  description: 'An API that allows the management of school bureaucracy'
+  contact:
+    name: Middleware2018-PSS
+    url: https://github.com/middleware2018-PSS/Services
+    email: mail@example.com
+
+servers:
+  - url: https://dev.foo.com/v1
+    description: Dev Server
+  
+  - url: https://prod.foo.com/v1
+    description: Prod Server
+
+paths:
+  /students:
+    summary: Represents a student
+    get:
+      description: Obtain the list of students from the school database
+      tags:
+        - Students
+      parameters:
+        - name: bodyLimit
+          in: query
+          description: The amount of students returned
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+            example: 5
+
+        - name: pageLimit
+          in: query
+          description: The pages to return students info
+          schema:
+            type: integer
+            minimum: 5
+            maximum: 1
+            example: 2
+
+      responses:
+        200:
+          description: Successful pull of students info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+    post:
+      description: Creates a new student in the database
+      tags:
+        - Students
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/Student'
+      responses:
+        200:
+          description: Successfully created a new student
+
+  /students/{id}:
+    get:
+      description: Obtain information about a specific student
+      tags:
+        - Students
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the student
+          schema:
+            type: integer
+            example: 42
+      responses:
+        200:
+          description: Success
+          content: 
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Student'
+
+components:
+  schemas:
+
+    Student:
+      description: Model containing Student info
+      properties:
+        id:
+          type: integer
+          example: 42
+        name:
+          type: string
+          example: John Doe
+        birthdate:
+          type: string
+          example: 01/01/1970
+
