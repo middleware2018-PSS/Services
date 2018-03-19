@@ -1,0 +1,74 @@
+### /students
+students:
+  # GET
+  get:
+    tags:
+      - students
+    summary: "Return the list of students (paginated)"
+    description: "Obtain the list of students from the school database"
+    parameters:
+      - name: limit
+        in: query
+        description: 'The number of results to return: 1–20, inclusive'
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+          example: 20
+          default: 20
+      - name: offset
+        in: query
+        description: Student account number to start at
+        schema:
+          type: integer
+          example: 0
+          default: 0
+    responses:
+      200:
+        description: Successful pull of students info
+        content:
+          application/json:
+            schema:
+              $ref: '../components.yaml#/Students'
+  # POST
+  post:
+    tags:
+      - students
+    summary: "Creates a student account"
+    description: "Creates a new student in the database"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '../components.yaml#/Student'
+    responses:
+      200:
+        description: "Successfully created a new student"
+
+
+### /students/{student_id}
+students_by_id:
+  #GET
+  get:
+    tags:
+      - students
+    summary: "Returns a student account"
+    description: "Returns the student account identified by student_id"
+    parameters:
+      - name: student_id
+        in: path
+        required: true
+        description: "The id of the student"
+        schema:
+          type: integer
+          example: 42
+    responses:
+      200:
+        description: Success
+        content: 
+          application/json:
+            schema:
+              type: object
+              $ref: '../components.yaml#/Student'

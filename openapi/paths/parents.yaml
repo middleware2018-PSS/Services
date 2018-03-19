@@ -1,0 +1,112 @@
+### /parents
+parents:
+  # GET
+  get:
+    tags:
+      - parents
+    summary: "Return the list of parents (paginated)"
+    description: "Obtain the list of parents from the school database.
+    Only the administrators can get the full list"
+    parameters:
+      - name: limit
+        in: query
+        description: 'The number of results to return: 1–20, inclusive'
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+          example: 20
+          default: 20
+
+      - name: offset
+        in: query
+        description: Parent account number to start at
+        schema:
+          type: integer
+          example: 0
+          default: 0
+
+    responses:
+      200:
+        description: Successful pull of parents info
+        content:
+          application/json:
+            schema:
+              $ref: '../components.yaml#/Parents'
+      403:
+        description: "The current user does not have the rights to access this resource.
+        Only administrators can get the list of all parents"
+
+  # POST
+  post:
+    tags:
+      - parents
+    summary: "Creates a parent account"
+    description: "Creates a new parent account in the database"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '../components.yaml#/Parent'
+    responses:
+      200:
+        description: "Successfully created a new parent account"
+      403:
+        description: "The current user does not have the rights to create this resource.
+        Only administrators can create new accounts"
+
+
+### /parents/{parent_id}
+parents_by_id:
+  # GET
+  get:
+    tags:
+      - parents
+    summary: "Returns a parent account"
+    description: "Returns the parent account identified by parent_id"
+    parameters:
+      - name: parent_id
+        in: path
+        required: true
+        description: "The id of the parent account"
+        schema:
+          type: integer
+          example: 42
+    responses:
+      200:
+        description: Success
+        content: 
+          application/json:
+            schema:
+              type: object
+              $ref: '../components.yaml#/Parent'
+      403:
+        description: "The current user does not have the rights to create this resource.
+        Only administrators can create new accounts"
+
+  # DELETE
+  delete:
+    tags:
+      - parents
+    summary: "Deletes a parent account"
+    description: "Deletes the parent account identified by parent_id"
+    parameters:
+      - name: parent_id
+        in: path
+        required: true
+        description: The id of the parent account
+        schema:
+          type: integer
+          example: 42
+    responses:
+      200:
+        description: "Successfully deleted the parent account"
+      400:
+        description: "Invalid parent_id supplied"
+      403:
+        description: "The current user does not have the rights to delete this resource.
+        Only administrators can delete parent accounts"
+      404:
+        description: "Parent account not found"

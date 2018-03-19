@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  version: '0.0.1'
+  title: 'Back2School API'
+  description: 'An API that allows the management of school bureaucracy'
+  contact:
+    name: Middleware2018-PSS
+    url: https://github.com/middleware2018-PSS/Services
+    email: mail@example.com
+
+servers:
+  - url: https://dev.foo.com/v1
+    description: Dev Server
+  
+  - url: https://prod.foo.com/v1
+    description: Prod Server
+
+paths:
+
+### STUDENTS
+  /students:
+    $ref: 'paths/students.yaml#/students'
+  /students/{student_id}:
+    $ref: 'paths/students.yaml#/students_by_id'
+
+### PARENTS
+  /parents:
+    $ref: 'paths/parents.yaml#/parents'
+  /parents/{parent_id}:
+    $ref: 'paths/parents.yaml#/parents_by_id'
+
+### PARENTS/STUDENTS
+  /parents/{parent_id}/students:
+    $ref: 'paths/parents_students.yaml#/parents_by_id-students'
+  /parents/{parent_id}/students/{student_id}:
+    $ref: 'paths/parents_students.yaml#/parents_by_id-students_by_id'
+
+### PARENTS/APPOINTMENTS
+  /parents/{parent_id}/appointments:
+    $ref: 'paths/parents_appointments.yaml#/parents_by_id-appointments'
+  /parents/{parent_id}/appointments/{appointments_id}:
+    $ref: 'paths/parents_appointments.yaml#/parents_by_id-appointments_by_id'
+
+#########################################################################################
+#                                      COMPONENTS                                       #
+#########################################################################################
+
+components:
+  schemas:
+    $ref: 'components.yaml'

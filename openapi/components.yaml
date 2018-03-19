@@ -1,0 +1,85 @@
+Student:
+  description: Model containing Student info
+  properties:
+    id:
+      type: integer
+      example: 42
+    name:
+      type: string
+      example: John Doe
+    birthdate:
+      type: string
+      example: 01/01/2010
+
+Students:
+  description: Array of students
+  type: array
+  items:
+    $ref: '#/Student'
+
+Parent:
+  description: Model containing Parent info
+  properties:
+    id:
+      type: integer
+      example: 42
+    name:
+      type: string
+      example: John
+    surname:
+      type: string
+      example: Doe
+    mail:
+      type: string
+      example: john.doe@example.com
+    info:
+      type: string
+      example: General information
+
+Parents:
+  description: Array of parents
+  type: array
+  items:
+    $ref: '#/Parent'
+
+Appointment:
+  description: Model containing Appointment info
+  properties:
+    id:
+      type: integer
+      example: 42
+    date:
+      type: string
+      example: '01/01/2018'
+    student:
+      $ref: '#/Student'
+    teacher:
+      $ref: '#/Teacher'
+    status:
+      type: string
+      example: Waiting for confirmation
+
+Appointments:
+  description: Array of appointments
+  type: array
+  items:
+    $ref: '#/Appointment'
+
+Teacher:
+  description: Model containing Teacher info
+  properties:
+    id:
+      type: integer
+      example: 42
+    name:
+      type: string
+      example: Alice
+    surname:
+      type: string
+      example: Brown
+    mail:
+      type: string
+      example: alice.brown@example.com
+    info:
+      type: string
+      example: Foo Bar
