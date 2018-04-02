@@ -1,9 +1,9 @@
 ### /parents/{parent_id}/students
-parents_by_id-students:
+parent-students:
   # GET
   get:
     tags:
-      - parents/students
+      - Parent::Students
     summary: "Returns the list of students that are child of {parent_id}"
     description: "Returns the list of students that are child of the parent
     identified by {parent_id}"
@@ -28,7 +28,7 @@ parents_by_id-students:
   # POST
   post:
     tags:
-      - parents/students
+      - Parent::Students
     summary: "Creates a student account"
     description: "Creates a new student account child of {parent_id}"
     requestBody:
@@ -47,11 +47,11 @@ parents_by_id-students:
 
 
 ### /parents/{parent_id}/students/{student_id}
-parents_by_id-students_by_id:
+parent-student:
   # GET
   get:
     tags:
-      - parents/students
+      - Parent::Students
     summary: "{student_id} child of {parent_id}"
     description: "Returns the student identified by {student_id}
     that is child of the parent of the parent identified by {parent_id}"
@@ -84,7 +84,7 @@ parents_by_id-students_by_id:
   # PUT
   put:
     tags:
-      - parents/students
+      - Parent::Students
     summary: "Modify student identified by {student_id}"
     description: "Modify attributes of the student account identified by {student_id}
     that is child of {parent_id}"
@@ -124,7 +124,7 @@ parents_by_id-students_by_id:
   # DELETE
   delete:
     tags:
-      - parents/students
+      - Parent::Students
     summary: "Deletes a student account"
     description: "Deletes the student account identified
     by {student_id} child of {parent_id}"

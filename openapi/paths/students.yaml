@@ -3,7 +3,7 @@ students:
   # GET
   get:
     tags:
-      - students
+      - Students
     summary: "Return the list of students (paginated)"
     description: "Obtain the list of students from the school database"
     parameters:
@@ -33,7 +33,7 @@ students:
   # POST
   post:
     tags:
-      - students
+      - Students
     summary: "Creates a student account"
     description: "Creates a new student in the database"
     requestBody:
@@ -49,11 +49,11 @@ students:
 
 
 ### /students/{student_id}
-students_by_id:
+student:
   #GET
   get:
     tags:
-      - students
+      - Students
     summary: "Returns a student account"
     description: "Returns the student account identified by student_id"
     parameters:

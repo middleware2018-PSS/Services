@@ -1,0 +1,151 @@
+### /students/{student_id}/grades
+student-grades:
+  # GET
+  get:
+    tags:
+      - Student::Grades
+    summary: "Grades obtained by a student"
+    description: "Returns the list of grades obained by a student
+    identified by {student_id}"
+    parameters:
+      - name: student_id
+        in: path
+        required: true
+        description: The id of the student account
+        schema:
+          type: integer
+          example: 42
+    responses:
+      200:
+        description: Success
+        content: 
+          application/json:
+            schema:
+              $ref: '../components.yaml#/Grades'
+      403:
+        description: "The current user does not have the rights to access this resource."
+
+  # POST
+  post:
+    tags:
+      - Student::Grades
+    summary: "Creates a student grade"
+    description: "Creates a new grade entry for a student identified by student_id"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '../components.yaml#/Grade'
+    responses:
+      200:
+        description: "Successfully created a new grade entry"
+      403:
+        description: "The current user does not have the rights to create this resource.
+        Only administrators or teachers can add grades"
+
+
+### /students/{student_id}/grades/{grade_id}
+student-grade:
+  # GET
+  get:
+    tags:
+      - Student::Grades
+    summary: "Grade obtained by a student"
+    description: "Retruns a single grade obtained by the student identified by student_id"
+    parameters:
+      - name: student_id
+        in: path
+        required: true
+        description: The id of the student account
+        schema:
+          type: integer
+          example: 42
+      - name: grade_id
+        in: path
+        required: true
+        description: The id of the grade
+        schema:
+          type: integer
+          example: 99
+    responses:
+      200:
+        description: Success
+        content: 
+          application/json:
+            schema:
+              type: object
+              $ref: '../components.yaml#/Grade'
+      403:
+        description: "The current user does not have the rights to access this resource."
+        
+  # PUT
+  put:
+    tags:
+      - Student::Grades
+    summary: "Modify a grade"
+    description: "Modify the student's grade identified by {grade_id}"
+    parameters:
+      - name: student_id
+        in: path
+        required: true
+        description: The id of the student account
+        schema:
+          type: integer
+          example: 42
+      - name: grade_id
+        in: path
+        required: true
+        description: The id of the grade
+        schema:
+          type: integer
+          example: 99
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '../components.yaml#/Grade'
+    responses:
+      200:
+        description: "Student grade correctly modified"
+        content: 
+          application/json:
+            schema:
+              type: object
+              $ref: '../components.yaml#/Grade'
+      403:
+        description: "The current user does not have the rights to modify this resource"
+
+  # DELETE
+  delete:
+    tags:
+      - Student::Grades
+    summary: "Deletes a grade"
+    description: "Deletes the grade identified by {grade_id}"
+    parameters:
+      - name: student_id
+        in: path
+        required: true
+        description: "The id of the student account"
+        schema:
+          type: integer
+          example: 42
+      - name: grade_id
+        in: path
+        required: true
+        description: "The id of the grade"
+        schema:
+          type: integer
+          example: 99
+    responses:
+      200:
+        description: "Successfully deleted the grade"
+      400:
+        description: "Invalid student_id or grade_id supplied"
+      403:
+        description: "The current user does not have the rights to delete this resource"
+      404:
+        description: "Grade not found"

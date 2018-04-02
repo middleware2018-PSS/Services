@@ -1,11 +1,11 @@
-### /parents
-parents:
+### /teachers
+teachers:
   # GET
   get:
     tags:
-      - Parents
-    summary: "Return the list of parents (paginated)"
-    description: "Obtain the list of parents from the school database.
+      - Teachers
+    summary: "Return the list of teachers (paginated)"
+    description: "Obtain the list of teachers from the school database.
     Only the administrators can get the full list"
     parameters:
       - name: limit
@@ -20,7 +20,7 @@ parents:
 
       - name: offset
         in: query
-        description: Parent account number to start at
+        description: Teacher account number to start at
         schema:
           type: integer
           example: 0
@@ -28,49 +28,49 @@ parents:
 
     responses:
       200:
-        description: Successful pull of parents info
+        description: Successful pull of teacher info
         content:
           application/json:
             schema:
-              $ref: '../components.yaml#/Parents'
+              $ref: '../components.yaml#/Teachers'
       403:
         description: "The current user does not have the rights to access this resource.
-        Only administrators can get the list of all parents"
+        Only administrators can get the list of all teachers"
 
   # POST
   post:
     tags:
-      - Parents
-    summary: "Creates a parent account"
-    description: "Creates a new parent account in the database"
+      - Teachers
+    summary: "Creates a teacher account"
+    description: "Creates a new teacher account in the database"
     requestBody:
       required: true
       content:
         application/json:
           schema:
             type: object
-            $ref: '../components.yaml#/Parent'
+            $ref: '../components.yaml#/Teacher'
     responses:
       200:
-        description: "Successfully created a new parent account"
+        description: "Successfully created a new teacher account"
       403:
         description: "The current user does not have the rights to create this resource.
         Only administrators can create new accounts"
 
 
-### /parents/{parent_id}
-parent:
+### /teachers/{teacher_id}
+teacher:
   # GET
   get:
     tags:
-      - Parents
-    summary: "Returns a parent account"
-    description: "Returns the parent account identified by parent_id"
+      - Teachers
+    summary: "Returns a teacher account"
+    description: "Returns the teacher account identified by teacher_id"
     parameters:
-      - name: parent_id
+      - name: teacher_id
         in: path
         required: true
-        description: "The id of the parent account"
+        description: "The id of the teacher account"
         schema:
           type: integer
           example: 42
@@ -81,7 +81,7 @@ parent:
           application/json:
             schema:
               type: object
-              $ref: '../components.yaml#/Parent'
+              $ref: '../components.yaml#/Teacher'
       403:
         description: "The current user does not have the rights to create this resource.
         Only administrators can create new accounts"
@@ -89,14 +89,14 @@ parent:
   # PUT
   put:
     tags:
-      - Parents
-    summary: "Modify a parent account"
-    description: "Modify the parent account identified by {parent_id}"
+      - Teachers
+    summary: "Modify a teacher account"
+    description: "Modify the teacher account identified by {teacher_id}"
     parameters:
-      - name: parent_id
+      - name: teacher_id
         in: path
         required: true
-        description: The id of the parent account
+        description: The id of the teacher account
         schema:
           type: integer
           example: 42
@@ -106,39 +106,39 @@ parent:
         application/json:
           schema:
             type: object
-            $ref: '../components.yaml#/Parent'
+            $ref: '../components.yaml#/Teacher'
     responses:
       200:
-        description: "Parent account correctly modified"
+        description: "Teacher account correctly modified"
         content: 
           application/json:
             schema:
               type: object
-              $ref: '../components.yaml#/Parent'
+              $ref: '../components.yaml#/Teacher'
       403:
         description: "The current user does not have the rights to modify this resource"
 
   # DELETE
   delete:
     tags:
-      - Parents
-    summary: "Deletes a parent account"
-    description: "Deletes the parent account identified by parent_id"
+      - Teachers
+    summary: "Deletes a teacher account"
+    description: "Deletes the teacher account identified by teacher_id"
     parameters:
-      - name: parent_id
+      - name: teacher_id
         in: path
         required: true
-        description: The id of the parent account
+        description: The id of the teacher account
         schema:
           type: integer
           example: 42
     responses:
       200:
-        description: "Successfully deleted the parent account"
+        description: "Successfully deleted the teacher account"
       400:
-        description: "Invalid parent_id supplied"
+        description: "Invalid teacher_id supplied"
       403:
         description: "The current user does not have the rights to delete this resource.
-        Only administrators can delete parent accounts"
+        Only administrators can delete teacher accounts"
       404:
-        description: "Parent account not found"
+        description: "Teacher account not found"

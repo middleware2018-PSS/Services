@@ -1,0 +1,151 @@
+### /students/{student_id}/payments
+student-payments:
+  # GET
+  get:
+    tags:
+      - Student::Payments
+    summary: "List of monthly payments"
+    description: "Returns the list of monthly payments assigned to a student"
+    parameters:
+      - name: student_id
+        in: path
+        required: true
+        description: The id of the student account
+        schema:
+          type: integer
+          example: 42
+    responses:
+      200:
+        description: Success
+        content: 
+          application/json:
+            schema:
+              $ref: '../components.yaml#/Payments'
+      403:
+        description: "The current user does not have the rights to access this resource."
+
+  # POST
+  post:
+    tags:
+      - Student::Payments
+    summary: "Creates a payment"
+    description: "Creates a new payment entry for a student identified by student_id"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '../components.yaml#/Payment'
+    responses:
+      200:
+        description: "Successfully created a new payment entry"
+      403:
+        description: "The current user does not have the rights to create this resource.
+        Only administrators can add payments"
+
+
+### /students/{student_id}/payments/{payment_id}
+student-payment:
+  # GET
+  get:
+    tags:
+      - Student::Payments
+    summary: "Single payment assigned to a student"
+    description: "Retruns a monthly payment assigned to the student
+    identified by student_id"
+    parameters:
+      - name: student_id
+        in: path
+        required: true
+        description: The id of the student account
+        schema:
+          type: integer
+          example: 42
+      - name: payment_id
+        in: path
+        required: true
+        description: The id of the payment
+        schema:
+          type: integer
+          example: 99
+    responses:
+      200:
+        description: Success
+        content: 
+          application/json:
+            schema:
+              type: object
+              $ref: '../components.yaml#/Payment'
+      403:
+        description: "The current user does not have the rights to access this resource."
+        
+  # PUT
+  put:
+    tags:
+      - Student::Payments
+    summary: "Modify a payment"
+    description: "Modify the student's payment identified by {payment_id}"
+    parameters:
+      - name: student_id
+        in: path
+        required: true
+        description: The id of the student account
+        schema:
+          type: integer
+          example: 42
+      - name: payment_id
+        in: path
+        required: true
+        description: The id of the payment
+        schema:
+          type: integer
+          example: 99
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '../components.yaml#/Payment'
+    responses:
+      200:
+        description: "Student payment correctly modified"
+        content: 
+          application/json:
+            schema:
+              type: object
+              $ref: '../components.yaml#/Payment'
+      403:
+        description: "The current user does not have the rights to modify this resource"
+
+  # DELETE
+  delete:
+    tags:
+      - Student::Payments
+    summary: "Deletes a payment"
+    description: "Deletes the payment identified by {payment_id}"
+    parameters:
+      - name: student_id
+        in: path
+        required: true
+        description: "The id of the student account"
+        schema:
+          type: integer
+          example: 42
+      - name: payment_id
+        in: path
+        required: true
+        description: "The id of the payment"
+        schema:
+          type: integer
+          example: 99
+    responses:
+      200:
+        description: "Successfully deleted the payment"
+      400:
+        description: "Invalid student_id or payment_id supplied"
+      403:
+        description: "The current user does not have the rights to delete this resource"
+      404:
+        description: "Payment not found"

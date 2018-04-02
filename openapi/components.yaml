@@ -42,6 +42,31 @@ Parents:
   items:
     $ref: '#/Parent'
 
+Teacher:
+  description: Model containing Teacher info
+  properties:
+    id:
+      type: integer
+      example: 42
+    name:
+      type: string
+      example: Alice
+    surname:
+      type: string
+      example: Brown
+    mail:
+      type: string
+      example: alice.brown@example.com
+    info:
+      type: string
+      example: Foo Bar
+
+Teachers:
+  description: Array of teachers
+  type: array
+  items:
+    $ref: '#/Teachers'
+
 Appointment:
   description: Model containing Appointment info
   properties:
@@ -65,21 +90,58 @@ Appointments:
   items:
     $ref: '#/Appointment'
 
-Teacher:
-  description: Model containing Teacher info
+Grade:
+  description: Model for grade entries
   properties:
     id:
       type: integer
       example: 42
-    name:
-      type: string
-      example: Alice
-    surname:
-      type: string
-      example: Brown
-    mail:
-      type: string
-      example: alice.brown@example.com
-    info:
-      type: string
-      example: Foo Bar
+    student_id:
+      type: integer
+      example: 42
+    subject_id:
+      type: integer
+      example: 42
+    class_id:
+      type: integer
+      example: 42
+    grade:
+        type: integer
+        example: 8
+
+Grades:
+  description: Array of grades
+  type: array
+  items:
+    $ref: '#/Grade'
+
+Payment:
+  description: Model for payments
+  properties:
+    id:
+      type: integer
+      example: 42
+    student_id:
+      type: integer
+      example: 42
+    amount:
+      type: integer
+      example: 1500
+    payed:
+      type: boolean
+      example: false
+    emitted:
+        type: string
+        example: '01/01/2018'
+    due_date:
+        type: string
+        example: '31/01/2018'
+    reason:
+        type: string
+        example: 'Monthly fee for January 2018'
+
+Payments:
+  description: Array of payments
+  type: array
+  items:
+    $ref: '#/Payment'

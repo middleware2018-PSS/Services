@@ -1,9 +1,9 @@
 ### /parents/{parent_id}/appointments
-parents_by_id-appointments:
+parent-appointments:
   # GET
   get:
     tags:
-      - parents/appointments
+      - Parent::Appointments
     summary: "Returns the list of appointments of {parent_id}"
     description: "Returns the list of students that are scheduled or
     waiting for approval for {parent_id}"
@@ -28,7 +28,7 @@ parents_by_id-appointments:
   # POST
   post:
     tags:
-      - parents/appointments
+      - Parent::Appointments
     summary: "Creates a new appointment"
     description: "Creates a new appointment request for {parent_id}"
     requestBody:
@@ -46,11 +46,11 @@ parents_by_id-appointments:
 
 
 ### /parents/{parent_id}/appointments/{appointment_id}
-parents_by_id-appointments_by_id:
+parent-appointment:
   # GET
   get:
     tags:
-      - parents/appointments
+      - Parent::Appointments
     summary: "Returns a specific appointment of {parent_id}"
     description: "Returns the appointment identified by {appointment_id}
     from the list of appointments of {parent_id}"
@@ -83,7 +83,7 @@ parents_by_id-appointments_by_id:
   # PUT
   put:
     tags:
-      - parents/appointments
+      - Parent::Appointments
     summary: "Modify the appointment identified by {appointment_id}"
     description: "Modify attributes of the appointment identified by {appointment_id}"
     parameters:
@@ -122,7 +122,7 @@ parents_by_id-appointments_by_id:
   # DELETE
   delete:
     tags:
-      - parents/appointments
+      - Parent::Appointments
     summary: "Deletes an appointment request"
     description: "Deletes the appointment request identified
     by {appointment_id} from the list of appointments of {parent_id}"

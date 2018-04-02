@@ -21,25 +21,63 @@ paths:
   /students:
     $ref: 'paths/students.yaml#/students'
   /students/{student_id}:
-    $ref: 'paths/students.yaml#/students_by_id'
+    $ref: 'paths/students.yaml#/student'
+
+### STUDENT::GRADES
+  /students/{student_id}/grades:
+    $ref: 'paths/student_grades.yaml#/student-grades'
+  /students/{student_id}/grades/{grade_id}:
+    $ref: 'paths/student_grades.yaml#/student-grade'
+
+### STUDENT::PAYMENTS
+  /students/{student_id}/payments:
+    $ref: 'paths/student_payments.yaml#/student-payments'
+  /students/{student_id}/payments/{payment_id}:
+    $ref: 'paths/student_payments.yaml#/student-payment'
 
 ### PARENTS
   /parents:
     $ref: 'paths/parents.yaml#/parents'
   /parents/{parent_id}:
-    $ref: 'paths/parents.yaml#/parents_by_id'
+    $ref: 'paths/parents.yaml#/parent'
 
-### PARENTS/STUDENTS
+### PARENT::STUDENTS
   /parents/{parent_id}/students:
-    $ref: 'paths/parents_students.yaml#/parents_by_id-students'
+    $ref: 'paths/parent_students.yaml#/parent-students'
   /parents/{parent_id}/students/{student_id}:
-    $ref: 'paths/parents_students.yaml#/parents_by_id-students_by_id'
+    $ref: 'paths/parent_students.yaml#/parent-student'
 
-### PARENTS/APPOINTMENTS
+### PARENT::APPOINTMENTS
   /parents/{parent_id}/appointments:
-    $ref: 'paths/parents_appointments.yaml#/parents_by_id-appointments'
+    $ref: 'paths/parent_appointments.yaml#/parent-appointments'
   /parents/{parent_id}/appointments/{appointments_id}:
-    $ref: 'paths/parents_appointments.yaml#/parents_by_id-appointments_by_id'
+    $ref: 'paths/parent_appointments.yaml#/parent-appointment'
+
+### TEACHERS
+  /teachers:
+    $ref: 'paths/teachers.yaml#/teachers'
+  /teachers/{teacher_id}:
+    $ref: 'paths/teachers.yaml#/teacher'
+
+  #/teacher/classes:
+    #$ref: 'paths/teacher_classes.yaml#/teacher-classes'
+  #/teacher/classes/{class_id}:
+    #$ref: 'paths/teacher_classes.yaml#/teacher-class'
+
+  #/teacher/classes/{class_id}/sutends:
+    #$ref: 'paths/teacher_students.yaml#/teacher-students'
+  #/teacher/classes/{class_id}/sutends/{student_id}:
+    #$ref: 'paths/teacher_students.yaml#/teacher-student'
+
+  #/teacher/classes/{class_id}/arguments:
+    #$ref: 'paths/teacher_arguments.yaml#/teacher-arguments'
+  #/teacher/classes/{class_id}/arguments/{argument_id}:
+    #$ref: 'paths/teacher_arguments.yaml#/teacher-argument'
+
+  #/teacher/classes/{class_id}/lessons:
+    #$ref: 'paths/teacher_lessons.yaml#/teacher-lessons'
+  #/teacher/classes/{class_id}/lessons/{lesson_id}:
+    #$ref: 'paths/teacher_lessons.yaml#/teacher-lesson'
 
 #########################################################################################
 #                                      COMPONENTS                                       #
