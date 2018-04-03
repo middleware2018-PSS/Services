@@ -59,25 +59,29 @@ paths:
   /teachers/{teacher_id}:
     $ref: 'paths/teachers.yaml#/teacher'
 
-  #/teacher/classes:
-    #$ref: 'paths/teacher_classes.yaml#/teacher-classes'
-  #/teacher/classes/{class_id}:
-    #$ref: 'paths/teacher_classes.yaml#/teacher-class'
+### TEACHER::CLASSES
+  /teacher/{teacher_id}/classes:
+    $ref: 'paths/teacher_classes.yaml#/teacher-classes'
+  /teacher/{teacher_id}/classes/{class_id}:
+    $ref: 'paths/teacher_classes.yaml#/teacher-class'
+  /teacher/{teacher_id}/classes/{class_id}/students:
+    $ref: 'paths/teacher_classes.yaml#/teacher-students'
+  /teacher/{teacher_id}/classes/{class_id}/subjects:
+    $ref: 'paths/teacher_classes.yaml#/teacher-subjects'
+  /teacher/{teacher_id}/classes/{class_id}/timetable:
+    $ref: 'paths/teacher_classes.yaml#/teacher-timetable'
 
-  #/teacher/classes/{class_id}/sutends:
-    #$ref: 'paths/teacher_students.yaml#/teacher-students'
-  #/teacher/classes/{class_id}/sutends/{student_id}:
-    #$ref: 'paths/teacher_students.yaml#/teacher-student'
+### TEACHER::APPOINTMENTS
+  /teachers/{teacher_id}/appointments:
+    $ref: 'paths/teacher_appointments.yaml#/teacher-appointments'
+  /teachers/{teacher_id}/appointments/{appointments_id}:
+    $ref: 'paths/teacher_appointments.yaml#/teacher-appointment'
 
-  #/teacher/classes/{class_id}/arguments:
-    #$ref: 'paths/teacher_arguments.yaml#/teacher-arguments'
-  #/teacher/classes/{class_id}/arguments/{argument_id}:
-    #$ref: 'paths/teacher_arguments.yaml#/teacher-argument'
-
-  #/teacher/classes/{class_id}/lessons:
-    #$ref: 'paths/teacher_lessons.yaml#/teacher-lessons'
-  #/teacher/classes/{class_id}/lessons/{lesson_id}:
-    #$ref: 'paths/teacher_lessons.yaml#/teacher-lesson'
+### CLASSES
+  /classes:
+    $ref: 'paths/classes.yaml#/classes'
+  /classes/{class_id}:
+    $ref: 'paths/classes.yaml#/class'
 
 #########################################################################################
 #                                      COMPONENTS                                       #

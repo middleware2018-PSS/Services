@@ -22,7 +22,7 @@ student-payments:
             schema:
               $ref: '../components.yaml#/Payments'
       403:
-        description: "The current user does not have the rights to access this resource."
+        description: "The current user does not have the rights to access this resource"
 
   # POST
   post:
@@ -78,7 +78,7 @@ student-payment:
               type: object
               $ref: '../components.yaml#/Payment'
       403:
-        description: "The current user does not have the rights to access this resource."
+        description: "The current user does not have the rights to access this resource"
         
   # PUT
   put:

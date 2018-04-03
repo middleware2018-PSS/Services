@@ -1,17 +1,17 @@
-### /parents/{parent_id}/appointments
-parent-appointments:
+### /teachers/{teacher_id}/appointments
+teacher-appointments:
   # GET
   get:
     tags:
-      - Parent::Appointments
-    summary: "Returns the list of appointments of {parent_id}"
+      - Teacher::Appointments
+    summary: "Returns the list of appointments of {teacher_id}"
     description: "Returns the list of appointments that are scheduled or
-    waiting for approval for {parent_id}"
+    waiting for approval for {teacher_id}"
     parameters:
-      - name: parent_id
+      - name: teacher_id
         in: path
         required: true
-        description: The id of the parent account
+        description: The id of the teacher account
         schema:
           type: integer
           example: 42
@@ -28,9 +28,9 @@ parent-appointments:
   # POST
   post:
     tags:
-      - Parent::Appointments
+      - Teacher::Appointments
     summary: "Creates a new appointment"
-    description: "Creates a new appointment request for {parent_id}"
+    description: "Creates a new appointment request for {teacher_id}"
     requestBody:
       required: true
       content:
@@ -45,20 +45,20 @@ parent-appointments:
         description: "The current user does not have the rights to create this resource"
 
 
-### /parents/{parent_id}/appointments/{appointment_id}
-parent-appointment:
+### /teachers/{teacher_id}/appointments/{appointment_id}
+teacher-appointment:
   # GET
   get:
     tags:
-      - Parent::Appointments
-    summary: "Returns a specific appointment of {parent_id}"
+      - Teacher::Appointments
+    summary: "Returns a specific appointment of {teacher_id}"
     description: "Returns the appointment identified by {appointment_id}
-    from the list of appointments of {parent_id}"
+    from the list of appointments of {teacher_id}"
     parameters:
-      - name: parent_id
+      - name: teacher_id
         in: path
         required: true
-        description: "The id of the parent account"
+        description: "The id of the teacher account"
         schema:
           type: integer
           example: 42
@@ -83,14 +83,14 @@ parent-appointment:
   # PUT
   put:
     tags:
-      - Parent::Appointments
+      - Teacher::Appointments
     summary: "Modify the appointment identified by {appointment_id}"
     description: "Modify attributes of the appointment identified by {appointment_id}"
     parameters:
-      - name: parent_id
+      - name: teacher_id
         in: path
         required: true
-        description: "The id of the parent account"
+        description: "The id of the teacher account"
         schema:
           type: integer
           example: 42
@@ -122,15 +122,15 @@ parent-appointment:
   # DELETE
   delete:
     tags:
-      - Parent::Appointments
+      - Teacher::Appointments
     summary: "Deletes an appointment request"
     description: "Deletes the appointment request identified
-    by {appointment_id} from the list of appointments of {parent_id}"
+    by {appointment_id} from the list of appointments of {teacher_id}"
     parameters:
-      - name: parent_id
+      - name: teacher_id
         in: path
         required: true
-        description: "The id of the parent account"
+        description: "The id of the teacher account"
         schema:
           type: integer
           example: 42
@@ -145,7 +145,7 @@ parent-appointment:
       200:
         description: "Successfully deleted the appointment request"
       400:
-        description: "Invalid parent_id or appointment_id supplied"
+        description: "Invalid teacher_id or appointment_id supplied"
       403:
         description: "The current user does not have the rights to delete this resource"
       404:

@@ -23,7 +23,7 @@ parent-students:
             schema:
               $ref: '../components.yaml#/Students'
       403:
-        description: "The current user does not have the rights to access this resource."
+        description: "The current user does not have the rights to access this resource"
 
   # POST
   post:
@@ -79,7 +79,7 @@ parent-student:
               type: object
               $ref: '../components.yaml#/Student'
       403:
-        description: "The current user does not have the rights to access this resource."
+        description: "The current user does not have the rights to access this resource"
         
   # PUT
   put:
@@ -149,6 +149,6 @@ parent-student:
       400:
         description: "Invalid parent_id or student_id supplied"
       403:
-        description: "The current user does not have the rights to delete this resource."
+        description: "The current user does not have the rights to delete this resource"
       404:
         description: "Student account not found"

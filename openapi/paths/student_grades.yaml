@@ -23,7 +23,7 @@ student-grades:
             schema:
               $ref: '../components.yaml#/Grades'
       403:
-        description: "The current user does not have the rights to access this resource."
+        description: "The current user does not have the rights to access this resource"
 
   # POST
   post:
@@ -78,7 +78,7 @@ student-grade:
               type: object
               $ref: '../components.yaml#/Grade'
       403:
-        description: "The current user does not have the rights to access this resource."
+        description: "The current user does not have the rights to access this resource"
         
   # PUT
   put:

@@ -67,28 +67,43 @@ Teachers:
   items:
     $ref: '#/Teachers'
 
-Appointment:
-  description: Model containing Appointment info
+Class:
+  description: Model for a class
   properties:
     id:
       type: integer
       example: 42
-    date:
+    year:
+      type: integer
+      example: 2018
+    section:
       type: string
-      example: '01/01/2018'
-    student:
-      $ref: '#/Student'
-    teacher:
-      $ref: '#/Teacher'
-    status:
+      example: '3A'
+    info:
       type: string
-      example: Waiting for confirmation
+      example: "General info"
 
-Appointments:
-  description: Array of appointments
+Classes:
+  description: Array of classes
   type: array
   items:
-    $ref: '#/Appointment'
+    $ref: '#/Class'
+
+Subject:
+  description: Model for a subject
+  properties:
+    id:
+      type: integer
+      example: 42
+    name:
+      type: string
+      example: 'Math'
+
+Subjects:
+  description: Array of subjects
+  type: array
+  items:
+    $ref: '#/Subject'
 
 Grade:
   description: Model for grade entries
@@ -114,6 +129,54 @@ Grades:
   type: array
   items:
     $ref: '#/Grade'
+
+Timetable:
+  description: Model for a timetable
+  properties:
+    id:
+      type: integer
+      example: 42
+    class_id:
+      type: integer
+      example: 42
+    subject_id:
+      type: integer
+      example: 42
+    location:
+      type: string
+      example: "TBD"
+    date:
+      type: integer
+      example: 42
+    start:
+      type: integer
+      example: 42
+    end:
+      type: integer
+      example: 42
+
+Appointment:
+  description: Model containing Appointment info
+  properties:
+    id:
+      type: integer
+      example: 42
+    date:
+      type: string
+      example: '01/01/2018'
+    student:
+      $ref: '#/Student'
+    teacher:
+      $ref: '#/Teacher'
+    status:
+      type: string
+      example: Waiting for confirmation
+
+Appointments:
+  description: Array of appointments
+  type: array
+  items:
+    $ref: '#/Appointment'
 
 Payment:
   description: Model for payments
