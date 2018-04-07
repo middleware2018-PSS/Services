@@ -1,19 +1,11 @@
-### /students/{student_id}/payments
-student-payments:
+### /payments
+payments:
   # GET
   get:
     tags:
-      - Student::Payments
+      - Payments
     summary: "List of monthly payments"
-    description: "Returns the list of monthly payments assigned to a student"
-    parameters:
-      - name: student_id
-        in: path
-        required: true
-        description: The id of the student account
-        schema:
-          type: integer
-          example: 42
+    description: "Returns the list of monthly payments"
     responses:
       200:
         description: Success
@@ -27,9 +19,9 @@ student-payments:
   # POST
   post:
     tags:
-      - Student::Payments
+      - Payments
     summary: "Creates a payment"
-    description: "Creates a new payment entry for a student identified by student_id"
+    description: "Creates a new payment entry"
     requestBody:
       required: true
       content:
@@ -45,30 +37,22 @@ student-payments:
         Only administrators can add payments"
 
 
-### /students/{student_id}/payments/{payment_id}
-student-payment:
+### /payments/{payment_id}
+payment:
   # GET
   get:
     tags:
-      - Student::Payments
-    summary: "Single payment assigned to a student"
-    description: "Retruns a monthly payment assigned to the student
-    identified by student_id"
+      - Payments
+    summary: "Returna a single payment"
+    description: "Retruns a monthly payment assigned to a student"
     parameters:
-      - name: student_id
-        in: path
-        required: true
-        description: The id of the student account
-        schema:
-          type: integer
-          example: 42
       - name: payment_id
         in: path
         required: true
         description: The id of the payment
         schema:
           type: integer
-          example: 99
+          example: 42
     responses:
       200:
         description: Success
@@ -83,24 +67,17 @@ student-payment:
   # PUT
   put:
     tags:
-      - Student::Payments
+      - Payments
     summary: "Modify a payment"
     description: "Modify the student's payment identified by {payment_id}"
     parameters:
-      - name: student_id
-        in: path
-        required: true
-        description: The id of the student account
-        schema:
-          type: integer
-          example: 42
       - name: payment_id
         in: path
         required: true
         description: The id of the payment
         schema:
           type: integer
-          example: 99
+          example: 42
     requestBody:
       required: true
       content:
@@ -122,29 +99,22 @@ student-payment:
   # DELETE
   delete:
     tags:
-      - Student::Payments
+      - Payments
     summary: "Deletes a payment"
     description: "Deletes the payment identified by {payment_id}"
     parameters:
-      - name: student_id
-        in: path
-        required: true
-        description: "The id of the student account"
-        schema:
-          type: integer
-          example: 42
       - name: payment_id
         in: path
         required: true
         description: "The id of the payment"
         schema:
           type: integer
-          example: 99
+          example: 42
     responses:
       200:
         description: "Successfully deleted the payment"
       400:
-        description: "Invalid student_id or payment_id supplied"
+        description: "Invalid payment_id supplied"
       403:
         description: "The current user does not have the rights to delete this resource"
       404:

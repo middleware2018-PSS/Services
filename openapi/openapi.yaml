@@ -23,35 +23,11 @@ paths:
   /students/{student_id}:
     $ref: 'paths/students.yaml#/student'
 
-### STUDENT::GRADES
-  /students/{student_id}/grades:
-    $ref: 'paths/student_grades.yaml#/student-grades'
-  /students/{student_id}/grades/{grade_id}:
-    $ref: 'paths/student_grades.yaml#/student-grade'
-
-### STUDENT::PAYMENTS
-  /students/{student_id}/payments:
-    $ref: 'paths/student_payments.yaml#/student-payments'
-  /students/{student_id}/payments/{payment_id}:
-    $ref: 'paths/student_payments.yaml#/student-payment'
-
 ### PARENTS
   /parents:
     $ref: 'paths/parents.yaml#/parents'
   /parents/{parent_id}:
     $ref: 'paths/parents.yaml#/parent'
-
-### PARENT::STUDENTS
-  /parents/{parent_id}/students:
-    $ref: 'paths/parent_students.yaml#/parent-students'
-  /parents/{parent_id}/students/{student_id}:
-    $ref: 'paths/parent_students.yaml#/parent-student'
-
-### PARENT::APPOINTMENTS
-  /parents/{parent_id}/appointments:
-    $ref: 'paths/parent_appointments.yaml#/parent-appointments'
-  /parents/{parent_id}/appointments/{appointments_id}:
-    $ref: 'paths/parent_appointments.yaml#/parent-appointment'
 
 ### TEACHERS
   /teachers:
@@ -59,29 +35,42 @@ paths:
   /teachers/{teacher_id}:
     $ref: 'paths/teachers.yaml#/teacher'
 
-### TEACHER::CLASSES
-  /teacher/{teacher_id}/classes:
-    $ref: 'paths/teacher_classes.yaml#/teacher-classes'
-  /teacher/{teacher_id}/classes/{class_id}:
-    $ref: 'paths/teacher_classes.yaml#/teacher-class'
-  /teacher/{teacher_id}/classes/{class_id}/students:
-    $ref: 'paths/teacher_classes.yaml#/teacher-students'
-  /teacher/{teacher_id}/classes/{class_id}/subjects:
-    $ref: 'paths/teacher_classes.yaml#/teacher-subjects'
-  /teacher/{teacher_id}/classes/{class_id}/timetable:
-    $ref: 'paths/teacher_classes.yaml#/teacher-timetable'
-
-### TEACHER::APPOINTMENTS
-  /teachers/{teacher_id}/appointments:
-    $ref: 'paths/teacher_appointments.yaml#/teacher-appointments'
-  /teachers/{teacher_id}/appointments/{appointments_id}:
-    $ref: 'paths/teacher_appointments.yaml#/teacher-appointment'
-
 ### CLASSES
   /classes:
     $ref: 'paths/classes.yaml#/classes'
   /classes/{class_id}:
     $ref: 'paths/classes.yaml#/class'
+
+### SUBJECTS
+  /subjects:
+    $ref: 'paths/subjects.yaml#/subjects'
+  /subjects/{subject_id}:
+    $ref: 'paths/subjects.yaml#/subject'
+
+### TIMETABLES
+  /timetables:
+    $ref: 'paths/timetables.yaml#/timetables'
+  /timetables/{timetable_id}:
+    $ref: 'paths/timetables.yaml#/timetable'
+
+### GRADES
+  /grades:
+    $ref: 'paths/grades.yaml#/grades'
+  /grades/{grade_id}:
+    $ref: 'paths/grades.yaml#/grade'
+
+### PAYMENTS
+  /payments:
+    $ref: 'paths/payments.yaml#/payments'
+  /payments/{payment_id}:
+    $ref: 'paths/payments.yaml#/payment'
+
+### APPOINTMENTS
+  /appointments:
+    $ref: 'paths/appointments.yaml#/appointments'
+  /appointments/{appointments_id}:
+    $ref: 'paths/appointments.yaml#/appointment'
+
 
 #########################################################################################
 #                                      COMPONENTS                                       #

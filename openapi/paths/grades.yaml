@@ -1,20 +1,11 @@
-### /students/{student_id}/grades
-student-grades:
+### /grades
+grades:
   # GET
   get:
     tags:
-      - Student::Grades
-    summary: "Grades obtained by a student"
-    description: "Returns the list of grades obained by a student
-    identified by {student_id}"
-    parameters:
-      - name: student_id
-        in: path
-        required: true
-        description: The id of the student account
-        schema:
-          type: integer
-          example: 42
+      - Grades
+    summary: "List of all grades"
+    description: "Returns the list of all grades"
     responses:
       200:
         description: Success
@@ -28,9 +19,9 @@ student-grades:
   # POST
   post:
     tags:
-      - Student::Grades
-    summary: "Creates a student grade"
-    description: "Creates a new grade entry for a student identified by student_id"
+      - Grades
+    summary: "Creates a new grade"
+    description: "Creates a new grade entry"
     requestBody:
       required: true
       content:
@@ -46,29 +37,22 @@ student-grades:
         Only administrators or teachers can add grades"
 
 
-### /students/{student_id}/grades/{grade_id}
-student-grade:
+### /grades/{grade_id}
+grade:
   # GET
   get:
     tags:
-      - Student::Grades
+      - Grades
     summary: "Grade obtained by a student"
-    description: "Retruns a single grade obtained by the student identified by student_id"
+    description: "Retruns a single grade obtained by a student"
     parameters:
-      - name: student_id
-        in: path
-        required: true
-        description: The id of the student account
-        schema:
-          type: integer
-          example: 42
       - name: grade_id
         in: path
         required: true
         description: The id of the grade
         schema:
           type: integer
-          example: 99
+          example: 42
     responses:
       200:
         description: Success
@@ -83,24 +67,17 @@ student-grade:
   # PUT
   put:
     tags:
-      - Student::Grades
+      - Grades
     summary: "Modify a grade"
     description: "Modify the student's grade identified by {grade_id}"
     parameters:
-      - name: student_id
-        in: path
-        required: true
-        description: The id of the student account
-        schema:
-          type: integer
-          example: 42
       - name: grade_id
         in: path
         required: true
         description: The id of the grade
         schema:
           type: integer
-          example: 99
+          example: 42
     requestBody:
       required: true
       content:
@@ -122,29 +99,22 @@ student-grade:
   # DELETE
   delete:
     tags:
-      - Student::Grades
+      - Grades
     summary: "Deletes a grade"
     description: "Deletes the grade identified by {grade_id}"
     parameters:
-      - name: student_id
-        in: path
-        required: true
-        description: "The id of the student account"
-        schema:
-          type: integer
-          example: 42
       - name: grade_id
         in: path
         required: true
         description: "The id of the grade"
         schema:
           type: integer
-          example: 99
+          example: 42
     responses:
       200:
         description: "Successfully deleted the grade"
       400:
-        description: "Invalid student_id or grade_id supplied"
+        description: "Invalid grade_id supplied"
       403:
         description: "The current user does not have the rights to delete this resource"
       404:

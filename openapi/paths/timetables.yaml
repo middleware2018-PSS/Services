@@ -1,0 +1,121 @@
+### /timetables
+timetables:
+  # GET
+  get:
+    tags:
+      - Timetables
+    summary: "List of timetables"
+    description: "Returns the list of timetables"
+    responses:
+      200:
+        description: Success
+        content: 
+          application/json:
+            schema:
+              $ref: '../components.yaml#/Timetables'
+      403:
+        description: "The current user does not have the rights to access this resource"
+
+  # POST
+  post:
+    tags:
+      - Timetables
+    summary: "Creates a new timetable"
+    description: "Creates a new timetable"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '../components.yaml#/Timetable'
+    responses:
+      200:
+        description: "Successfully created a new timetable entry"
+      403:
+        description: "The current user does not have the rights to create this resource.
+        Only administrators can add timetables"
+
+
+### /timetables/{timetable_id}
+timetable:
+  # GET
+  get:
+    tags:
+      - Timetables
+    summary: "Returna a single timetable"
+    description: "Retruns a single timetable"
+    parameters:
+      - name: timetable_id
+        in: path
+        required: true
+        description: The id of the timetable
+        schema:
+          type: integer
+          example: 42
+    responses:
+      200:
+        description: Success
+        content: 
+          application/json:
+            schema:
+              type: object
+              $ref: '../components.yaml#/Timetable'
+      403:
+        description: "The current user does not have the rights to access this resource"
+        
+  # PUT
+  put:
+    tags:
+      - Timetables
+    summary: "Modify a timetable"
+    description: "Modify the timetable identified by {timetable_id}"
+    parameters:
+      - name: timetable_id
+        in: path
+        required: true
+        description: The id of the timetable
+        schema:
+          type: integer
+          example: 42
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '../components.yaml#/Timetable'
+    responses:
+      200:
+        description: "Timetable correctly modified"
+        content: 
+          application/json:
+            schema:
+              type: object
+              $ref: '../components.yaml#/Timetable'
+      403:
+        description: "The current user does not have the rights to modify this resource"
+
+  # DELETE
+  delete:
+    tags:
+      - Timetables
+    summary: "Deletes a timetable"
+    description: "Deletes the timetable identified by {timetable_id}"
+    parameters:
+      - name: timetable_id
+        in: path
+        required: true
+        description: "The id of the timetable"
+        schema:
+          type: integer
+          example: 42
+    responses:
+      200:
+        description: "Successfully deleted the timetable"
+      400:
+        description: "Invalid timetable_id supplied"
+      403:
+        description: "The current user does not have the rights to delete this resource"
+      404:
+        description: "Timetable not found"

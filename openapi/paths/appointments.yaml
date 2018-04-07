@@ -1,20 +1,12 @@
-### /parents/{parent_id}/appointments
-parent-appointments:
+### /appointments
+appointments:
   # GET
   get:
     tags:
-      - Parent::Appointments
-    summary: "Returns the list of appointments of {parent_id}"
+      - Appointments
+    summary: "Returns the list of appointments"
     description: "Returns the list of appointments that are scheduled or
-    waiting for approval for {parent_id}"
-    parameters:
-      - name: parent_id
-        in: path
-        required: true
-        description: The id of the parent account
-        schema:
-          type: integer
-          example: 42
+    waiting for approval"
     responses:
       200:
         description: Success
@@ -28,9 +20,9 @@ parent-appointments:
   # POST
   post:
     tags:
-      - Parent::Appointments
+      - Appointments
     summary: "Creates a new appointment"
-    description: "Creates a new appointment request for {parent_id}"
+    description: "Creates a new appointment request"
     requestBody:
       required: true
       content:
@@ -45,30 +37,22 @@ parent-appointments:
         description: "The current user does not have the rights to create this resource"
 
 
-### /parents/{parent_id}/appointments/{appointment_id}
-parent-appointment:
+### /appointments/{appointment_id}
+appointment:
   # GET
   get:
     tags:
-      - Parent::Appointments
-    summary: "Returns a specific appointment of {parent_id}"
-    description: "Returns the appointment identified by {appointment_id}
-    from the list of appointments of {parent_id}"
+      - Appointments
+    summary: "Returns a specific appointment"
+    description: "Returns the appointment identified by {appointment_id}"
     parameters:
-      - name: parent_id
-        in: path
-        required: true
-        description: "The id of the parent account"
-        schema:
-          type: integer
-          example: 42
       - name: appointment_id
         in: path
         required: true
         description: "The id of the desired appointment"
         schema:
           type: integer
-          example: 99
+          example: 42
     responses:
       200:
         description: Success
@@ -83,24 +67,17 @@ parent-appointment:
   # PUT
   put:
     tags:
-      - Parent::Appointments
+      - Appointments
     summary: "Modify the appointment identified by {appointment_id}"
     description: "Modify attributes of the appointment identified by {appointment_id}"
     parameters:
-      - name: parent_id
-        in: path
-        required: true
-        description: "The id of the parent account"
-        schema:
-          type: integer
-          example: 42
       - name: appointment_id
         in: path
         required: true
         description: "The id of the desired appointment"
         schema:
           type: integer
-          example: 99
+          example: 42
     requestBody:
       required: true
       content:
@@ -122,18 +99,10 @@ parent-appointment:
   # DELETE
   delete:
     tags:
-      - Parent::Appointments
+      - Appointments
     summary: "Deletes an appointment request"
-    description: "Deletes the appointment request identified
-    by {appointment_id} from the list of appointments of {parent_id}"
+    description: "Deletes the appointment request identified by {appointment_id}"
     parameters:
-      - name: parent_id
-        in: path
-        required: true
-        description: "The id of the parent account"
-        schema:
-          type: integer
-          example: 42
       - name: appointment_id
         in: path
         required: true

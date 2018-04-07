@@ -1,0 +1,121 @@
+### /subjects
+subjects:
+  # GET
+  get:
+    tags:
+      - Subjects
+    summary: "List of subjects taught in class"
+    description: "Returns the list of subjects taught in class"
+    responses:
+      200:
+        description: Success
+        content: 
+          application/json:
+            schema:
+              $ref: '../components.yaml#/Subjects'
+      403:
+        description: "The current user does not have the rights to access this resource"
+
+  # POST
+  post:
+    tags:
+      - Subjects
+    summary: "Creates a new subject"
+    description: "Creates a new subject"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '../components.yaml#/Subject'
+    responses:
+      200:
+        description: "Successfully created a new subject entry"
+      403:
+        description: "The current user does not have the rights to create this resource.
+        Only administrators can add subjects"
+
+
+### /subjects/{subject_id}
+subject:
+  # GET
+  get:
+    tags:
+      - Subjects
+    summary: "Returna a single subject"
+    description: "Retruns a single subject"
+    parameters:
+      - name: subject_id
+        in: path
+        required: true
+        description: The id of the subject
+        schema:
+          type: integer
+          example: 42
+    responses:
+      200:
+        description: Success
+        content: 
+          application/json:
+            schema:
+              type: object
+              $ref: '../components.yaml#/Subject'
+      403:
+        description: "The current user does not have the rights to access this resource"
+        
+  # PUT
+  put:
+    tags:
+      - Subjects
+    summary: "Modify a subject"
+    description: "Modify the subject identified by {subject_id}"
+    parameters:
+      - name: subject_id
+        in: path
+        required: true
+        description: The id of the subject
+        schema:
+          type: integer
+          example: 42
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '../components.yaml#/Subject'
+    responses:
+      200:
+        description: "Subject correctly modified"
+        content: 
+          application/json:
+            schema:
+              type: object
+              $ref: '../components.yaml#/Subject'
+      403:
+        description: "The current user does not have the rights to modify this resource"
+
+  # DELETE
+  delete:
+    tags:
+      - Subjects
+    summary: "Deletes a subject"
+    description: "Deletes the subject identified by {subject_id}"
+    parameters:
+      - name: subject_id
+        in: path
+        required: true
+        description: "The id of the subject"
+        schema:
+          type: integer
+          example: 42
+    responses:
+      200:
+        description: "Successfully deleted the subject"
+      400:
+        description: "Invalid subject_id supplied"
+      403:
+        description: "The current user does not have the rights to delete this resource"
+      404:
+        description: "Subject not found"
