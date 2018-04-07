@@ -1,0 +1,24 @@
+### /login
+login:
+  # POST
+  post:
+    tags:
+      - Auth
+    summary: "User login"
+    description: "Allows the user to login and obtain an access token"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: user
+              password:
+                type: string
+                example: password
+    responses:
+      200:
+        description: "Successfully logged in"

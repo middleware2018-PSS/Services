@@ -17,6 +17,10 @@ servers:
 
 paths:
 
+### AUTH
+  /login:
+    $ref: 'paths/auth.yaml#/login'
+
 ### STUDENTS
   /students:
     $ref: 'paths/students.yaml#/students'
