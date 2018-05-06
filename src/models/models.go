@@ -65,6 +65,7 @@ type Teacher struct {
 type TimeTable struct {
 	Class    Class      `json:"class,omitempty"`
 	Location Location   `json:"location,omitempty"`
+	Subject Subject `json:"subject,omitempty"`
 	Date     *time.Time `json:"date,omitempty"`
 	Start    *time.Time `json:"start,omitempty"`
 	End      *time.Time `json:"end,omitempty"`

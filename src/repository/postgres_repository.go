@@ -17,16 +17,12 @@ func NewPostgresRepository(DB *sql.DB) *postgresRepository {
 func (r *postgresRepository) StudentById(id int) (student *models.Student) {
 
 	// get basic data
-
-	rows, err := r.Query(`SELECT id,	name, surname, mail 
-								FROM back2school.students WHERE id = $1`, id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
 	student = &models.Student{}
-	for rows.Next() {
-		rows.Scan(&student.ID, &student.Name, &student.Surname, &student.Mail)
+	err := r.QueryRow(`SELECT id,	name, surname, mail 
+								FROM back2school.students WHERE id = $1`, id).Scan(&student.ID,
+									&student.Name, &student.Surname, &student.Mail)
+	if err != nil {
+		log.Print(err)
 	}
 
 	// Payments
@@ -44,8 +40,14 @@ func (r *postgresRepository) StudentById(id int) (student *models.Student) {
 	student.Classes = r.ClassesByStudent(student.ID)
 
 	// Appointments
+	student.Appointments = r.AppointmentsByStudent(student.ID)
 
-	rows, err = r.Query(`SELECT id FROM back2school.appointments 
+	return student
+}
+
+func (r *postgresRepository) AppointmentsByStudent(id int64) (appointments []models.Appointment){
+
+	rows, err := r.Query(`SELECT id FROM back2school.appointments 
 								WHERE student = $1`, id)
 	if err != nil {
 		log.Fatal(err)
@@ -54,10 +56,24 @@ func (r *postgresRepository) StudentById(id int) (student *models.Student) {
 	for rows.Next() {
 		app := models.Appointment{}
 		rows.Scan(&app.ID)
-		student.Appointments = append(student.Appointments, app)
+		appointments = append(appointments, app)
 	}
+	return appointments
+}
 
-	return student
+func (r *postgresRepository) ClassesByStudent(id int64) (classes []models.Class) {
+	rows, err := r.Query(`SELECT class FROM back2school.enrolled
+			WHERE student = $1`, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		class := models.Class{}
+		rows.Scan(&class.ID)
+		classes = append(classes, class)
+	}
+	return classes
 }
 
 func (r *postgresRepository) NotificationsByStudent(id int64) (notifications []models.Notification) {
@@ -75,35 +91,17 @@ func (r *postgresRepository) NotificationsByStudent(id int64) (notifications []m
 	return notifications
 }
 
-func (r *postgresRepository) ClassesByStudent(id int64) (classes []models.Class) {
-	rows, err := r.Query(`SELECT class FROM back2school.enrolled 
-								WHERE student = $1`, id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		class := models.Class{}
-		rows.Scan(&class.ID)
-		classes = append(classes, class)
-	}
-	return classes
-}
-
 func (r *postgresRepository) ParentById(id int64) (parent *models.Parent) {
 
 	// get basic data
-
-	rows, err := r.Query(`SELECT id,	name, surname, mail 
-								FROM back2school.parents WHERE id = $1`, id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
 	parent = &models.Parent{}
-	for rows.Next() {
-		rows.Scan(&parent.ID, &parent.Name, &parent.Surname, &parent.Mail)
+
+	err := r.QueryRow(`SELECT id,	name, surname, mail 
+								FROM back2school.parents WHERE id = $1`, id).Scan(&parent.ID, &parent.Name, &parent.Surname, &parent.Mail)
+	if err != nil {
+		log.Print(err)
 	}
+
 
 	// Childrens
 	parent.ParentOf = r.ChildrenByParent(parent.ID)
@@ -215,3 +213,105 @@ func (r *postgresRepository) GradesByStudent(id int64) (grades []models.Grade) {
 	}
 	return grades
 }
+
+func (r *postgresRepository) TeacherByID(id int64) (teacher *models.Teacher, err error){
+
+	teacher = &models.Teacher{}
+
+	// general info
+
+	err = r.QueryRow(`SELECT id, name, surname, mail FROM back2school.teachers WHERE id = $1`,
+						id).Scan(&teacher.ID, &teacher.Name, &teacher.Surname, &teacher.Mail)
+	if err != nil {
+		log.Print(err)
+	}
+	if err == sql.ErrNoRows{
+		return nil, err
+	}
+
+	// Classes
+
+	teacher.Classes = r.ClassesByTeacher(teacher.ID)
+
+	// Appointments
+	teacher.Appointments = r.AppointmentsByTeacher(teacher.ID)
+
+	// Lectures
+	teacher.Lectures = r.LectureByTeacher(teacher.ID)
+
+	// Notifications
+	teacher.Notifications = r.NotificationsByTeacher(teacher.ID)
+
+	return teacher, nil
+
+}
+
+func (r *postgresRepository) LectureByTeacher(id int64) (lectures []models.TimeTable){
+	rows, err := r.Query(`SELECT class, subject, date from back2school.timetable natural join back2school.teaches as t
+								where t.teacher = $1`, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		lecture := models.TimeTable{}
+		rows.Scan(&lecture.Class, &lecture.Subject, &lecture.Date)
+		lectures = append(lectures, lecture)
+	}
+	return lectures
+}
+
+
+func (r *postgresRepository) ClassesByTeacher(id int64) (classes map[models.Subject][]models.Class){
+	classes = make(map[models.Subject][]models.Class)
+	rows, err := r.Query(`SELECT subject, class FROM back2school.teaches 
+								WHERE teacher = $1`, id)
+	if err != nil {
+		log.Print(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		class := models.Class{}
+		var subj models.Subject
+		rows.Scan(&subj,&class.ID)
+		classes[subj] = append(classes[subj],class)
+	}
+	return classes
+	}
+
+
+
+
+func (r *postgresRepository) AppointmentsByTeacher(id int64) (appointments []models.Appointment){
+
+	rows, err := r.Query(`SELECT id FROM back2school.appointments 
+								WHERE teacher = $1`, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		app := models.Appointment{}
+		rows.Scan(&app.ID)
+		appointments = append(appointments, app)
+	}
+	return appointments
+}
+
+
+func (r *postgresRepository) NotificationsByTeacher(id int64) (notifications []models.Notification) {
+	rows, err := r.Query(`SELECT id FROM back2school.Notification 
+								WHERE (receiver = $1 and receiver_kind = 'teacher') or receiver_kind = 'general'`, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		notif := models.Notification{}
+		rows.Scan(&notif.ID)
+		notifications = append(notifications, notif)
+	}
+	return notifications
+}
+
+

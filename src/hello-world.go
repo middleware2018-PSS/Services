@@ -17,17 +17,19 @@ func test_repository() {
 	}
 	defer db.Close()
 	repo := repository.NewPostgresRepository(db)
-	student := repo.StudentById(1)
-	s, _ := json.MarshalIndent(student, " ", "  ")
-	fmt.Printf("student : %s\n\n", s)
-	parent := repo.ParentById(3)
-	s, _ = json.MarshalIndent(parent, " ", "  ")
-	fmt.Printf("parent : %s\n\n", s)
+	pprint(repo.StudentById(1))
+	pprint(repo.ParentById(4))
+	t, _ := repo.TeacherByID(1)
+	pprint(t)
 
 
 
 }
 
+func pprint(smt interface{}){
+	s, _ := json.MarshalIndent(smt, " ", "  ")
+	fmt.Printf("%T : %s\n\n", smt, s)
+}
 func main() {
 	test_repository()
 
