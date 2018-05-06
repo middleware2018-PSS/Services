@@ -1,35 +1,29 @@
 package main
 
 import (
-	"github.com/middleware2018-PSS/Services/src/models"
-	"fmt"
-	"encoding/json"
-	"time"
-	"github.com/gobuffalo/pop"
+	_ "github.com/lib/pq"
+	"database/sql"
 	"log"
+	"github.com/middleware2018-PSS/Services/src/repository"
 )
 
-func main() {
-	student := models.Student{}
-	student.Payments = []models.Payment{{0, 100, true, time.Now(), ""}}
-	student.Appointments = []models.Appointment{
-		{
-			Time:time.Now(),
-			Location:"",
-			Teacher: models.Teacher{},
-		},
-	}
-	str, _ := json.MarshalIndent(student," ", "  ")
-	str2, _ := json.MarshalIndent(models.Teacher{}," ", "  ")
-	fmt.Printf("%s\n",str)
-	fmt.Printf("%s\n",str2)
-	fmt.Println(time.Now().Date())
-	db, err := pop.Connect("development")
+func test_repository(){
+	connStr := "user=postgres dbname=postgres sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 	defer db.Close()
-	fmt.Println(db.URL())
+	repo := repository.NewPostgresRepository(db)
+	repo.StudentById(1)
+	repo.ParentById(3)
+
+
+}
+
+
+func main() {
+	test_repository()
 
 }
 
