@@ -21,18 +21,18 @@ type Student struct {
 }
 
 type Grade struct {
-	Student	Student		`json:"student,omitempty"`
-	Subject Subject   `json:"subject,omitempty"`
+	Student Student    `json:"student,omitempty"`
+	Subject Subject    `json:"subject,omitempty"`
 	Date    *time.Time `json:"date,omitempty"`
-	Grade   int       `json:"grade,omitempty"`
+	Grade   int        `json:"grade,omitempty"`
 }
 
 type Appointment struct {
-	ID  int `json:"id,omitempty"`
+	ID       int        `json:"id,omitempty"`
 	Time     *time.Time `json:"time,omitempty"`
-	Location Location  `json:"location,omitempty"`
-	Student  Student   `json:"student,omitempty"`
-	Teacher  Teacher   `json:"student,omitempty"`
+	Location Location   `json:"location,omitempty"`
+	Student  Student    `json:"student,omitempty"`
+	Teacher  Teacher    `json:"student,omitempty"`
 }
 
 type Notification struct {
@@ -42,11 +42,13 @@ type Notification struct {
 }
 
 type Parent struct {
-	ID       int64     `json:"id,omitempty"`
-	Name     string    `json:"name,omitempty"`
-	Surname  string    `json:"surname,omitempty"`
-	Mail     string    `json:"mail,omitempty"`
-	ParentOf []Student `json:"ParentOf,omitempty"`
+	ID            int64          `json:"id,omitempty"`
+	Name          string         `json:"name,omitempty"`
+	Surname       string         `json:"surname,omitempty"`
+	Mail          string         `json:"mail,omitempty"`
+	ParentOf      []Student      `json:"ParentOf,omitempty"`
+	Payments      []Payment      `json:"payments,omitempty"`
+	Notifications []Notification `json:"notification,omitempty"`
 }
 
 type Teacher struct {
@@ -61,19 +63,19 @@ type Teacher struct {
 }
 
 type TimeTable struct {
-	Class    Class     `json:"class,omitempty"`
-	Location Location  `json:"location,omitempty"`
+	Class    Class      `json:"class,omitempty"`
+	Location Location   `json:"location,omitempty"`
 	Date     *time.Time `json:"date,omitempty"`
 	Start    *time.Time `json:"start,omitempty"`
 	End      *time.Time `json:"end,omitempty"`
 }
 
 type Payment struct {
-	ID      int64     `json:"id,omitempty"`
-	Amount  int64     `json:"amount,omitempty"`
-	Payed   bool      `json:"payed,omitempty"`
+	ID      int64      `json:"id,omitempty"`
+	Amount  int64      `json:"amount,omitempty"`
+	Payed   bool       `json:"payed,omitempty"`
 	Emitted *time.Time `json:"emitted,omitempty"`
-	Reason  string    `json:"reason,omitempty"`
+	Reason  string     `json:"reason,omitempty"`
 }
 
 type Class struct {
