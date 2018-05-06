@@ -21,12 +21,11 @@ func test_repository() {
 	pprint(repo.ParentById(4))
 	t, _ := repo.TeacherByID(1)
 	pprint(t)
-
-
+	pprint(repo.ClassesByID(2))
 
 }
 
-func pprint(smt interface{}){
+func pprint(smt interface{}) {
 	s, _ := json.MarshalIndent(smt, " ", "  ")
 	fmt.Printf("%T : %s\n\n", smt, s)
 }

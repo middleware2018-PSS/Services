@@ -36,9 +36,11 @@ type Appointment struct {
 }
 
 type Notification struct {
-	ID       int64  `json:"id,omitempty"`
-	Receiver int64  `json:"receiver,omitempty"`
-	Message  string `json:"message,omitempty"`
+	ID           int64     `json:"id,omitempty"`
+	Receiver     int64     `json:"receiver,omitempty"`
+	Time         time.Time `json:"time,omitempty"`
+	Message      string    `json:"message,omitempty"`
+	ReceiverKind string    `json:"receiver_kind,omitempty"`
 }
 
 type Parent struct {
@@ -65,7 +67,7 @@ type Teacher struct {
 type TimeTable struct {
 	Class    Class      `json:"class,omitempty"`
 	Location Location   `json:"location,omitempty"`
-	Subject Subject `json:"subject,omitempty"`
+	Subject  Subject    `json:"subject,omitempty"`
 	Date     *time.Time `json:"date,omitempty"`
 	Start    *time.Time `json:"start,omitempty"`
 	End      *time.Time `json:"end,omitempty"`

@@ -1,6 +1,0 @@
-development:
-  dialect: postgres
-  database: public
-  user: postgres
-  host: 127.0.0.1 
-  pool: 5
