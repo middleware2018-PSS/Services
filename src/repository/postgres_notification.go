@@ -10,7 +10,7 @@ func (r *postgresRepository) NotificationByID(id int64) (notifications []models.
 								FROM back2school.notification WHERE id = $1 `, id)
 	defer rows.Close()
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	for rows.Next() {
 		notification := &models.Notification{}

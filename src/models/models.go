@@ -8,6 +8,8 @@ type Subject = string
 
 type Location = string
 
+// remove connections
+
 type Student struct {
 	ID            int64          `json:"id,omitempty"`
 	Name          string         `json:"name,omitempty"`
@@ -38,7 +40,7 @@ type Appointment struct {
 type Notification struct {
 	ID           int64     `json:"id,omitempty"`
 	Receiver     int64     `json:"receiver,omitempty"`
-	Time         time.Time `json:"time,omitempty"`
+	Time         *time.Time `json:"time,omitempty"`
 	Message      string    `json:"message,omitempty"`
 	ReceiverKind string    `json:"receiver_kind,omitempty"`
 }

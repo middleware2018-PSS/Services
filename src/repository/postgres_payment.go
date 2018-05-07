@@ -10,7 +10,7 @@ func (r *postgresRepository) PaymentByID(id int64) (payments []models.Payment) {
 								FROM back2school.payments WHERE id = $1 `, id)
 	defer rows.Close()
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	for rows.Next() {
 		payment := &models.Payment{}

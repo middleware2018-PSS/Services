@@ -41,7 +41,7 @@ func (r *postgresRepository) PaymentByStudent(id int64) (payments []models.Payme
 								FROM back2school.payments WHERE student = $1 `, id)
 	defer rows.Close()
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	for rows.Next() {
 		payment := models.Payment{}
@@ -55,7 +55,7 @@ func (r *postgresRepository) GradesByStudent(id int64) (grades []models.Grade) {
 	rows, err := r.Query(`SELECT student, subject, date
 									FROM back2school.grades WHERE student = $1`, id)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -70,7 +70,7 @@ func (r *postgresRepository) NotificationsByStudent(id int64) (notifications []m
 	rows, err := r.Query(`SELECT id FROM back2school.Notification 
 								WHERE (receiver = $1 and receiver_kind = 'student') or receiver_kind = 'general'`, id)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -85,7 +85,7 @@ func (r *postgresRepository) ClassesByStudent(id int64) (classes []models.Class)
 	rows, err := r.Query(`SELECT class FROM back2school.enrolled
 			WHERE student = $1`, id)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -101,7 +101,7 @@ func (r *postgresRepository) AppointmentsByStudent(id int64) (appointments []mod
 	rows, err := r.Query(`SELECT id FROM back2school.appointments 
 								WHERE student = $1`, id)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	defer rows.Close()
 	for rows.Next() {

@@ -36,7 +36,7 @@ func (r *postgresRepository) ChildrenByParent(id int64) (child []models.Student)
 	rows, err := r.Query(`SELECT student
 								FROM back2school.isparent WHERE parent = $1`, id)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -54,7 +54,7 @@ func (r *postgresRepository) PaymentsByParent(id int64) (payments []models.Payme
 	rows, err := r.Query(query, id)
 	defer rows.Close()
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	for rows.Next() {
 		payment := models.Payment{}
@@ -72,7 +72,7 @@ func (r *postgresRepository) NotificationsByParent(id int64) (list []models.Noti
 	rows, err := r.Query(query, id)
 	defer rows.Close()
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	for rows.Next() {
 		notification := models.Notification{}

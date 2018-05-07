@@ -60,7 +60,7 @@ func (r *postgresRepository) AppointmentsByTeacher(id int64) (appointments []mod
 	rows, err := r.Query(`SELECT id FROM back2school.appointments 
 								WHERE teacher = $1`, id)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -75,7 +75,7 @@ func (r *postgresRepository) NotificationsByTeacher(id int64) (notifications []m
 	rows, err := r.Query(`SELECT id FROM back2school.Notification 
 								WHERE (receiver = $1 and receiver_kind = 'teacher') or receiver_kind = 'general'`, id)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -90,7 +90,7 @@ func (r *postgresRepository) LectureByTeacher(id int64) (lectures []models.TimeT
 	rows, err := r.Query(`SELECT class, subject, date from back2school.timetable natural join back2school.teaches as t
 								where t.teacher = $1`, id)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
