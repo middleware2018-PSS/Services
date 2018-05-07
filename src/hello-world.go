@@ -17,11 +17,15 @@ func test_repository() {
 	}
 	defer db.Close()
 	repo := repository.NewPostgresRepository(db)
-	pprint(repo.StudentById(1))
-	pprint(repo.ParentById(4))
-	t, _ := repo.TeacherByID(1)
+	s, _ := repo.StudentById(1)
+	pprint(s)
+	p, _ := repo.ParentById(4)
+	pprint(p)
+	t, _:= repo.TeacherByID(1)
 	pprint(t)
-	pprint(repo.ClassesByID(2))
+	c, err:= repo.ClassesByID(2)
+	pprint(c)
+	fmt.Printf("%v",err)
 
 }
 

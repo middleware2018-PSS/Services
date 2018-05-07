@@ -5,20 +5,21 @@ import (
 	"log"
 )
 
-func (r *postgresRepository) TeacherByID(id int64) (teacher *models.Teacher) {
+func (r *postgresRepository) TeacherByID(id int64) (teacher models.Teacher, err error) {
 
-	err := r.QueryRow(`SELECT id, name, surname, mail 
+	err = r.QueryRow(`SELECT id, name, surname, mail 
 							FROM back2school.teachers
 							WHERE id = $1`,
 		id).Scan(&teacher.ID, &teacher.Name, &teacher.Surname, &teacher.Mail)
+
 	if err != nil {
 		log.Print(err)
 	}
-	return teacher
+	return teacher, err
 
 }
 
-func (r *postgresRepository) ClassesByTeacher(id int64) (classes map[models.Subject][]models.Class) {
+func (r *postgresRepository) ClassesByTeacher(id int64) (classes map[models.Subject][]models.Class, err error) {
 	classes = make(map[models.Subject][]models.Class)
 	rows, err := r.Query(`SELECT subject, id, year, section, info, grade
 								FROM back2school.teaches join back2school.classes on id = class 
@@ -34,10 +35,10 @@ func (r *postgresRepository) ClassesByTeacher(id int64) (classes map[models.Subj
 		rows.Scan(&subj, &class.ID, &class.Year, &class.Section, &class.Info, &class.Grade)
 		classes[subj] = append(classes[subj], class)
 	}
-	return classes
+	return classes, err
 }
 
-func (r *postgresRepository) AppointmentsByTeacher(id int64, offset int, limit int) (appointments []models.Appointment) {
+func (r *postgresRepository) AppointmentsByTeacher(id int64, offset int, limit int) (appointments []models.Appointment, err error) {
 
 	rows, err := r.Query(`SELECT id, student, teacher, location, time
 								FROM back2school.appointments 
@@ -53,10 +54,10 @@ func (r *postgresRepository) AppointmentsByTeacher(id int64, offset int, limit i
 		rows.Scan(&app.ID, &app.Student.ID, &app.Teacher.ID, &app.Location, &app.Time)
 		appointments = append(appointments, app)
 	}
-	return appointments
+	return appointments, err
 }
 
-func (r *postgresRepository) NotificationsByTeacher(id int64, offset int, limit int) (notifications []models.Notification) {
+func (r *postgresRepository) NotificationsByTeacher(id int64, offset int, limit int) (notifications []models.Notification, err error) {
 	rows, err := r.Query(`SELECT id, receiver, message, receiver_kind, time 
 								FROM back2school.notification 
 								WHERE (receiver = $1 and receiver_kind = 'teacher') or receiver_kind = 'general'
@@ -71,10 +72,10 @@ func (r *postgresRepository) NotificationsByTeacher(id int64, offset int, limit 
 		rows.Scan(&notif.ID, &notif.Receiver, &notif.Message, &notif.ReceiverKind, &notif.Time)
 		notifications = append(notifications, notif)
 	}
-	return notifications
+	return notifications, err
 }
 
-func (r *postgresRepository) LectureByTeacher(id int64, offset int, limit int) (lectures []models.TimeTable) {
+func (r *postgresRepository) LectureByTeacher(id int64, offset int, limit int) (lectures []models.TimeTable, err error) {
 	rows, err := r.Query(`SELECT class, subject, location, start, end, info	
 								from back2school.timetable natural join back2school.teaches as t
 								where t.teacher = $1
@@ -89,9 +90,10 @@ func (r *postgresRepository) LectureByTeacher(id int64, offset int, limit int) (
 		rows.Scan(&lecture.Class.ID, &lecture.Subject, &lecture.Location, &lecture.Start, &lecture.End, &lecture.Info)
 		lectures = append(lectures, lecture)
 	}
-	return lectures
+	return lectures, err
 }
 
-func (r *postgresRepository) UpdateTeacher(id int64){
+func (r *postgresRepository) UpdateTeacher(id int64) (err error){
 	//TODO
+	return
 }
