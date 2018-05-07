@@ -15,11 +15,7 @@ type Student struct {
 	Name          string         `json:"name,omitempty"`
 	Surname       string         `json:"surname,omitempty"`
 	Mail          string         `json:"mail,omitempty"`
-	Payments      []Payment      `json:"payments,omitempty"`
-	Grades        []Grade        `json:"grades,omitempty"`
-	Notifications []Notification `json:"notifications,omitempty"`
-	Classes       []Class        `json:"classes,omitempty"` // enrolled -> classes
-	Appointments  []Appointment  `json:"appointments,omitempty"`
+	Info			string 	`json:"info,omitempty"`
 }
 
 type Grade struct {
@@ -27,6 +23,7 @@ type Grade struct {
 	Subject Subject    `json:"subject,omitempty"`
 	Date    *time.Time `json:"date,omitempty"`
 	Grade   int        `json:"grade,omitempty"`
+	Teacher Teacher `json:"teacher,omitempty"`
 }
 
 type Appointment struct {
@@ -50,9 +47,7 @@ type Parent struct {
 	Name          string         `json:"name,omitempty"`
 	Surname       string         `json:"surname,omitempty"`
 	Mail          string         `json:"mail,omitempty"`
-	ParentOf      []Student      `json:"ParentOf,omitempty"`
-	Payments      []Payment      `json:"payments,omitempty"`
-	Notifications []Notification `json:"notification,omitempty"`
+	Info          string         `json:"info,omitempty"`
 }
 
 type Teacher struct {
@@ -60,19 +55,15 @@ type Teacher struct {
 	Name          string              `json:"name,omitempty"`
 	Surname       string              `json:"surname,omitempty"`
 	Mail          string              `json:"mail,omitempty"`
-	Classes       map[Subject][]Class `json:"classes,omitempty"`
-	Appointments  []Appointment       `json:"appointments,omitempty"`
-	Lectures      []TimeTable         `json:"lectures,omitempty"`
-	Notifications []Notification      `json:"notifications,omitempty"`
 }
 
 type TimeTable struct {
 	Class    Class      `json:"class,omitempty"`
 	Location Location   `json:"location,omitempty"`
 	Subject  Subject    `json:"subject,omitempty"`
-	Date     *time.Time `json:"date,omitempty"`
 	Start    *time.Time `json:"start,omitempty"`
 	End      *time.Time `json:"end,omitempty"`
+	Info 		string `json:"info,omitempty"`
 }
 
 type Payment struct {
@@ -81,6 +72,7 @@ type Payment struct {
 	Payed   bool       `json:"payed,omitempty"`
 	Emitted *time.Time `json:"emitted,omitempty"`
 	Reason  string     `json:"reason,omitempty"`
+	Student Student	`json:"student,omitempty"`
 }
 
 type Class struct {
@@ -89,5 +81,4 @@ type Class struct {
 	Section  string    `json:"section,omitempty"` // as "A" in 5'A
 	Grade    int       `json:"grade,omitempty"`   // as "5" in 5'A
 	Info     string    `json:"info,omitempty"`
-	Students []Student `json:"students,omitempty"`
 }

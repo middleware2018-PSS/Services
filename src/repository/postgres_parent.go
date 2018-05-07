@@ -5,80 +5,102 @@ import (
 	"log"
 )
 
-func (r *postgresRepository) ParentById(id int64) (parent *models.Parent) {
+func (r *postgresRepository) UpdateParent(id int64) {
+	// TODO
+}
 
+func (r *postgresRepository) ParentById(id int64) (parent *models.Parent) {
 	// get basic data
 	parent = &models.Parent{}
 
-	err := r.QueryRow(`SELECT id,	name, surname, mail 
-								FROM back2school.parents WHERE id = $1`, id).Scan(&parent.ID, &parent.Name, &parent.Surname, &parent.Mail)
+	err := r.QueryRow(`SELECT id,	name, surname, mail, info
+								FROM back2school.parents WHERE id = $1`,
+		id).Scan(&parent.ID, &parent.Name, &parent.Surname, &parent.Mail, &parent.Info)
 	if err != nil {
 		log.Print(err)
 	}
-
-	// Children
-
-	parent.ParentOf = r.ChildrenByParent(parent.ID)
-
-	// Payments
-
-	parent.Payments = r.PaymentsByParent(parent.ID)
-
-	// Notifications
-
-	parent.Notifications = r.NotificationsByParent(parent.ID)
-
 	return parent
 }
 
-func (r *postgresRepository) ChildrenByParent(id int64) (child []models.Student) {
-
-	rows, err := r.Query(`SELECT student
-								FROM back2school.isparent WHERE parent = $1`, id)
+func (r *postgresRepository) ChildrenByParent(id int64, offset int, limit int) (children []models.Student) {
+	rows, err := r.Query(`SELECT s.id, s.name, s.surname, s.mail, s.info
+								FROM back2school.isparent join back2school.students as s on student = s.id 
+								WHERE parent = $1
+								order by s.name desc
+								limit $2 offset $3`, id, limit, offset)
 	if err != nil {
 		log.Print(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		student := models.Student{}
-		rows.Scan(&student.ID)
-		child = append(child, student)
+		rows.Scan(&student.ID, &student.Name, &student.Surname, &student.Mail, &student.Info)
+		children = append(children, student)
 	}
-	return child
+	return children
 }
 
-func (r *postgresRepository) PaymentsByParent(id int64) (payments []models.Payment) {
-	query := `select p.id
+func (r *postgresRepository) PaymentsByParent(id int64, offset int, limit int) (payments []models.Payment) {
+	rows, err := r.Query(`select p.id, p.amount, p.student, p.payed, p.reason, p.emitted
 		from back2school.payments as p natural join back2school.isparent
-		where parent = $1`
-	rows, err := r.Query(query, id)
+		where parent = $1
+		order by p.emitted desc
+		limit $2 offset $3`, id, limit, offset)
 	defer rows.Close()
 	if err != nil {
 		log.Print(err)
 	}
 	for rows.Next() {
 		payment := models.Payment{}
-		rows.Scan(&payment.ID)
+		rows.Scan(&payment.ID, &payment.Amount, &payment.Student.ID, &payment.Payed, &payment.Reason, &payment.Emitted)
 		payments = append(payments, payment)
 	}
 	return payments
 }
 
-func (r *postgresRepository) NotificationsByParent(id int64) (list []models.Notification) {
-	query := `select n.id
+func (r *postgresRepository) NotificationsByParent(id int64, offset int, limit int) (list []models.Notification) {
+	query := `select * from (
+				select n.id, n.receiver, n.message, n.receiver_kind, n.time
 				from back2school.notification as n join back2school.isparent on n.receiver = student
 				where parent = $1 and receiver_kind = 'student'
-				union all select id from back2school.notification where receiver_kind = 'general'`
-	rows, err := r.Query(query, id)
+				union all 
+				select n.id, n.receiver, n.message, n.receiver_kind, n.time
+				from back2school.notification as n
+				where receiver_kind = 'general'
+				) as a order by time desc
+				limit $2 offset $3`
+	rows, err := r.Query(query, id, limit, offset)
 	defer rows.Close()
 	if err != nil {
 		log.Print(err)
 	}
 	for rows.Next() {
 		notification := models.Notification{}
-		rows.Scan(&notification.ID)
+		rows.Scan(&notification.ID, &notification.Receiver, &notification.Message,
+			&notification.ReceiverKind, &notification.Time)
 		list = append(list, notification)
 
 	}
 	return list
+}
+
+
+func (r *postgresRepository) AppointmentsByParent(id int64, offset int, limit int) (appointments []models.Appointment) {
+	query := `select a.id, a.student, a.teacher, a.location, a.time
+				from back2school.appointments as a natural join back2school.isparent 
+				where parent = $1
+				order by a.time desc
+				limit $2 offset $3`
+	rows, err := r.Query(query, id, limit, offset)
+	defer rows.Close()
+	if err != nil {
+		log.Print(err)
+	}
+	for rows.Next() {
+		appointment := models.Appointment{}
+		rows.Scan(&appointment.ID, &appointment.Student, &appointment.Teacher, &appointment.Location, &appointment.Time)
+		appointments = append(appointments, appointment)
+
+	}
+	return appointments
 }

@@ -3,27 +3,64 @@ package repository
 import "github.com/middleware2018-PSS/Services/src/models"
 
 type Repository interface {
+
 	ClassesByID(id int64) (class models.Class)
 
-	NotificationByID(id int64) (notifications []models.Notification)
+	NotificationByID(id int64) (notification models.Notification)
 
-	PaymentByID(id int64) (payments []models.Payment)
+	PaymentByID(id int64) (payment models.Payment)
 
+
+	// Parents
+	// see/modify their personal data
 	ParentById(id int64) (parent *models.Parent)
-	ChildrenByParent(id int64) (child []models.Student)
-	PaymentsByParent(id int64) (payments []models.Payment)
-	NotificationsByParent(id int64) (list []models.Notification)
+	UpdateParent(id int64)
 
+	// see/modify the personal data of their registered children
+	ChildrenByParent(id int64, offset int, limit int) (children []models.Student)
 	StudentById(id int) (student *models.Student)
-	PaymentByStudent(id int64) (payments []models.Payment)
-	GradesByStudent(id int64) (grades []models.Grade)
-	NotificationsByStudent(id int64) (notifications []models.Notification)
-	ClassesByStudent(id int64) (classes []models.Class)
-	AppointmentsByStudent(id int64) (appointments []models.Appointment)
+	UpdateStudent(id int64)
 
-	TeacherByID(id int64) (teacher *models.Teacher, err error)
+	// see the grades obtained by their children
+	GradesByStudent(id int64, offset int, limit int) (grades []models.Grade)
+
+	// see the monthly payments that have been made to the school in the past
+	PaymentsByParent(id int64, offset int, limit int) (payments []models.Payment)
+
+	// see general/personal notifications coming from the school
+	NotificationsByParent(id int64, offset int, limit int) (list []models.Notification)
+
+	// see/modify appointments that they have with their children's teachers
+	// (calendar-like support for requesting appointments)
+	AppointmentsByParent(id int64, offset int, limit int) (appointments []models.Appointment)
+	UpdateAppointments(id int64)
+	AppointmentById(id int64) (appointment models.Appointment)
+
+	// see/modify their personal data
+	TeacherByID(id int64) (teacher *models.Teacher)
+	UpdateTeacher(id int64)
+
+	// see the classrooms in which they teach, with information regarding the argument that they teach
+	// in that class, the students that make up the class, and the complete lesson timetable for that
+	// class
 	ClassesByTeacher(id int64) (classes map[models.Subject][]models.Class)
-	AppointmentsByTeacher(id int64) (appointments []models.Appointment)
-	NotificationsByTeacher(id int64) (notifications []models.Notification)
-	LectureByTeacher(id int64) (lectures []models.TimeTable)
+	StudentByClass(id int64, offset int, limit int) (students []models.Student)
+	LectureByClass(id int64, offset int, limit int) (lectures []models.TimeTable)
+
+	// LectureByClass(id int64, offset int, limit int) (students []models.TimeTable)
+	AppointmentsByTeacher(id int64, offset int, limit int) (appointments []models.Appointment)
+	// UpdateAppointments(id int64)
+	NotificationsByTeacher(id int64, offset int, limit int) (notifications []models.Notification)
+	LectureByTeacher(id int64, offset int, limit int) (lectures []models.TimeTable)
+
+
+	// LectureByClass(id int64, offset int, limit int) (students []models.TimeTable)
+	GradeStudent(grade models.Grade)
+
+	// TODO
+	// parents:
+	// see/pay (fake payment) upcoming scheduled payments (monthly, material, trips)
+	// admins:
+	// everything
+
 }
