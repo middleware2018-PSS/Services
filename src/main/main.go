@@ -18,7 +18,9 @@ func main() {
 	}
 	defer db.Close()
 
-	con := controller.NewController(repository.NewPostgresRepository(db))
+	r := repository.NewPostgresRepository(db)
+	con := controller.NewController(r)
+
 	api := gin.Default()
 	// TODO: add authentication
 	//auth := api.Group("/parent", gin.BasicAuth(gin.Accounts{"3":"bar"}))
@@ -30,10 +32,11 @@ func main() {
 	api.GET("/payment/:id", ById(con.GetNotificationByID))
 	api.GET("/teacher/:id", ById(con.GetTeacherByID))
 
+
 	api.Run(":5000")
 }
 
-func ById(f func(int64) (interface{}, error)) (func (c *gin.Context)){
+func ById(f func(int64) (interface{}, error)) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// TODO: check err
 		id, err := strconv.Atoi(c.Param("id"))
@@ -47,7 +50,6 @@ func ById(f func(int64) (interface{}, error)) (func (c *gin.Context)){
 	}
 
 }
-
 
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {

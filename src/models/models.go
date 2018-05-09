@@ -58,7 +58,7 @@ type Teacher struct {
 }
 
 type TimeTable struct {
-	ID int64 `json:"id,omitempty"`
+	ID       int64      `json:"id,omitempty"`
 	Class    Class      `json:"class,omitempty"`
 	Location Location   `json:"location,omitempty"`
 	Subject  Subject    `json:"subject,omitempty"`

@@ -16,7 +16,7 @@ func (r *postgresRepository) TeacherByID(id int64) (interface{}, error) {
 	if err != nil {
 		log.Print(err)
 	}
-	return teacher,switchError(err)
+	return teacher, switchError(err)
 
 }
 

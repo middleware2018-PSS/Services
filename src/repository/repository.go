@@ -1,17 +1,17 @@
 package repository
 
 import (
-	"github.com/middleware2018-PSS/Services/src/models"
+	"database/sql"
 	"errors"
 	"fmt"
-	"database/sql"
+	"github.com/middleware2018-PSS/Services/src/models"
+	"log"
 )
 
 var (
-	ErrNoResult = errors.New("No result found")
+	ErrNoResult      = errors.New("No result found")
 	ErrorNotBlocking = errors.New("Something went wrong but no worriez")
 )
-
 
 type Repository interface {
 	ClassesByID(id int64) (class models.Class, err error)
@@ -54,7 +54,7 @@ type Repository interface {
 	// class
 	ClassesByTeacher(id int64) (classes map[models.Subject][]models.Class, err error)
 	StudentByClass(id int64, offset int, limit int) (students []models.Student, err error)
-	LectureByClass(id int64, offset int, limit int) (lectures []models.TimeTable, err error)
+	LectureByClass(id int64, offset int, limit int) (lectures []interface{}, err error)
 
 	// LectureByClass(id int64, offset int, limit int) (students []models.TimeTable, err error)
 	AppointmentsByTeacher(id int64, offset int, limit int) (appointments []models.Appointment, err error)
@@ -73,17 +73,37 @@ type Repository interface {
 
 }
 
-
-func switchError(err error) error{
-	if err != nil{
-		switch err{
+func switchError(err error) error {
+	if err != nil {
+		switch err {
 		case sql.ErrNoRows:
 			err = ErrNoResult
 		default:
-		if fmt.Sprintf("%v", err)[:len("sql: Scan error")] == "sql: Scan error"{
-			err = ErrorNotBlocking
-		}
+			if fmt.Sprintf("%v", err)[:len("sql: Scan error")] == "sql: Scan error" {
+				err = ErrorNotBlocking
+			}
 		}
 	}
 	return err
 }
+
+
+func f(rows *sql.Rows) interface{}  {
+	lecture := models.TimeTable{}
+	rows.Scan(&lecture.ID, &lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
+	return lecture
+}
+
+func (r *postgresRepository) listBySMTH(id int64, offset int, limit int, query string, f func(*sql.Rows) interface{}) (list []interface{}, err error){
+	rows, err := r.Query(query, id, limit, offset)
+	defer rows.Close()
+	if err != nil {
+		log.Print(err)
+	}
+	for rows.Next() {
+		list = append(list, f(rows))
+	}
+	return list, err
+
+}
+
