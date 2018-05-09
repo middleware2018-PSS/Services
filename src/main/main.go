@@ -24,25 +24,26 @@ func main() {
 	//auth := api.Group("/parent", gin.BasicAuth(gin.Accounts{"3":"bar"}))
 	//auth.Use(Auth())
 	// auth.GET("/:id",getParent )
-	api.GET("/parent/:id", func(c *gin.Context) {
-		// TODO: check err
-		id, _ := strconv.Atoi(c.Param("id"))
-		p, _ := con.GetParentByID(int64(id))
-		c.JSON(http.StatusOK, p)
-	})
-	api.GET("/student/:id", func(c *gin.Context) {
+	api.GET("/parent/:id", ById(con.GetParentByID))
+	api.GET("/student/:id", ById(con.GetStudentByID))
+	api.Run(":5000")
+}
+
+func ById(f func(int64) (interface{}, error)) (func (c *gin.Context)){
+	return func(c *gin.Context) {
 		// TODO: check err
 		id, err := strconv.Atoi(c.Param("id"))
-		p, err := con.GetStudentByID(int64(id))
+		p, err := f(int64(id))
 		switch err {
 		case nil:
 			c.JSON(http.StatusOK, p)
 		default:
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		}
-	})
-	api.Run(":5000")
+	}
+
 }
+
 
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
