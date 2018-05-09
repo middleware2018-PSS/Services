@@ -5,9 +5,10 @@ import (
 	"log"
 )
 
-func (r *postgresRepository) TeacherByID(id int64) (teacher models.Teacher, err error) {
+func (r *postgresRepository) TeacherByID(id int64) (interface{}, error) {
 
-	err = r.QueryRow(`SELECT id, name, surname, mail 
+	teacher := models.Teacher{}
+	err := r.QueryRow(`SELECT id, name, surname, mail 
 							FROM back2school.teachers
 							WHERE id = $1`,
 		id).Scan(&teacher.ID, &teacher.Name, &teacher.Surname, &teacher.Mail)
@@ -15,7 +16,7 @@ func (r *postgresRepository) TeacherByID(id int64) (teacher models.Teacher, err 
 	if err != nil {
 		log.Print(err)
 	}
-	return teacher, err
+	return teacher,switchError(err)
 
 }
 
@@ -76,7 +77,7 @@ func (r *postgresRepository) NotificationsByTeacher(id int64, offset int, limit 
 }
 
 func (r *postgresRepository) LectureByTeacher(id int64, offset int, limit int) (lectures []models.TimeTable, err error) {
-	rows, err := r.Query(`SELECT class, subject, location, start, end, info	
+	rows, err := r.Query(`SELECT id, class, subject, location, start, end, info	
 								from back2school.timetable natural join back2school.teaches as t
 								where t.teacher = $1
 								order by start desc
@@ -87,7 +88,7 @@ func (r *postgresRepository) LectureByTeacher(id int64, offset int, limit int) (
 	defer rows.Close()
 	for rows.Next() {
 		lecture := models.TimeTable{}
-		rows.Scan(&lecture.Class.ID, &lecture.Subject, &lecture.Location, &lecture.Start, &lecture.End, &lecture.Info)
+		rows.Scan(&lecture.ID, &lecture.Class.ID, &lecture.Subject, &lecture.Location, &lecture.Start, &lecture.End, &lecture.Info)
 		lectures = append(lectures, lecture)
 	}
 	return lectures, err

@@ -16,9 +16,9 @@ var (
 type Repository interface {
 	ClassesByID(id int64) (class models.Class, err error)
 
-	NotificationByID(id int64) (notification models.Notification, err error)
+	NotificationByID(id int64) (notification interface{}, err error)
 
-	PaymentByID(id int64) (payment models.Payment, err error)
+	PaymentByID(id int64) (payment interface{}, err error)
 
 	// Parents
 	// see/modify their personal data
@@ -46,7 +46,7 @@ type Repository interface {
 	AppointmentById(id int64) (appointment models.Appointment, err error)
 
 	// see/modify their personal data
-	TeacherByID(id int64) (teacher models.Teacher, err error)
+	TeacherByID(id int64) (teacher interface{}, err error)
 	UpdateTeacher(id int64) (err error)
 
 	// see the classrooms in which they teach, with information regarding the argument that they teach

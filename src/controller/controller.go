@@ -15,6 +15,14 @@ func NewController(repo repository.Repository) Controller {
 	return Controller{repo}
 }
 
+func (con Controller) GetTeacherByID(id int64) (parent interface{}, err error) {
+	return getByID(id, con.r.TeacherByID)
+}
+
+func (con Controller) GetNotificationByID(id int64) (parent interface{}, err error) {
+	return getByID(id, con.r.NotificationByID)
+}
+
 func (con Controller) GetParentByID(id int64) (parent interface{}, err error) {
 	return getByID(id, con.r.ParentById)
 }

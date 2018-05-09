@@ -31,8 +31,8 @@ func (r *postgresRepository) StudentByClass(id int64, offset int, limit int) (st
 }
 
 func (r *postgresRepository) LectureByClass(id int64, offset int, limit int) (lectures []models.TimeTable, err error) {
-	rows, err := r.Query(`select class, subject, start, end, location, info
-						from back2school.timetable natural join teaches
+	rows, err := r.Query(`select id, class, subject, start, end, location, info
+						from back2school.timetable natural join back2school.teaches
 						where teacher = $1
 						order by start desc
 						limit $2 offset $3`, id, limit, offset)
@@ -42,7 +42,7 @@ func (r *postgresRepository) LectureByClass(id int64, offset int, limit int) (le
 	}
 	for rows.Next() {
 		lecture := models.TimeTable{}
-		rows.Scan(&lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
+		rows.Scan(&lecture.ID, &lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
 		lectures = append(lectures, lecture)
 	}
 	return lectures, err

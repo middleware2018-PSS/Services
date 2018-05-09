@@ -5,12 +5,13 @@ import (
 	"log"
 )
 
-func (r *postgresRepository) NotificationByID(id int64) (notification models.Notification, err error) {
-	err = r.QueryRow(`SELECT id, receiver, message, time, receiver_kind
-								FROM back2school.notification WHERE id = $1 `, id).Scan(notification.ID,
-		notification.Receiver, notification.Message, notification.Time, notification.ReceiverKind)
+func (r *postgresRepository) NotificationByID(id int64) (interface{}, error) {
+	n := models.Notification{}
+	err := r.QueryRow(`SELECT id, receiver, message, time, receiver_kind
+								FROM back2school.notification WHERE id = $1 `, id).Scan(&n.ID,
+		&n.Receiver, &n.Message, &n.Time, &n.ReceiverKind)
 	if err != nil {
 		log.Print(err)
 	}
-	return notification, err
+	return n, switchError(err)
 }

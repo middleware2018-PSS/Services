@@ -26,6 +26,10 @@ func main() {
 	// auth.GET("/:id",getParent )
 	api.GET("/parent/:id", ById(con.GetParentByID))
 	api.GET("/student/:id", ById(con.GetStudentByID))
+	api.GET("/notification/:id", ById(con.GetNotificationByID))
+	api.GET("/payment/:id", ById(con.GetNotificationByID))
+	api.GET("/teacher/:id", ById(con.GetTeacherByID))
+
 	api.Run(":5000")
 }
 
