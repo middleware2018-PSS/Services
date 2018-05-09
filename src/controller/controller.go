@@ -3,19 +3,13 @@ package controller
 // shall check accesses and orchestrate actions of the
 
 import (
-	"database/sql"
-	"fmt"
 	"github.com/middleware2018-PSS/Services/src/repository"
-	"github.com/pkg/errors"
+	"log"
 )
 
 type Controller struct {
 	r repository.Repository
 }
-
-var (
-	NoResult = errors.New("No result found")
-)
 
 func NewController(repo repository.Repository) Controller {
 	return Controller{repo}
@@ -33,13 +27,13 @@ func getByID(id int64, f func(int64) (interface{}, error)) (res interface{}, err
 	res, e := f(id)
 	//TODO: check err
 	switch e {
-	case sql.ErrNoRows:
-		return res, NoResult
+	case repository.ErrNoResult:
+		log.Print(e)
+		return nil, e
+	case repository.ErrorNotBlocking:
+		log.Print(e)
+		return res, nil
 	default:
-		if fmt.Sprintf("%v", e)[:len("sql: Scan error")] == "sql: Scan error" {
-			return res, nil
-		} else {
-			return res, err
-		}
+		return res, nil
 	}
 }

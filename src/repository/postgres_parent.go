@@ -15,7 +15,7 @@ func (r *postgresRepository) ParentById(id int64) (interface{}, error) {
 	err := r.QueryRow(`SELECT id,	name, surname, mail, info
 								FROM back2school.parents WHERE id = $1`,
 		id).Scan(&p.ID, &p.Name, &p.Surname, &p.Mail, &p.Info)
-	return p, err
+	return p, switchError(err)
 }
 
 func (r *postgresRepository) ChildrenByParent(id int64, offset int, limit int) (children []models.Student, err error) {

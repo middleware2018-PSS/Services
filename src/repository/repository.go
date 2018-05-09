@@ -1,6 +1,17 @@
 package repository
 
-import "github.com/middleware2018-PSS/Services/src/models"
+import (
+	"github.com/middleware2018-PSS/Services/src/models"
+	"errors"
+	"fmt"
+	"database/sql"
+)
+
+var (
+	ErrNoResult = errors.New("No result found")
+	ErrorNotBlocking = errors.New("Something went wrong but no worriez")
+)
+
 
 type Repository interface {
 	ClassesByID(id int64) (class models.Class, err error)
@@ -60,4 +71,19 @@ type Repository interface {
 	// admins:
 	// everything
 
+}
+
+
+func switchError(err error) error{
+	if err != nil{
+		switch err{
+		case sql.ErrNoRows:
+			err = ErrNoResult
+		default:
+		if fmt.Sprintf("%v", err)[:len("sql: Scan error")] == "sql: Scan error"{
+			err = ErrorNotBlocking
+		}
+		}
+	}
+	return err
 }
