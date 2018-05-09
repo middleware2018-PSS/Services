@@ -5,15 +5,12 @@ import (
 	"log"
 )
 
-func (r *postgresRepository) StudentById(id int) (student *models.Student, err error) {
-	student = &models.Student{}
+func (r *postgresRepository) StudentById(id int64) (student interface{}, err error) {
+	s := models.Student{}
 	err = r.QueryRow(`SELECT id,	name, surname, mail, info 
-								FROM back2school.students WHERE id = $1`, id).Scan(&student.ID,
-		&student.Name, &student.Surname, &student.Mail, &student.Info)
-	if err != nil {
-		log.Print(err)
-	}
-	return student, err
+								FROM back2school.students WHERE id = $1`, id).Scan(&s.ID,
+		&s.Name, &s.Surname, &s.Mail, &s.Info)
+	return s, err
 }
 
 func (r *postgresRepository) GradesByStudent(id int64, offset int, limit int) (grades []models.Grade, err error) {
@@ -44,4 +41,3 @@ func (r *postgresRepository) UpdateStudent(id int64) (err error) {
 	// TODO
 	return
 }
-

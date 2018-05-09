@@ -10,16 +10,12 @@ func (r *postgresRepository) UpdateParent(id int64) (err error) {
 	return
 }
 
-func (r *postgresRepository) ParentById(id int64) (parent models.Parent, err error) {
-	// get basic data}
-
-	err = r.QueryRow(`SELECT id,	name, surname, mail, info
+func (r *postgresRepository) ParentById(id int64) (interface{}, error) {
+	p := models.Parent{}
+	err := r.QueryRow(`SELECT id,	name, surname, mail, info
 								FROM back2school.parents WHERE id = $1`,
-		id).Scan(&parent.ID, &parent.Name, &parent.Surname, &parent.Mail, &parent.Info)
-	if err != nil {
-		log.Print(err)
-	}
-	return parent, err
+		id).Scan(&p.ID, &p.Name, &p.Surname, &p.Mail, &p.Info)
+	return p, err
 }
 
 func (r *postgresRepository) ChildrenByParent(id int64, offset int, limit int) (children []models.Student, err error) {
@@ -83,7 +79,6 @@ func (r *postgresRepository) NotificationsByParent(id int64, offset int, limit i
 	}
 	return list, err
 }
-
 
 func (r *postgresRepository) AppointmentsByParent(id int64, offset int, limit int) (appointments []models.Appointment, err error) {
 	query := `select a.id, a.student, a.teacher, a.location, a.time

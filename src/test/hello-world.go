@@ -1,4 +1,4 @@
-package main
+package test
 
 import (
 	"database/sql"
@@ -21,11 +21,11 @@ func test_repository() {
 	pprint(s)
 	p, _ := repo.ParentById(4)
 	pprint(p)
-	t, _:= repo.TeacherByID(1)
+	t, _ := repo.TeacherByID(1)
 	pprint(t)
-	c, err:= repo.ClassesByID(2)
+	c, err := repo.ClassesByID(2)
 	pprint(c)
-	fmt.Printf("%v",err)
+	fmt.Printf("%v", err)
 
 }
 

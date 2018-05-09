@@ -3,22 +3,20 @@ package repository
 import "github.com/middleware2018-PSS/Services/src/models"
 
 type Repository interface {
-
 	ClassesByID(id int64) (class models.Class, err error)
 
 	NotificationByID(id int64) (notification models.Notification, err error)
 
 	PaymentByID(id int64) (payment models.Payment, err error)
 
-
 	// Parents
 	// see/modify their personal data
-	ParentById(id int64) (parent models.Parent, err error)
+	ParentById(id int64) (parent interface{}, err error)
 	UpdateParent(id int64) (err error)
 
 	// see/modify the personal data of their registered children
 	ChildrenByParent(id int64, offset int, limit int) (children []models.Student, err error)
-	StudentById(id int) (student *models.Student, err error)
+	StudentById(id int64) (student interface{}, err error)
 	UpdateStudent(id int64) (err error)
 
 	// see the grades obtained by their children
@@ -52,7 +50,6 @@ type Repository interface {
 	// UpdateAppointments(id int64, err error)
 	NotificationsByTeacher(id int64, offset int, limit int) (notifications []models.Notification, err error)
 	LectureByTeacher(id int64, offset int, limit int) (lectures []models.TimeTable, err error)
-
 
 	// LectureByClass(id int64, offset int, limit int) (students []models.TimeTable, err error)
 	GradeStudent(grade models.Grade) (err error)

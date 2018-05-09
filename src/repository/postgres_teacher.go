@@ -93,7 +93,7 @@ func (r *postgresRepository) LectureByTeacher(id int64, offset int, limit int) (
 	return lectures, err
 }
 
-func (r *postgresRepository) UpdateTeacher(id int64) (err error){
+func (r *postgresRepository) UpdateTeacher(id int64) (err error) {
 	//TODO
 	return
 }
