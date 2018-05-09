@@ -45,5 +45,3 @@ func getByID(id int64, f func(int64) (interface{}, error)) (res interface{}, err
 		return res, nil
 	}
 }
-
-

@@ -635,8 +635,6 @@ COPY back2school.teachers (id, name, mail, info, surname) FROM stdin;
 COPY back2school.teaches (teacher, subject, class) FROM stdin;
 1	science	2
 1	science	3
-1	science	2
-1	science	3
 \.
 
 
@@ -645,6 +643,7 @@ COPY back2school.teaches (teacher, subject, class) FROM stdin;
 --
 
 COPY back2school.timetable (class, subject, location, start, "end", info, id) FROM stdin;
+2	science		\N	\N		2
 \.
 
 
@@ -708,7 +707,7 @@ SELECT pg_catalog.setval('back2school.teachers_id_seq', 1, false);
 -- Name: timetable_id_seq; Type: SEQUENCE SET; Schema: back2school; Owner: postgres
 --
 
-SELECT pg_catalog.setval('back2school.timetable_id_seq', 1, false);
+SELECT pg_catalog.setval('back2school.timetable_id_seq', 2, true);
 
 
 --
@@ -781,6 +780,14 @@ ALTER TABLE ONLY back2school.subjects
 
 ALTER TABLE ONLY back2school.teachers
     ADD CONSTRAINT teachers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: teaches teaches_teacher_subject_class_pk; Type: CONSTRAINT; Schema: back2school; Owner: postgres
+--
+
+ALTER TABLE ONLY back2school.teaches
+    ADD CONSTRAINT teaches_teacher_subject_class_pk UNIQUE (teacher, subject, class);
 
 
 --

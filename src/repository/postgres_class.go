@@ -11,29 +11,29 @@ func (r *postgresRepository) ClassesByID(id int64) (class models.Class, err erro
 	return class, err
 }
 
-func (r *postgresRepository) StudentByClass(id int64, offset int, limit int) (students interface{}, err error) {
-	return r.listBySMTH(id, offset, limit,`select id, name, surname, mail, info 
+func (r *postgresRepository) StudentByClass(id int64, offset int, limit int) (students []interface{}, err error) {
+	return r.listByID(id, offset, limit, `select id, name, surname, mail, info 
 						from back2school.student join back2school.enrolled on student = id 
 						where class = $1
 						order by name desc, surname desc
 						limit $2 offset $3`,
-		func(rows *sql.Rows) interface{} {
+		func(rows *sql.Rows) (interface{}, error) {
 			student := models.Student{}
-			rows.Scan(&student.ID, &student.Name, &student.Surname, &student.Mail, &student.Info)
-			return student
+			err := rows.Scan(&student.ID, &student.Name, &student.Surname, &student.Mail, &student.Info)
+			return student, err
 		})
 }
 
 func (r *postgresRepository) LectureByClass(id int64, offset int, limit int) ([]interface{}, error) {
-	return r.listBySMTH(id, offset, limit,
+	return r.listByID(id, offset, limit,
 		`select id, class, subject, "start", "end", location, info
 				from back2school.timetable natural join back2school.teaches
 				where teacher = $1
 				order by "start" desc
 				limit $2 offset $3`,
-		func(rows *sql.Rows) interface{} {
+		func(rows *sql.Rows) (interface{}, error) {
 			lecture := models.TimeTable{}
-			rows.Scan(&lecture.ID, &lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
-			return lecture
+			err := rows.Scan(&lecture.ID, &lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
+			return lecture, err
 		})
 }

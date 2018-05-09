@@ -20,6 +20,11 @@ func main() {
 
 	r := repository.NewPostgresRepository(db)
 	con := controller.NewController(r)
+	/*	l, _ := r.LectureByClass(1,0,100)
+		l2, _:= r.LectureByClass(1,0,100)
+		j1, _ := json.Marshal(l)
+		j2, _ := json.Marshal(l2)
+		fmt.Printf("%s ==  %s", j1, j2)*/
 
 	api := gin.Default()
 	// TODO: add authentication
@@ -31,7 +36,6 @@ func main() {
 	api.GET("/notification/:id", ById(con.GetNotificationByID))
 	api.GET("/payment/:id", ById(con.GetNotificationByID))
 	api.GET("/teacher/:id", ById(con.GetTeacherByID))
-
 
 	api.Run(":5000")
 }
