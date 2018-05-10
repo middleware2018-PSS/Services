@@ -12,11 +12,18 @@ func (r *postgresRepository) TeacherByID(id int64) (interface{}, error) {
 							FROM back2school.teachers
 							WHERE id = $1`,
 		id).Scan(&teacher.ID, &teacher.Name, &teacher.Surname, &teacher.Mail)
-	if err != nil {
-		log.Print(err)
-	}
 	return teacher, switchError(err)
 
+}
+
+func (r *postgresRepository) Teachers(limit int, offset int) ([]interface{}, error) {
+	return r.listByParams(`select id, name, surname, mail, info 
+						from back2school.teachers
+						order by name desc, surname desc`, func(rows *sql.Rows) (interface{}, error) {
+		teacher := models.Teacher{}
+		err := rows.Scan(&teacher.ID, &teacher.Name, &teacher.Surname, &teacher.Mail, &teacher.Info)
+		return teacher, err
+	}, limit, offset)
 }
 
 func (r *postgresRepository) ClassesPerSubjectByTeacher(id int64) (classes map[models.Subject][]models.Class, err error) {
@@ -38,43 +45,41 @@ func (r *postgresRepository) ClassesPerSubjectByTeacher(id int64) (classes map[m
 	return classes, err
 }
 
-func (r *postgresRepository) AppointmentsByTeacher(id int64, offset int, limit int) (appointments []interface{}, err error) {
-	return r.listByID(id, offset, limit, `SELECT id, student, teacher, location, time
+func (r *postgresRepository) AppointmentsByTeacher(id int64, limit int, offset int) (appointments []interface{}, err error) {
+	return r.listByParams(`SELECT id, student, teacher, location, time
 										FROM back2school.appointments 
 										WHERE teacher = $1
-										order by time desc
-										limit $2 offset $3`,
+										order by time desc`,
 		func(rows *sql.Rows) (interface{}, error) {
 			app := models.Appointment{}
 			err := rows.Scan(&app.ID, &app.Student.ID, &app.Teacher.ID, &app.Location, &app.Time)
 			return app, err
-		})
+		}, limit, offset, id)
 }
 
-func (r *postgresRepository) NotificationsByTeacher(id int64, offset int, limit int) (notifications []interface{}, err error) {
-	return r.listByID(id, offset, limit, `SELECT id, receiver, message, receiver_kind, time 
+func (r *postgresRepository) NotificationsByTeacher(id int64, limit int, offset int) (notifications []interface{}, err error) {
+	return r.listByParams(`SELECT id, receiver, message, receiver_kind, time 
 								FROM back2school.notification 
 								WHERE (receiver = $1 and receiver_kind = 'teacher') or receiver_kind = 'general'
-								order by time desc
-								limit $2 offset $3`,
+								order by time desc`,
 		func(rows *sql.Rows) (interface{}, error) {
 			notif := models.Notification{}
 			err := rows.Scan(&notif.ID, &notif.Receiver, &notif.Message, &notif.ReceiverKind, &notif.Time)
 			return notif, err
-		})
+		}, limit, offset, id)
 }
 
-func (r *postgresRepository) LectureByTeacher(id int64, offset int, limit int) (lectures []interface{}, err error) {
-	return r.listByID(id, offset, limit, `SELECT id, class, subject, location, start, end, info	
+func (r *postgresRepository) LectureByTeacher(id int64, limit int, offset int) (lectures []interface{}, err error) {
+	return r.listByParams(`SELECT id, class, subject, location, start, end, info	
 								from back2school.timetable natural join back2school.teaches as t
 								where t.teacher = $1
-								order by start desc
-								limit $2 offset $3`, func(rows *sql.Rows) (interface{}, error) {
+								order by start desc`,
+		func(rows *sql.Rows) (interface{}, error) {
 		lecture := models.TimeTable{}
 		err := rows.Scan(&lecture.ID, &lecture.Class.ID, &lecture.Subject, &lecture.Location, &lecture.Start, &lecture.End, &lecture.Info)
 		return lecture, err
 
-	})
+	}, limit, offset, id)
 }
 
 func (r *postgresRepository) UpdateTeacher(id int64) (err error) {

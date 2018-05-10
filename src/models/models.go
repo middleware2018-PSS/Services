@@ -55,6 +55,7 @@ type Teacher struct {
 	Name    string `json:"name,omitempty"`
 	Surname string `json:"surname,omitempty"`
 	Mail    string `json:"mail,omitempty"`
+	Info    string `json:"info,omitempty"`
 }
 
 type TimeTable struct {

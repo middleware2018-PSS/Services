@@ -31,16 +31,24 @@ func main() {
 	//auth := api.Group("/parent", gin.BasicAuth(gin.Accounts{"3":"bar"}))
 	//auth.Use(Auth())
 	// auth.GET("/:id",getParent )
-	api.GET("/parent/:id", ById(con.GetParentByID))
-	api.GET("/student/:id", ById(con.GetStudentByID))
-	api.GET("/notification/:id", ById(con.GetNotificationByID))
-	api.GET("/payment/:id", ById(con.GetNotificationByID))
-	api.GET("/teacher/:id", ById(con.GetTeacherByID))
+	// admin := api.Group("/admin")
+	api.GET("/parents/:id", byID(con.GetParentByID))
+	api.GET("/students/:id", byID(con.GetStudentByID))
+	api.GET("/notifications/:id", byID(con.GetNotificationByID))
+	api.GET("/payments/:id", byID(con.GetNotificationByID))
+	api.GET("/teachers/:id", byID(con.GetTeacherByID))
+
+	api.GET("/parents", getOffsetLimit(con.Parents))
+	api.GET("/students", getOffsetLimit(con.Students))
+	api.GET("/notifications", getOffsetLimit(con.Notifications))
+	api.GET("/payments", getOffsetLimit(con.Payments))
+	api.GET("/teachers", getOffsetLimit(con.Teachers))
+	api.GET("/classes", getOffsetLimit(con.Classes))
 
 	api.Run(":5000")
 }
 
-func ById(f func(int64) (interface{}, error)) func(c *gin.Context) {
+func byID(f func(int64) (interface{}, error)) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// TODO: check err
 		id, err := strconv.Atoi(c.Param("id"))
@@ -53,6 +61,17 @@ func ById(f func(int64) (interface{}, error)) func(c *gin.Context) {
 		}
 	}
 
+}
+
+func getOffsetLimit(f func(int, int) ([]interface{}, error)) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		//TODO check errors
+		offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
+		limit, _ := strconv.Atoi(c.DefaultQuery("offset", "10"))
+
+		res, _ := f(limit, offset)
+		c.JSON(http.StatusOK, res)
+	}
 }
 
 func Auth() gin.HandlerFunc {
