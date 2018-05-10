@@ -68,7 +68,11 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE back2school.admins (
-    id integer NOT NULL
+    id integer NOT NULL,
+    password text DEFAULT ' '::text NOT NULL,
+    info text DEFAULT ' '::text,
+    name text DEFAULT ' '::text,
+    surname text DEFAULT ' '::text
 );
 
 
@@ -251,7 +255,8 @@ CREATE TABLE back2school.parents (
     name text DEFAULT ''::text,
     surname text DEFAULT ''::text,
     mail text DEFAULT ''::text,
-    info text DEFAULT ''::text
+    info text DEFAULT ''::text,
+    password text DEFAULT ' '::text NOT NULL
 );
 
 
@@ -371,7 +376,8 @@ CREATE TABLE back2school.teachers (
     name text DEFAULT ''::text,
     mail text DEFAULT ''::text,
     info text DEFAULT ''::text,
-    surname text DEFAULT ''::text
+    surname text DEFAULT ''::text,
+    password text DEFAULT ' '::text NOT NULL
 );
 
 
@@ -517,7 +523,7 @@ ALTER TABLE ONLY back2school.timetable ALTER COLUMN id SET DEFAULT nextval('back
 -- Data for Name: admins; Type: TABLE DATA; Schema: back2school; Owner: postgres
 --
 
-COPY back2school.admins (id) FROM stdin;
+COPY back2school.admins (id, password, info, name, surname) FROM stdin;
 \.
 
 
@@ -583,9 +589,9 @@ COPY back2school.notification (id, receiver, message, "time", receiver_kind) FRO
 -- Data for Name: parents; Type: TABLE DATA; Schema: back2school; Owner: postgres
 --
 
-COPY back2school.parents (id, name, surname, mail, info) FROM stdin;
-3	pippo	pippi		\N
-4	pi	pi	\N	\N
+COPY back2school.parents (id, name, surname, mail, info, password) FROM stdin;
+3	pippo	pippi		\N	 
+4	pi	pi	\N	\N	 
 \.
 
 
@@ -623,8 +629,8 @@ science
 -- Data for Name: teachers; Type: TABLE DATA; Schema: back2school; Owner: postgres
 --
 
-COPY back2school.teachers (id, name, mail, info, surname) FROM stdin;
-1	mortola	mail	info	mail
+COPY back2school.teachers (id, name, mail, info, surname, password) FROM stdin;
+1	mortola	mail	info	mail	 
 \.
 
 
