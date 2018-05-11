@@ -21,14 +21,12 @@ func NewPostgresRepository(DB *sql.DB) *postgresRepository {
 }
 
 func switchError(err error) error {
-	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			err = ErrNoResult
-		default:
-			if fmt.Sprintf("%v", err)[:len("sql: Scan error")] == "sql: Scan error" {
-				err = ErrorNotBlocking
-			}
+	switch err {
+	case sql.ErrNoRows:
+		err = ErrNoResult
+	default:
+		if fmt.Sprintf("%v", err)[:len("sql: Scan error")] == "sql: Scan error" {
+			err = ErrorNotBlocking
 		}
 	}
 	return err
