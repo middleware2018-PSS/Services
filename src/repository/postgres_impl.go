@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"github.com/middleware2018-PSS/Services/src/models"
-	"log"
 )
 
 func (r *postgresRepository) UpdateAppointments(id int64) (err error) {
@@ -151,10 +150,10 @@ func (r *postgresRepository) AppointmentsByParent(id int64, limit int, offset in
 				where parent = $1
 				order by a.time desc`,
 		func(rows *sql.Rows) (interface{}, error) {
-		appointment := models.Appointment{}
-		err := rows.Scan(&appointment.ID, &appointment.Student, &appointment.Teacher, &appointment.Location, &appointment.Time)
-		return appointment, err
-	}, limit, offset, id)
+			appointment := models.Appointment{}
+			err := rows.Scan(&appointment.ID, &appointment.Student, &appointment.Teacher, &appointment.Location, &appointment.Time)
+			return appointment, err
+		}, limit, offset, id)
 }
 
 func (r *postgresRepository) PaymentByID(id int64) (interface{}, error) {
@@ -235,26 +234,6 @@ func (r *postgresRepository) Teachers(limit int, offset int) ([]interface{}, err
 	}, limit, offset)
 }
 
-func (r *postgresRepository) ClassesPerSubjectByTeacher(id int64) (classes map[models.Subject][]models.Class, err error) {
-	// TODO check errors
-	classes = make(map[models.Subject][]models.Class)
-	rows, err := r.Query(`SELECT subject, id, year, section, info, grade
-								FROM back2school.teaches join back2school.classes on id = class 
-								WHERE teacher = $1
-								order by subject asc, year desc, grade asc, section desc `, id)
-	if err != nil {
-		log.Print(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		class := models.Class{}
-		var subj models.Subject
-		rows.Scan(&subj, &class.ID, &class.Year, &class.Section, &class.Info, &class.Grade)
-		classes[subj] = append(classes[subj], class)
-	}
-	return classes, switchError(err)
-}
-
 func (r *postgresRepository) AppointmentsByTeacher(id int64, limit int, offset int) (appointments []interface{}, err error) {
 	return r.listByParams(`SELECT id, student, teacher, location, time
 										FROM back2school.appointments 
@@ -279,7 +258,28 @@ func (r *postgresRepository) NotificationsByTeacher(id int64, limit int, offset 
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) LectureByTeacher(id int64, limit int, offset int) (lectures []interface{}, err error) {
+func (r *postgresRepository) SubjectsByTeacher(id int64, limit int, offset int) (notifications []interface{}, err error) {
+	return r.listByParams(`SELECT DISTINCT subject FROM back2school.teaches where teacher = $1 order by subject`,
+		func(rows *sql.Rows) (interface{}, error) {
+			subj := ""
+			err := rows.Scan(&subj)
+			return subj, err
+		}, limit, offset, id)
+}
+
+func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int64, subject string, limit int, offset int) ([]interface{}, error) {
+	return r.listByParams(`SELECT id, year, section, info, grade
+								FROM back2school.teaches join back2school.classes on id = class 
+								WHERE teacher = $1 and subject = $2
+								order by year desc, grade asc, section desc `,
+		func(rows *sql.Rows) (interface{}, error) {
+			class := models.Class{}
+			err := rows.Scan(&class.ID, &class.Year, &class.Section, &class.Info, &class.Grade)
+			return class, err
+		}, limit, offset, teacher, subject)
+}
+
+func (r *postgresRepository) LecturesByTeacher(id int64, limit int, offset int) (lectures []interface{}, err error) {
 	return r.listByParams(`SELECT id, class, subject, location, start, "end", info	
 								from back2school.timetable natural join back2school.teaches as t
 								where t.teacher = $1

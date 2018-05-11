@@ -43,7 +43,9 @@ type Repository interface {
 	// see the classrooms in which they teach, with information regarding the argument that they teach
 	// in that class, the students that make up the class, and the complete lesson timetable for that
 	// class
-	ClassesPerSubjectByTeacher(id int64) (classes map[models.Subject][]models.Class, err error)
+	SubjectsByTeacher(id int64, limit int, offset int) ([]interface{}, error)
+	ClassesBySubjectAndTeacher(teacher int64, subject string, limit int, offset int) ([]interface{}, error)
+
 	StudentByClass(id int64, limit int, offset int) ([]interface{}, error)
 	LectureByClass(id int64, limit int, offset int) ([]interface{}, error)
 
@@ -51,7 +53,7 @@ type Repository interface {
 	AppointmentsByTeacher(id int64, limit int, offset int) ([]interface{}, error)
 	// UpdateAppointments(id int64, err error)
 	NotificationsByTeacher(id int64, limit int, offset int) ([]interface{}, error)
-	LectureByTeacher(id int64, limit int, offset int) ([]interface{}, error)
+	LecturesByTeacher(id int64, limit int, offset int) ([]interface{}, error)
 
 	// LectureByClass(id int64, limit int, offset int) (students []interface{}, err error)
 	GradeStudent(grade models.Grade) error

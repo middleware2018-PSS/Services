@@ -12,7 +12,7 @@ type postgresRepository struct {
 }
 
 var (
-	ErrNoResult      = errors.New("No result found.")
+	ErrNoResult      = errors.New("No results found.")
 	ErrorNotBlocking = errors.New("Something went wrong but no worriez.")
 )
 
@@ -21,12 +21,14 @@ func NewPostgresRepository(DB *sql.DB) *postgresRepository {
 }
 
 func switchError(err error) error {
-	switch err {
-	case sql.ErrNoRows:
-		err = ErrNoResult
-	default:
-		if fmt.Sprintf("%v", err)[:len("sql: Scan error")] == "sql: Scan error" {
-			err = ErrorNotBlocking
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			err = ErrNoResult
+		default:
+			if l := len("sql: Scan error"); len(err.Error()) >= l && err.Error()[:l] == "sql: Scan error" {
+				err = ErrorNotBlocking
+			}
 		}
 	}
 	return err
@@ -36,16 +38,21 @@ func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (inter
 	query = query + fmt.Sprintf(" limit $%d offset $%d", len(params)+1, len(params)+2)
 	params = append(params, limit, offset)
 	rows, err := r.Query(query, params...)
-	defer rows.Close()
-	if err != nil {
-		log.Print(err)
-	}
-	for rows.Next() {
-		el, err := f(rows)
+		defer rows.Close()
 		if err != nil {
-			//TODO check error
+			log.Print(err)
+		} else {
+		for rows.Next() {
+			el, err := f(rows)
+			if err != nil {
+				//TODO check error
+			}
+			list = append(list, el)
 		}
-		list = append(list, el)
 	}
-	return list, switchError(err)
+	if len(list)>0 {
+		return list, switchError(err)
+	} else {
+		return list, switchError(sql.ErrNoRows)
+	}
 }

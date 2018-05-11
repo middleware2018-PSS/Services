@@ -54,6 +54,26 @@ func (con Controller) Notifications(limit int, offset int) ([]interface{}, error
 	return con.r.Notifications(limit, offset)
 }
 
+func (con Controller) LecturesByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+	return con.r.LecturesByTeacher(id, limit, offset)
+}
+
+func (con Controller) AppointmentsByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+	return con.r.AppointmentsByTeacher(id, limit, offset)
+}
+
+func (con Controller) SubjectByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+	return con.r.SubjectsByTeacher(id, limit, offset)
+}
+
+func (con Controller) ClassesBySubjectAndTeacher(teacher int64, subject string, limit int, offset int) ([]interface{}, error) {
+	return con.r.ClassesBySubjectAndTeacher(teacher, subject, limit, offset)
+}
+
+func (con Controller) NotificationsByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+	return con.r.NotificationsByTeacher(id, limit, offset)
+}
+
 func getByID(id int64, f func(int64) (interface{}, error)) (interface{}, error) {
 	res, e := f(id)
 	//TODO: check err

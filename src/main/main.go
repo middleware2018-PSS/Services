@@ -37,6 +37,18 @@ func main() {
 	api.GET("/notifications/:id", byID(con.GetNotificationByID))
 	api.GET("/payments/:id", byID(con.GetNotificationByID))
 	api.GET("/teachers/:id", byID(con.GetTeacherByID))
+	api.GET("/teachers/:id/lectures", byIDWithOffsetAndLimit(con.LecturesByTeacher))
+	api.GET("/teachers/:id/appointments", byIDWithOffsetAndLimit(con.AppointmentsByTeacher))
+	api.GET("/teachers/:id/notifications", byIDWithOffsetAndLimit(con.NotificationsByTeacher))
+	api.GET("/teachers/:id/subjects", byIDWithOffsetAndLimit(con.SubjectByTeacher))
+	api.GET("/teachers/:id/subjects/:subject", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		subj := c.Param("subject")
+		offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
+		limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+		res, err := con.ClassesBySubjectAndTeacher(int64(id), subj, limit, offset)
+		handleErr(err, res, c)
+	})
 
 	api.GET("/parents", getOffsetLimit(con.Parents))
 	api.GET("/students", getOffsetLimit(con.Students))
@@ -52,25 +64,31 @@ func byID(f func(int64) (interface{}, error)) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// TODO: check err
 		id, err := strconv.Atoi(c.Param("id"))
-		p, err := f(int64(id))
-		switch err {
-		case nil:
-			c.JSON(http.StatusOK, p)
-		default:
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-		}
+		res, err := f(int64(id))
+		handleErr(err, res, c)
 	}
 
 }
 
 func getOffsetLimit(f func(int, int) ([]interface{}, error)) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		//TODO check errors
-		offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
-		limit, _ := strconv.Atoi(c.DefaultQuery("offset", "10"))
+		//TODO Check id and errors
+		offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
+		limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+		res, err := f(limit, offset)
 
-		res, _ := f(limit, offset)
-		c.JSON(http.StatusOK, res)
+		handleErr(err, res, c)
+	}
+}
+
+func byIDWithOffsetAndLimit(f func(int64, int, int) ([]interface{}, error)) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		//TODO Check id and errors (4 real)
+		id, err := strconv.Atoi(c.Param("id"))
+		offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
+		limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+		res, err := f(int64(id), limit, offset)
+		handleErr(err, res, c)
 	}
 }
 
@@ -83,5 +101,14 @@ func Auth() gin.HandlerFunc {
 			c.AbortWithStatus(401)
 		}
 
+	}
+}
+
+func handleErr(err error, res interface{}, c *gin.Context) {
+	switch err {
+	case nil:
+		c.JSON(http.StatusOK, res)
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 }
