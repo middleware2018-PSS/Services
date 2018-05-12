@@ -292,6 +292,22 @@ func (r *postgresRepository) LecturesByTeacher(id int64, limit int, offset int) 
 		}, limit, offset, id)
 }
 
+func (r *postgresRepository) ClassesByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+	type Class struct {
+		models.Class
+		Subject models.Subject `json:"subject,omitempty"`
+	}
+	return r.listByParams(`SELECT id, year, section, info, grade, subject
+								FROM back2school.teaches join back2school.classes on id = class 
+								WHERE teacher = $1
+								order by subject asc, year desc, grade asc, section desc `,
+		func(rows *sql.Rows) (interface{}, error) {
+			class := Class{}
+			err := rows.Scan(&class.ID, &class.Year, &class.Section, &class.Info, &class.Grade, &class.Subject)
+			return class, err
+		}, limit, offset, id)
+}
+
 func (r *postgresRepository) UpdateTeacher(id int64) (err error) {
 	//TODO
 	return

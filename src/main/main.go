@@ -1,18 +1,21 @@
 package main
 
+//go:generate swagger generate spec
 import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/middleware2018-PSS/Services/src/controller"
 	"github.com/middleware2018-PSS/Services/src/repository"
+	"github.com/pkg/errors"
 	"log"
 	"net/http"
 	"strconv"
-	"github.com/pkg/errors"
+	"fmt"
+	"strings"
 )
 
-var	(
+var (
 	LimitError = errors.New("Limit Must Be Greater Than Zero.")
 )
 
@@ -33,30 +36,23 @@ func main() {
 
 	api := gin.Default()
 	// TODO implement AUTH with data from db
-	parents := api.Group("/parents/:id", gin.BasicAuth(gin.Accounts{"3":"prova"}), Access())
+	parents := api.Group("/parents/:id", gin.BasicAuth(gin.Accounts{"3": "prova"}), Access())
 
 	// TODO add hypermedia
 	parents.GET("", byID("id", con.GetParentByID))
-	parents.GET("/students", byIDWithOffsetAndLimit(con.StudentsByParent))
+	parents.GET("/students", byIDWithOffsetAndLimit("id", con.StudentsByParent))
 	// TODO redirect or deeper links? e.g. /parents/id/students/student/grades...
-	parents.GET("/students/:student", byID("student",con.GetStudentByID))
-	parents.GET("/appointments", byIDWithOffsetAndLimit(con.AppointmentsByParent))
-	parents.GET("/payments", byIDWithOffsetAndLimit(con.PaymentsByParent))
-	parents.GET("/notifications", byIDWithOffsetAndLimit(con.NotificationsByParent))
+	parents.GET("/students/:student", byID("student", con.GetStudentByID))
+	parents.GET("/appointments", byIDWithOffsetAndLimit("id", con.AppointmentsByParent))
+	parents.GET("/payments", byIDWithOffsetAndLimit("id", con.PaymentsByParent))
+	parents.GET("/notifications", byIDWithOffsetAndLimit("id", con.NotificationsByParent))
 
-	// TODO /admin/...?
-	api.GET("/students/:id", byID("id", con.GetStudentByID))
-	api.GET("/students/:id/grades", byIDWithOffsetAndLimit(con.GradesByStudent))
-	api.GET("/notifications/:id", byID("id", con.GetNotificationByID))
-	api.GET("/payments/:id", byID("id", con.GetNotificationByID))
-
-
-	teachers := api.Group("/teachers/:id", gin.BasicAuth(gin.Accounts{"3":"prova"}), Access())
+	teachers := api.Group("/teachers/:id", gin.BasicAuth(gin.Accounts{"1": "prova"}), Access())
 	teachers.GET("", byID("id", con.GetTeacherByID))
-	teachers.GET("/lectures", byIDWithOffsetAndLimit(con.LecturesByTeacher))
-	teachers.GET("/appointments", byIDWithOffsetAndLimit(con.AppointmentsByTeacher))
-	teachers.GET("/notifications", byIDWithOffsetAndLimit(con.NotificationsByTeacher))
-	teachers.GET("/subjects", byIDWithOffsetAndLimit(con.SubjectByTeacher))
+	teachers.GET("/lectures", byIDWithOffsetAndLimit("id", con.LecturesByTeacher))
+	teachers.GET("/appointments", byIDWithOffsetAndLimit("id", con.AppointmentsByTeacher))
+	teachers.GET("/notifications", byIDWithOffsetAndLimit("id", con.NotificationsByTeacher))
+	teachers.GET("/subjects", byIDWithOffsetAndLimit("id", con.SubjectByTeacher))
 	teachers.GET("/subjects/:subject", func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		subj := c.Param("subject")
@@ -65,13 +61,24 @@ func main() {
 		res, err := con.ClassesBySubjectAndTeacher(int64(id), subj, limit, offset)
 		handleErr(err, res, c)
 	})
+	teachers.GET("/classes", byIDWithOffsetAndLimit("id", con.ClassesByTeacher))
 
-	api.GET("/parents", getOffsetLimit(con.Parents))
-	api.GET("/students", getOffsetLimit(con.Students))
-	api.GET("/notifications", getOffsetLimit(con.Notifications))
-	api.GET("/payments", getOffsetLimit(con.Payments))
-	api.GET("/teachers", getOffsetLimit(con.Teachers))
-	api.GET("/classes", getOffsetLimit(con.Classes))
+	admin := api.Group("/admins/:id", gin.BasicAuth(gin.Accounts{"1": "prova"}), Access())
+	admin.GET("/parents", getOffsetLimit(con.Parents))
+	admin.GET("/parents/:parent", byID("parent", con.GetParentByID))
+	admin.GET("/students", getOffsetLimit(con.Students))
+	admin.GET("/students/:student", byID("student", con.GetStudentByID))
+	admin.GET("/students/:student/grades", byIDWithOffsetAndLimit("student", con.GradesByStudent))
+
+	admin.GET("/notifications", getOffsetLimit(con.Notifications))
+	admin.GET("/payments", getOffsetLimit(con.Payments))
+	admin.GET("/payments/:payment", byID("payment", con.PaymentByID))
+
+	admin.GET("/teachers", getOffsetLimit(con.Teachers))
+	admin.GET("/classes", getOffsetLimit(con.Classes))
+	admin.GET("/classes/:class", byID("class", con.ClassByID))
+	admin.GET("/classes/:class/students", byIDWithOffsetAndLimit("class", con.StudentsByClass))
+	admin.GET("/notifications/:notification", byID("notification", con.GetNotificationByID))
 
 	api.Run(":5000")
 }
@@ -97,24 +104,37 @@ func getOffsetLimit(f func(int, int) ([]interface{}, error)) func(c *gin.Context
 	return func(c *gin.Context) {
 		//TODO Check id and errors
 		offset, limit := offsetLimit(c)
-		if limit > 0{
+		if limit > 0 {
 			res, err := f(limit, offset)
 			handleErr(err, res, c)
 		} else {
-			handleErr( LimitError, nil, c)
+			handleErr(LimitError, nil, c)
 		}
 
 	}
 }
 
-func byIDWithOffsetAndLimit(f func(int64, int, int) ([]interface{}, error)) func(c *gin.Context) {
+func byIDWithOffsetAndLimit(id string, f func(int64, int, int) ([]interface{}, error)) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		//TODO Check id and errors (4 real)
-		id, err := strconv.Atoi(c.Param("id"))
+		id, err := strconv.Atoi(c.Param(id))
 		offset, limit := offsetLimit(c)
 		res, err := f(int64(id), limit, offset)
-		handleErr(err, res, c)
+		result := struct {
+			L    []interface{} `json:"result"`
+			Next string        `json:"next"`
+		}{res, next(c.Request.RequestURI, offset, limit)}
+		handleErr(err, result, c)
 	}
+}
+
+func next(uri string, offset int, limit int) (res string) {
+	if n := strings.Index(uri, "?"); n >= 0 {
+		res = uri[:n]
+	} else {
+		res = uri
+	}
+	return strings.Join([]string{res, fmt.Sprintf("?offset=%d&limit=%d", offset+limit, limit)}, "")
 }
 
 func Access() gin.HandlerFunc {

@@ -38,10 +38,10 @@ func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (inter
 	query = query + fmt.Sprintf(" limit $%d offset $%d", len(params)+1, len(params)+2)
 	params = append(params, limit, offset)
 	rows, err := r.Query(query, params...)
-		defer rows.Close()
-		if err != nil {
-			log.Print(err)
-		} else {
+	defer rows.Close()
+	if err != nil {
+		log.Print(err)
+	} else {
 		for rows.Next() {
 			el, err := f(rows)
 			if err != nil {
@@ -50,7 +50,7 @@ func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (inter
 			list = append(list, el)
 		}
 	}
-	if len(list)>0 {
+	if len(list) > 0 {
 		return list, switchError(err)
 	} else {
 		return list, switchError(sql.ErrNoRows)

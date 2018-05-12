@@ -54,6 +54,7 @@ type Repository interface {
 	// UpdateAppointments(id int64, err error)
 	NotificationsByTeacher(id int64, limit int, offset int) ([]interface{}, error)
 	LecturesByTeacher(id int64, limit int, offset int) ([]interface{}, error)
+	ClassesByTeacher(id int64, limit int, offset int) ([]interface{}, error)
 
 	// LectureByClass(id int64, limit int, offset int) (students []interface{}, err error)
 	GradeStudent(grade models.Grade) error

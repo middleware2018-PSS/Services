@@ -6,7 +6,7 @@ import (
 	"github.com/middleware2018-PSS/Services/src/repository"
 )
 
-func getListByIDOffsetLimit(id int64, limit int, offset int,f func(int64, int, int) ([]interface{}, error)) ([]interface{}, error) {
+func getListByIDOffsetLimit(id int64, limit int, offset int, f func(int64, int, int) ([]interface{}, error)) ([]interface{}, error) {
 	res, e := f(id, limit, offset)
 	//TODO: check err
 	switch e {
@@ -42,6 +42,10 @@ func NewController(repo repository.Repository) Controller {
 
 func (con Controller) GetTeacherByID(id int64) (interface{}, error) {
 	return getByID(id, con.r.TeacherByID)
+}
+
+func (con Controller) ClassByID(id int64) (interface{}, error) {
+	return getByID(id, con.r.ClassByID)
 }
 
 func (con Controller) GetNotificationByID(id int64) (interface{}, error) {
@@ -120,3 +124,14 @@ func (con Controller) NotificationsByParent(id int64, limit int, offset int) ([]
 	return con.r.NotificationsByParent(id, limit, offset)
 }
 
+func (con Controller) ClassesByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+	return con.r.ClassesByTeacher(id, limit, offset)
+}
+
+func (con Controller) StudentsByClass(id int64, limit int, offset int) ([]interface{}, error) {
+	return con.r.StudentByClass(id, limit, offset)
+}
+
+func (con Controller) PaymentByID(id int64) (interface{}, error) {
+	return con.r.PaymentByID(id)
+}
