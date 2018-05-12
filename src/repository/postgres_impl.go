@@ -104,7 +104,7 @@ func (r *postgresRepository) Parents(limit int, offset int) ([]interface{}, erro
 }
 
 func (r *postgresRepository) ChildrenByParent(id int64, limit int, offset int) (children []interface{}, err error) {
-	return r.listByParams(`SELECT s.id, s.name, s.surname, s.mail, s.info
+	return r.listByParams(`SELECT distinct s.id, s.name, s.surname, s.mail, s.info
 								FROM back2school.isparent join back2school.students as s on student = s.id 
 								WHERE parent = $1
 								order by s.name desc`,

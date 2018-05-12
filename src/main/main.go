@@ -9,6 +9,11 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"github.com/pkg/errors"
+)
+
+var	(
+	LimitError = errors.New("Limit Must Be Greater Than Zero.")
 )
 
 func main() {
@@ -27,21 +32,32 @@ func main() {
 		fmt.Printf("%s ==  %s", j1, j2)*/
 
 	api := gin.Default()
-	// TODO: add authentication
-	//auth := api.Group("/parent", gin.BasicAuth(gin.Accounts{"3":"bar"}))
-	//auth.Use(Auth())
-	// auth.GET("/:id",getParent )
-	// admin := api.Group("/admin")
-	api.GET("/parents/:id", byID(con.GetParentByID))
-	api.GET("/students/:id", byID(con.GetStudentByID))
-	api.GET("/notifications/:id", byID(con.GetNotificationByID))
-	api.GET("/payments/:id", byID(con.GetNotificationByID))
-	api.GET("/teachers/:id", byID(con.GetTeacherByID))
-	api.GET("/teachers/:id/lectures", byIDWithOffsetAndLimit(con.LecturesByTeacher))
-	api.GET("/teachers/:id/appointments", byIDWithOffsetAndLimit(con.AppointmentsByTeacher))
-	api.GET("/teachers/:id/notifications", byIDWithOffsetAndLimit(con.NotificationsByTeacher))
-	api.GET("/teachers/:id/subjects", byIDWithOffsetAndLimit(con.SubjectByTeacher))
-	api.GET("/teachers/:id/subjects/:subject", func(c *gin.Context) {
+	// TODO implement AUTH with data from db
+	parents := api.Group("/parents/:id", gin.BasicAuth(gin.Accounts{"3":"prova"}), Access())
+
+	// TODO add hypermedia
+	parents.GET("", byID("id", con.GetParentByID))
+	parents.GET("/students", byIDWithOffsetAndLimit(con.StudentsByParent))
+	// TODO redirect or deeper links? e.g. /parents/id/students/student/grades...
+	parents.GET("/students/:student", byID("student",con.GetStudentByID))
+	parents.GET("/appointments", byIDWithOffsetAndLimit(con.AppointmentsByParent))
+	parents.GET("/payments", byIDWithOffsetAndLimit(con.PaymentsByParent))
+	parents.GET("/notifications", byIDWithOffsetAndLimit(con.NotificationsByParent))
+
+	// TODO /admin/...?
+	api.GET("/students/:id", byID("id", con.GetStudentByID))
+	api.GET("/students/:id/grades", byIDWithOffsetAndLimit(con.GradesByStudent))
+	api.GET("/notifications/:id", byID("id", con.GetNotificationByID))
+	api.GET("/payments/:id", byID("id", con.GetNotificationByID))
+
+
+	teachers := api.Group("/teachers/:id", gin.BasicAuth(gin.Accounts{"3":"prova"}), Access())
+	teachers.GET("", byID("id", con.GetTeacherByID))
+	teachers.GET("/lectures", byIDWithOffsetAndLimit(con.LecturesByTeacher))
+	teachers.GET("/appointments", byIDWithOffsetAndLimit(con.AppointmentsByTeacher))
+	teachers.GET("/notifications", byIDWithOffsetAndLimit(con.NotificationsByTeacher))
+	teachers.GET("/subjects", byIDWithOffsetAndLimit(con.SubjectByTeacher))
+	teachers.GET("/subjects/:subject", func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		subj := c.Param("subject")
 		offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
@@ -60,24 +76,34 @@ func main() {
 	api.Run(":5000")
 }
 
-func byID(f func(int64) (interface{}, error)) func(c *gin.Context) {
+func byID(key string, f func(int64) (interface{}, error)) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// TODO: check err
-		id, err := strconv.Atoi(c.Param("id"))
+		id, err := strconv.Atoi(c.Param(key))
 		res, err := f(int64(id))
 		handleErr(err, res, c)
 	}
 
 }
 
+func offsetLimit(c *gin.Context) (int, int) {
+	// TODO check err
+	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	return offset, limit
+}
+
 func getOffsetLimit(f func(int, int) ([]interface{}, error)) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		//TODO Check id and errors
-		offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
-		limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
-		res, err := f(limit, offset)
+		offset, limit := offsetLimit(c)
+		if limit > 0{
+			res, err := f(limit, offset)
+			handleErr(err, res, c)
+		} else {
+			handleErr( LimitError, nil, c)
+		}
 
-		handleErr(err, res, c)
 	}
 }
 
@@ -85,20 +111,18 @@ func byIDWithOffsetAndLimit(f func(int64, int, int) ([]interface{}, error)) func
 	return func(c *gin.Context) {
 		//TODO Check id and errors (4 real)
 		id, err := strconv.Atoi(c.Param("id"))
-		offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
-		limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+		offset, limit := offsetLimit(c)
 		res, err := f(int64(id), limit, offset)
 		handleErr(err, res, c)
 	}
 }
 
-func Auth() gin.HandlerFunc {
+func Access() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if id := c.Param("id"); id == c.GetString("user") {
 			c.Next()
 		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "not allowed"})
-			c.AbortWithStatus(401)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Not Authorized User."})
 		}
 
 	}
@@ -108,6 +132,8 @@ func handleErr(err error, res interface{}, c *gin.Context) {
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, res)
+	case repository.ErrNoResult:
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
