@@ -3,6 +3,7 @@ package main
 //go:generate swagger generate spec
 import (
 	"database/sql"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/middleware2018-PSS/Services/src/controller"
@@ -11,13 +12,17 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"fmt"
 	"strings"
 )
 
 var (
 	LimitError = errors.New("Limit Must Be Greater Than Zero.")
 )
+
+type List struct {
+	L    []interface{} `json:"result", xml:"result"`
+	Next string        `json:"next,omitempty",xml:"next"`
+}
 
 func main() {
 	db, err := sql.Open("postgres", "user=postgres dbname=postgres sslmode=disable")
@@ -37,7 +42,6 @@ func main() {
 	api := gin.Default()
 	// TODO implement AUTH with data from db
 	parents := api.Group("/parents/:id", gin.BasicAuth(gin.Accounts{"3": "prova"}), Access())
-
 	// TODO add hypermedia
 	parents.GET("", byID("id", con.GetParentByID))
 	parents.GET("/students", byIDWithOffsetAndLimit("id", con.StudentsByParent))
@@ -120,19 +124,19 @@ func byIDWithOffsetAndLimit(id string, f func(int64, int, int) ([]interface{}, e
 		id, err := strconv.Atoi(c.Param(id))
 		offset, limit := offsetLimit(c)
 		res, err := f(int64(id), limit, offset)
-		result := struct {
-			L    []interface{} `json:"result"`
-			Next string        `json:"next"`
-		}{res, next(c.Request.RequestURI, offset, limit)}
+		result := List{res, next(c.Request.RequestURI, offset, limit, res)}
 		handleErr(err, result, c)
 	}
 }
 
-func next(uri string, offset int, limit int) (res string) {
+func next(uri string, offset int, limit int, input []interface{}) (res string) {
 	if n := strings.Index(uri, "?"); n >= 0 {
 		res = uri[:n]
 	} else {
 		res = uri
+	}
+	if l := len(input); l < limit {
+		return ""
 	}
 	return strings.Join([]string{res, fmt.Sprintf("?offset=%d&limit=%d", offset+limit, limit)}, "")
 }
@@ -148,13 +152,21 @@ func Access() gin.HandlerFunc {
 	}
 }
 
+func negotiate(c *gin.Context, data interface{}) gin.Negotiate {
+	return gin.Negotiate{
+		Offered: []string{gin.MIMEJSON, gin.MIMEXML},
+		Data:    data,
+	}
+}
+
 func handleErr(err error, res interface{}, c *gin.Context) {
+
 	switch err {
 	case nil:
-		c.JSON(http.StatusOK, res)
+		c.Negotiate(http.StatusOK, negotiate(c, res))
 	case repository.ErrNoResult:
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.Negotiate(http.StatusNotFound, negotiate(c, gin.H{"error": err.Error()}))
 	default:
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Negotiate(http.StatusBadRequest, negotiate(c, gin.H{"error": err.Error()}))
 	}
 }
