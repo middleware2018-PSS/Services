@@ -56,3 +56,29 @@ func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (inter
 		return list, switchError(sql.ErrNoRows)
 	}
 }
+
+func getListByIDOffsetLimit(id int64, limit int, offset int, f func(int64, int, int) ([]interface{}, error)) ([]interface{}, error) {
+	res, e := f(id, limit, offset)
+	//TODO: check err
+	switch e {
+	case ErrNoResult:
+		return nil, e
+	case ErrorNotBlocking:
+		return res, nil
+	default:
+		return res, nil
+	}
+}
+
+func getByID(id int64, f func(int64) (interface{}, error)) (interface{}, error) {
+	res, e := f(id)
+	//TODO: check err
+	switch e {
+	case ErrNoResult:
+		return nil, e
+	case ErrorNotBlocking:
+		return res, nil
+	default:
+		return res, nil
+	}
+}

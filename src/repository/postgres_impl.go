@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"github.com/middleware2018-PSS/Services/src/models"
+	"log"
 )
 
 func (r *postgresRepository) UpdateAppointments(id int64) (err error) {
@@ -35,7 +36,7 @@ func (r *postgresRepository) Classes(limit int, offset int) ([]interface{}, erro
 	}, limit, offset)
 }
 
-func (r *postgresRepository) StudentByClass(id int64, limit int, offset int) (students []interface{}, err error) {
+func (r *postgresRepository) StudentsByClass(id int64, limit int, offset int) (students []interface{}, err error) {
 	return r.listByParams("select distinct id, name, surname, mail, info "+
 		"from back2school.students join back2school.enrolled on student = id "+
 		"where class = $1 "+
@@ -79,12 +80,7 @@ func (r *postgresRepository) Notifications(limit int, offset int) ([]interface{}
 		}, limit, offset)
 }
 
-func (r *postgresRepository) UpdateParent(id int64) (err error) {
-	// TODO
-	return
-}
-
-func (r *postgresRepository) ParentById(id int64) (interface{}, error) {
+func (r *postgresRepository) ParentByID(id int64) (interface{}, error) {
 	p := models.Parent{}
 	err := r.QueryRow("SELECT id,	name, surname, mail, info "+
 		"FROM back2school.parents WHERE id = $1",
@@ -184,7 +180,7 @@ func (r *postgresRepository) Students(limit int, offset int) (student []interfac
 	}, limit, offset)
 }
 
-func (r *postgresRepository) StudentById(id int64) (student interface{}, err error) {
+func (r *postgresRepository) StudentByID(id int64) (student interface{}, err error) {
 	s := models.Student{}
 	err = r.QueryRow("SELECT id,	name, surname, mail, info  "+
 		"FROM back2school.students WHERE id = $1", id).Scan(&s.ID,
@@ -205,11 +201,6 @@ func (r *postgresRepository) GradesByStudent(id int64, limit int, offset int) ([
 }
 
 func (r *postgresRepository) GradeStudent(grade models.Grade) (err error) {
-	// TODO
-	return
-}
-
-func (r *postgresRepository) UpdateStudent(id int64) (err error) {
 	// TODO
 	return
 }
@@ -308,7 +299,31 @@ func (r *postgresRepository) ClassesByTeacher(id int64, limit int, offset int) (
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) UpdateTeacher(id int64) (err error) {
-	//TODO
-	return
+func (r *postgresRepository) update(query string, params ...interface{}) (err error) {
+	_, err = r.DB.Exec(query, params...)
+	if err != nil {
+		log.Print(err.Error())
+	}
+	return switchError(err)
+}
+
+func (r *postgresRepository) UpdateTeacher(teacher models.Teacher) (err error) {
+	query := "UPDATE back2school.teachers" +
+		" SET name = $1, surname = $2, mail = $3, info = $4 " +
+		"where id = $5"
+	return r.update(query, teacher.Name, teacher.Surname, teacher.Mail, teacher.Info, teacher.ID)
+}
+
+func (r *postgresRepository) UpdateParent(parent models.Parent) (err error) {
+	query := "UPDATE back2school.parents" +
+		" SET name = $1, surname = $2, mail = $3, info = $4 " +
+		"where id = $5"
+	return r.update(query, parent.Name, parent.Surname, parent.Mail, parent.Info, parent.ID)
+}
+
+func (r *postgresRepository) UpdateStudent(student models.Student) (err error) {
+	query := "UPDATE back2school.student" +
+		" SET name = $1, surname = $2, mail = $3, info = $4 " +
+		"where id = $5"
+	return r.update(query, student.Name, student.Surname, student.Mail, student.Info, student.ID)
 }

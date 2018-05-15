@@ -1,25 +1,24 @@
 package main
 
-//go:generate swagger generate spec
 import (
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/middleware2018-PSS/Services/src/controller"
+	"github.com/middleware2018-PSS/Services/src/models"
 	"github.com/middleware2018-PSS/Services/src/repository"
+	"github.com/middleware2018-PSS/Services/src/representations"
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"github.com/middleware2018-PSS/Services/src/representations"
 )
 
 var (
 	LimitError = errors.New("Limit Must Be Greater Than Zero.")
 )
-
 
 func main() {
 	db, err := sql.Open("postgres", "user=postgres dbname=postgres sslmode=disable")
@@ -33,12 +32,25 @@ func main() {
 
 	api := gin.Default()
 	// TODO implement AUTH with data from db
-	parent := api.Group("/parents/:id", gin.BasicAuth(gin.Accounts{"3": "prova"}), Access())
+	// TODO implement AUTH instead of relying on url
+	parent := api.Group("/parents/:id") //, gin.BasicAuth(gin.Accounts{"3": "prova"}), Access())
 	{
-		parent.GET("", byID("id", con.GetParentByID))
-		parent.GET("/students", byIDWithOffsetAndLimit("id", con.StudentsByParent))
+		parent.GET("", byID("id", con.ParentByID))
+		parent.PUT("", func(c *gin.Context) {
+			// not possible to refactor (at the best of my knowledge)
+			var p models.Parent
+			if err := c.ShouldBind(&p); err == nil {
+				id, _ := strconv.Atoi(c.Param("id"))
+				p.ID = int64(id)
+				if err := con.UpdateParent(p); err == nil {
+					c.JSON(http.StatusCreated, p)
+				}
+			}
+
+		})
+		parent.GET("/students", byIDWithOffsetAndLimit("id", con.ChildrenByParent))
 		// TODO redirect or deeper links? e.g. /parents/id/students/student/grades...
-		parent.GET("/students/:student", byID("student", con.GetStudentByID))
+		parent.GET("/students/:student", byID("student", con.StudentByID))
 		parent.GET("/students/:student/grades", byIDWithOffsetAndLimit("student", con.GradesByStudent))
 		parent.GET("/appointments", byIDWithOffsetAndLimit("id", con.AppointmentsByParent))
 		parent.GET("/payments", byIDWithOffsetAndLimit("id", con.PaymentsByParent))
@@ -46,13 +58,24 @@ func main() {
 	}
 
 	// TODO add hypermedia
-	teachers := api.Group("/teachers/:id", gin.BasicAuth(gin.Accounts{"1": "prova"}), Access())
+	teachers := api.Group("/teachers/:id") //, gin.BasicAuth(gin.Accounts{"1": "prova"}), Access())
 	{
-		teachers.GET("", byID("id", con.GetTeacherByID))
+		teachers.GET("", byID("id", con.TeacherByID))
+		teachers.PUT("", func(c *gin.Context) {
+			var t models.Teacher
+			if err := c.ShouldBind(&t); err == nil {
+				id, _ := strconv.Atoi(c.Param("id"))
+				t.ID = int64(id)
+				if err := con.UpdateTeacher(t); err != nil {
+					c.JSON(http.StatusNoContent, nil)
+				}
+			}
+
+		})
 		teachers.GET("/lectures", byIDWithOffsetAndLimit("id", con.LecturesByTeacher))
 		teachers.GET("/appointments", byIDWithOffsetAndLimit("id", con.AppointmentsByTeacher))
 		teachers.GET("/notifications", byIDWithOffsetAndLimit("id", con.NotificationsByTeacher))
-		teachers.GET("/subjects", byIDWithOffsetAndLimit("id", con.SubjectByTeacher))
+		teachers.GET("/subjects", byIDWithOffsetAndLimit("id", con.SubjectsByTeacher))
 		teachers.GET("/subjects/:subject", func(c *gin.Context) {
 			id, err := strconv.Atoi(c.Param("id"))
 			subj := c.Param("subject")
@@ -68,13 +91,13 @@ func main() {
 	admin := api.Group("/admins/:id", gin.BasicAuth(gin.Accounts{"1": "prova"}), Access())
 
 	admin.GET("/parents", getOffsetLimit(con.Parents))
-	admin.GET("/parents/:parent", byID("parent", con.GetParentByID))
+	admin.GET("/parents/:parent", byID("parent", con.ParentByID))
 
 	admin.GET("/students", getOffsetLimit(con.Students))
 	api.GET("/students/:student/grades", byIDWithOffsetAndLimit("student", con.GradesByStudent))
 
 	admin.GET("/notifications", getOffsetLimit(con.Notifications))
-	admin.GET("/notifications/:notification", byID("notification", con.GetNotificationByID))
+	admin.GET("/notifications/:notification", byID("notification", con.NotificationByID))
 
 	admin.GET("/payments", getOffsetLimit(con.Payments))
 	admin.GET("/payments/:payment", byID("payment", con.PaymentByID))
@@ -98,7 +121,6 @@ func byID(key string, f func(int64) (interface{}, error)) func(c *gin.Context) {
 	}
 
 }
-
 
 func offsetLimit(c *gin.Context) (int, int) {
 	// TODO check err
@@ -127,7 +149,7 @@ func byIDWithOffsetAndLimit(id string, f func(int64, int, int) ([]interface{}, e
 		id, err := strconv.Atoi(c.Param(id))
 		offset, limit := offsetLimit(c)
 		res, err := f(int64(id), limit, offset)
-		for i, el := range res{
+		for i, el := range res {
 			res[i], _ = representations.ToRepresentation(el, c)
 		}
 		result := representations.List{res, next(c.Request.RequestURI, offset, limit, res)}
@@ -166,12 +188,16 @@ func negotiate(c *gin.Context, data interface{}) gin.Negotiate {
 }
 
 func handleErr(err error, res interface{}, c *gin.Context) {
-	switch err {
-	case nil:
-		c.Negotiate(http.StatusOK, negotiate(c, res))
-	case repository.ErrNoResult:
-		c.Negotiate(http.StatusNotFound, negotiate(c, gin.H{"error": err.Error()}))
-	default:
-		c.Negotiate(http.StatusBadRequest, negotiate(c, gin.H{"error": err.Error()}))
+	if res != nil {
+		switch err {
+		case nil:
+			c.Negotiate(http.StatusOK, negotiate(c, res))
+		case repository.ErrNoResult:
+			c.Negotiate(http.StatusNotFound, negotiate(c, gin.H{"error": err.Error()}))
+		default:
+			c.Negotiate(http.StatusBadRequest, negotiate(c, gin.H{"error": err.Error()}))
+		}
+	} else {
+		c.JSON(http.StatusNoContent, nil)
 	}
 }

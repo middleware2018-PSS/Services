@@ -13,13 +13,13 @@ type Repository interface {
 
 	// Parents
 	// see/modify their personal data
-	ParentById(id int64) (interface{}, error)
-	UpdateParent(id int64) error
+	ParentByID(id int64) (interface{}, error)
+	UpdateParent(models.Parent) error
+	UpdateStudent(student models.Student) error
 
 	// see/modify the personal data of their registered children
 	ChildrenByParent(id int64, limit int, offset int) ([]interface{}, error)
-	StudentById(id int64) (interface{}, error)
-	UpdateStudent(id int64) error
+	StudentByID(id int64) (interface{}, error)
 
 	// see the grades obtained by their children
 	GradesByStudent(id int64, limit int, offset int) ([]interface{}, error)
@@ -38,7 +38,7 @@ type Repository interface {
 
 	// see/modify their personal data
 	TeacherByID(id int64) (teacher interface{}, err error)
-	UpdateTeacher(id int64) (err error)
+	UpdateTeacher(teacher models.Teacher) (err error)
 
 	// see the classrooms in which they teach, with information regarding the argument that they teach
 	// in that class, the students that make up the class, and the complete lesson timetable for that
@@ -46,7 +46,7 @@ type Repository interface {
 	SubjectsByTeacher(id int64, limit int, offset int) ([]interface{}, error)
 	ClassesBySubjectAndTeacher(teacher int64, subject string, limit int, offset int) ([]interface{}, error)
 
-	StudentByClass(id int64, limit int, offset int) ([]interface{}, error)
+	StudentsByClass(id int64, limit int, offset int) ([]interface{}, error)
 	LectureByClass(id int64, limit int, offset int) ([]interface{}, error)
 
 	// LectureByClass(id int64, limit int, offset int) (students []interface{}, err error)
