@@ -34,34 +34,50 @@ type Teacher struct {
 }
 
 type List struct {
+	Self    string        `json:"self",xml:"self"`
 	Results []interface{} `json:"results", xml:"results"`
 	Next    string        `json:"next,omitempty",xml:"next"`
 }
 
+type Class struct {
+	Self     string       `json:"self",xml:"self"`
+	Data     models.Class `json:"data", xml:"data"`
+	Students string       `json:"students", xml:"students"`
+}
+
 func ToRepresentation(res interface{}, c *gin.Context) (interface{}, error) {
-	url := c.Request.RequestURI
 	switch r := res.(type) {
 	case models.Parent:
-
+		self := "/parents/" + fmt.Sprintf("%d", r.ID)
 		return Parent{r,
-			url + "/students",
-			url,
-			url + "/appointments",
-			url + "/payments",
-			url + "/notifications",
+			self + "/students",
+			self,
+			self + "/appointments",
+			self + "/payments",
+			self + "/notifications",
 		}, nil
 	case models.Teacher:
-		return Teacher{r, url,
-			url + "/lectures",
-			url + "/appointments",
-			url + "/notifications",
-			url + "/subjects",
-			url + "/classes"}, nil
+		self := "/teachers/" + fmt.Sprintf("%d", r.ID)
+		return Teacher{r,
+			self,
+			self + "/lectures",
+			self + "/appointments",
+			self + "/notifications",
+			self + "/subjects",
+			self + "/classes"}, nil
 	case models.Student:
-		url = fixID(url, r.ID)
+		self := "/students/" + fmt.Sprintf("%d", r.ID)
 		return Student{
-			r, url,
-			url + "/grades",
+			r,
+			self,
+			self + "/grades",
+		}, nil
+	case models.Class:
+		self := "/classes/" + fmt.Sprintf("%d", r.ID)
+		return Class{
+			self,
+			r,
+			self + "/students",
 		}, nil
 
 	default:
@@ -69,7 +85,7 @@ func ToRepresentation(res interface{}, c *gin.Context) (interface{}, error) {
 		return struct {
 			Data interface{} `json:"data",xml:"data"`
 			Self string      `json:"self",xml:"self"`
-		}{res, url}, nil
+		}{res, c.Request.RequestURI}, nil
 	}
 }
 

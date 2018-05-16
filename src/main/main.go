@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
-	"github.com/middleware2018-PSS/Services/src/controller"
 	"github.com/middleware2018-PSS/Services/src/models"
 	"github.com/middleware2018-PSS/Services/src/repository"
 	"github.com/middleware2018-PSS/Services/src/representations"
@@ -27,8 +26,7 @@ func main() {
 	}
 	defer db.Close()
 
-	r := repository.NewPostgresRepository(db)
-	con := controller.NewController(r)
+	con := repository.NewPostgresRepository(db)
 
 	api := gin.Default()
 	// TODO implement AUTH with data from db
@@ -46,18 +44,18 @@ func main() {
 					c.JSON(http.StatusCreated, p)
 				}
 			}
-
 		})
 		parent.GET("/students", byIDWithOffsetAndLimit("id", con.ChildrenByParent))
 		// TODO redirect or deeper links? e.g. /parents/id/students/student/grades...
-		parent.GET("/students/:student", byID("student", con.StudentByID))
-		parent.GET("/students/:student/grades", byIDWithOffsetAndLimit("student", con.GradesByStudent))
+		// "natural join isparent as i", "and i.parent = "
 		parent.GET("/appointments", byIDWithOffsetAndLimit("id", con.AppointmentsByParent))
+		//TODO how to check accessing right student?!?!
 		parent.GET("/payments", byIDWithOffsetAndLimit("id", con.PaymentsByParent))
 		parent.GET("/notifications", byIDWithOffsetAndLimit("id", con.NotificationsByParent))
 	}
 
 	// TODO add hypermedia
+
 	teachers := api.Group("/teachers/:id") //, gin.BasicAuth(gin.Accounts{"1": "prova"}), Access())
 	{
 		teachers.GET("", byID("id", con.TeacherByID))
@@ -87,26 +85,35 @@ func main() {
 		teachers.GET("/classes", byIDWithOffsetAndLimit("id", con.ClassesByTeacher))
 	}
 
+	api.GET("/appointments/:appointment", byID("appointment", con.AppointmentByID))
+	api.PUT("/appointments/:appointment", func(c *gin.Context) {
+		var a models.Appointment
+		if err := c.ShouldBind(&a); err == nil {
+			id, _ := strconv.Atoi(c.Param("id"))
+			a.ID = int64(id)
+			if err := con.UpdateAppointments(a); err == nil {
+				c.JSON(http.StatusCreated, a)
+			}
+		}
+	})
 	// TODO remove admin from path and use token
-	admin := api.Group("/admins/:id", gin.BasicAuth(gin.Accounts{"1": "prova"}), Access())
 
-	admin.GET("/parents", getOffsetLimit(con.Parents))
-	admin.GET("/parents/:parent", byID("parent", con.ParentByID))
+	api.GET("/parents", getOffsetLimit(con.Parents))
 
-	admin.GET("/students", getOffsetLimit(con.Students))
+	api.GET("/students", getOffsetLimit(con.Students))
 	api.GET("/students/:student/grades", byIDWithOffsetAndLimit("student", con.GradesByStudent))
 
-	admin.GET("/notifications", getOffsetLimit(con.Notifications))
-	admin.GET("/notifications/:notification", byID("notification", con.NotificationByID))
+	api.GET("/notifications", getOffsetLimit(con.Notifications))
+	api.GET("/notifications/:notification", byID("notification", con.NotificationByID))
 
-	admin.GET("/payments", getOffsetLimit(con.Payments))
-	admin.GET("/payments/:payment", byID("payment", con.PaymentByID))
+	api.GET("/payments", getOffsetLimit(con.Payments))
+	api.GET("/payments/:payment", byID("payment", con.PaymentByID))
 
-	admin.GET("/teachers", getOffsetLimit(con.Teachers))
+	api.GET("/teachers", getOffsetLimit(con.Teachers))
 
-	admin.GET("/classes", getOffsetLimit(con.Classes))
-	admin.GET("/classes/:class", byID("class", con.ClassByID))
-	admin.GET("/classes/:class/students", byIDWithOffsetAndLimit("class", con.StudentsByClass))
+	api.GET("/classes", getOffsetLimit(con.Classes))
+	api.GET("/classes/:class", byID("class", con.ClassByID))
+	api.GET("/classes/:class/students", byIDWithOffsetAndLimit("class", con.StudentsByClass))
 
 	api.Run(":5000")
 }
@@ -135,6 +142,9 @@ func getOffsetLimit(f func(int, int) ([]interface{}, error)) func(c *gin.Context
 		offset, limit := offsetLimit(c)
 		if limit > 0 {
 			res, err := f(limit, offset)
+			for i, el := range res {
+				res[i], _ = representations.ToRepresentation(el, c)
+			}
 			handleErr(err, res, c)
 		} else {
 			handleErr(LimitError, nil, c)
@@ -152,7 +162,7 @@ func byIDWithOffsetAndLimit(id string, f func(int64, int, int) ([]interface{}, e
 		for i, el := range res {
 			res[i], _ = representations.ToRepresentation(el, c)
 		}
-		result := representations.List{res, next(c.Request.RequestURI, offset, limit, res)}
+		result := representations.List{c.Request.RequestURI, res, next(c.Request.RequestURI, offset, limit, res)}
 		handleErr(err, result, c)
 	}
 }
@@ -180,7 +190,7 @@ func Access() gin.HandlerFunc {
 	}
 }
 
-func negotiate(c *gin.Context, data interface{}) gin.Negotiate {
+func negotiate(data interface{}) gin.Negotiate {
 	return gin.Negotiate{
 		Offered: []string{gin.MIMEJSON, gin.MIMEXML},
 		Data:    data,
@@ -191,13 +201,14 @@ func handleErr(err error, res interface{}, c *gin.Context) {
 	if res != nil {
 		switch err {
 		case nil:
-			c.Negotiate(http.StatusOK, negotiate(c, res))
+			c.Negotiate(http.StatusOK, negotiate(res))
 		case repository.ErrNoResult:
-			c.Negotiate(http.StatusNotFound, negotiate(c, gin.H{"error": err.Error()}))
+			c.Negotiate(http.StatusNotFound, negotiate(gin.H{"error": err.Error()}))
 		default:
-			c.Negotiate(http.StatusBadRequest, negotiate(c, gin.H{"error": err.Error()}))
+			c.Negotiate(http.StatusBadRequest, negotiate(gin.H{"error": err.Error()}))
 		}
 	} else {
 		c.JSON(http.StatusNoContent, nil)
 	}
 }
+

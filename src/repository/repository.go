@@ -1,7 +1,13 @@
 package repository
 
 import (
+	"errors"
 	"github.com/middleware2018-PSS/Services/src/models"
+)
+
+var (
+	ErrNoResult      = errors.New("No results found.")
+	ErrorNotBlocking = errors.New("Something went wrong but no worriez.")
 )
 
 type Repository interface {
@@ -33,8 +39,8 @@ type Repository interface {
 	// see/modify appointments that they have with their children's teachers
 	// (calendar-like support for requesting appointments, err error)
 	AppointmentsByParent(id int64, limit int, offset int) ([]interface{}, error)
-	UpdateAppointments(id int64) error
-	AppointmentById(id int64) (interface{}, error)
+	UpdateAppointments(appointment models.Appointment) error
+	AppointmentByID(id int64) (interface{}, error)
 
 	// see/modify their personal data
 	TeacherByID(id int64) (teacher interface{}, err error)
@@ -57,7 +63,7 @@ type Repository interface {
 	ClassesByTeacher(id int64, limit int, offset int) ([]interface{}, error)
 
 	// LectureByClass(id int64, limit int, offset int) (students []interface{}, err error)
-	GradeStudent(grade models.Grade) error
+	// TODO GradeStudent(grade models.Grade) error
 	// TODO
 	// parents:
 	// see/pay (fake payment) upcoming scheduled payments (monthly, material, trips, err error)

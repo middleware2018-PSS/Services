@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
 )
@@ -11,27 +10,8 @@ type postgresRepository struct {
 	*sql.DB
 }
 
-var (
-	ErrNoResult      = errors.New("No results found.")
-	ErrorNotBlocking = errors.New("Something went wrong but no worriez.")
-)
-
 func NewPostgresRepository(DB *sql.DB) *postgresRepository {
 	return &postgresRepository{DB}
-}
-
-func switchError(err error) error {
-	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			err = ErrNoResult
-		default:
-			if l := len("sql: Scan error"); len(err.Error()) >= l && err.Error()[:l] == "sql: Scan error" {
-				err = ErrorNotBlocking
-			}
-		}
-	}
-	return err
 }
 
 func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (interface{}, error), limit int, offset int, params ...interface{}) (list []interface{}, err error) {
@@ -51,34 +31,55 @@ func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (inter
 		}
 	}
 	if len(list) > 0 {
-		return list, switchError(err)
+		return switchResults(list, err)
 	} else {
-		return list, switchError(sql.ErrNoRows)
+		return switchResults(list, sql.ErrNoRows)
 	}
 }
 
-func getListByIDOffsetLimit(id int64, limit int, offset int, f func(int64, int, int) ([]interface{}, error)) ([]interface{}, error) {
-	res, e := f(id, limit, offset)
+func (r *postgresRepository) update(query string, params ...interface{}) (err error) {
+	_, err = r.DB.Exec(query, params...)
+	if err != nil {
+		log.Print(err.Error())
+	}
+	return switchErrors(err)
+}
+
+func switchResult(res interface{}, e error) (interface{}, error) {
 	//TODO: check err
-	switch e {
-	case ErrNoResult:
+	if e = switchErrors(e); e != nil {
 		return nil, e
-	case ErrorNotBlocking:
-		return res, nil
-	default:
+	} else {
 		return res, nil
 	}
 }
 
-func getByID(id int64, f func(int64) (interface{}, error)) (interface{}, error) {
-	res, e := f(id)
+func switchResults(res []interface{}, e error) ([]interface{}, error) {
 	//TODO: check err
-	switch e {
-	case ErrNoResult:
+	if e = switchErrors(e); e != nil {
 		return nil, e
-	case ErrorNotBlocking:
-		return res, nil
-	default:
+	} else {
 		return res, nil
 	}
+}
+
+func switchErrors(e error) error {
+	if e != nil {
+
+		switch e {
+		case sql.ErrNoRows:
+			return ErrNoResult
+
+		default:
+			log.Printf("%v", e)
+			return nil
+		}
+	} else {
+		return nil
+	}
+
+}
+
+type WithID interface{
+	ID() string
 }

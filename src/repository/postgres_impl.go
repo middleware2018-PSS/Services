@@ -3,27 +3,21 @@ package repository
 import (
 	"database/sql"
 	"github.com/middleware2018-PSS/Services/src/models"
-	"log"
 )
 
-func (r *postgresRepository) UpdateAppointments(id int64) (err error) {
-	//TODO
-	return
-}
-
-func (r *postgresRepository) AppointmentById(id int64) (interface{}, error) {
+func (r *postgresRepository) AppointmentByID(id int64) (interface{}, error) {
 	appointment := models.Appointment{}
 	err := r.QueryRow("SELECT id, student, teacher, time, location "+
 		"FROM back2school.appointments WHERE id = $1 ", id).Scan(
 		&appointment.ID, &appointment.Student.ID, &appointment.Teacher.ID, &appointment.Time, &appointment.Location)
-	return appointment, switchError(err)
+	return switchResult(appointment, err)
 }
 
 func (r *postgresRepository) ClassByID(id int64) (interface{}, error) {
 	class := models.Class{}
 	err := r.QueryRow("SELECT id, year, section, info, grade FROM back2school.classes "+
 		"WHERE id = $1", id).Scan(&class.ID, &class.Year, &class.Section, &class.Info, &class.Grade)
-	return class, switchError(err)
+	return switchResult(class, err)
 }
 
 func (r *postgresRepository) Classes(limit int, offset int) ([]interface{}, error) {
@@ -66,7 +60,7 @@ func (r *postgresRepository) NotificationByID(id int64) (interface{}, error) {
 	err := r.QueryRow("SELECT id, receiver, message, time, receiver_kind "+
 		"FROM back2school.notification WHERE id = $1 ", id).Scan(&n.ID,
 		&n.Receiver, &n.Message, &n.Time, &n.ReceiverKind)
-	return n, switchError(err)
+	return switchResult(n, err)
 }
 
 func (r *postgresRepository) Notifications(limit int, offset int) ([]interface{}, error) {
@@ -85,7 +79,7 @@ func (r *postgresRepository) ParentByID(id int64) (interface{}, error) {
 	err := r.QueryRow("SELECT id,	name, surname, mail, info "+
 		"FROM back2school.parents WHERE id = $1",
 		id).Scan(&p.ID, &p.Name, &p.Surname, &p.Mail, &p.Info)
-	return p, switchError(err)
+	return switchResult(p, err)
 }
 
 func (r *postgresRepository) Parents(limit int, offset int) ([]interface{}, error) {
@@ -156,7 +150,7 @@ func (r *postgresRepository) PaymentByID(id int64) (interface{}, error) {
 	payment := &models.Payment{}
 	err := r.QueryRow("SELECT id, amount, payed, emitted, reason "+
 		"FROM back2school.payments WHERE id = $1 ", id).Scan(payment.ID, payment.Amount, payment.Payed, payment.Emitted, payment.Reason)
-	return payment, switchError(err)
+	return switchResult(payment, err)
 }
 
 func (r *postgresRepository) Payments(limit int, offset int) ([]interface{}, error) {
@@ -185,7 +179,7 @@ func (r *postgresRepository) StudentByID(id int64) (student interface{}, err err
 	err = r.QueryRow("SELECT id,	name, surname, mail, info  "+
 		"FROM back2school.students WHERE id = $1", id).Scan(&s.ID,
 		&s.Name, &s.Surname, &s.Mail, &s.Info)
-	return s, switchError(err)
+	return switchResult(s, err)
 }
 
 func (r *postgresRepository) GradesByStudent(id int64, limit int, offset int) ([]interface{}, error) {
@@ -200,18 +194,13 @@ func (r *postgresRepository) GradesByStudent(id int64, limit int, offset int) ([
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) GradeStudent(grade models.Grade) (err error) {
-	// TODO
-	return
-}
-
 func (r *postgresRepository) TeacherByID(id int64) (interface{}, error) {
 	teacher := models.Teacher{}
 	err := r.QueryRow("SELECT id, name, surname, mail  "+
 		"FROM back2school.teachers "+
 		"WHERE id = $1",
 		id).Scan(&teacher.ID, &teacher.Name, &teacher.Surname, &teacher.Mail)
-	return teacher, switchError(err)
+	return switchResult(teacher, err)
 
 }
 
@@ -299,14 +288,6 @@ func (r *postgresRepository) ClassesByTeacher(id int64, limit int, offset int) (
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) update(query string, params ...interface{}) (err error) {
-	_, err = r.DB.Exec(query, params...)
-	if err != nil {
-		log.Print(err.Error())
-	}
-	return switchError(err)
-}
-
 func (r *postgresRepository) UpdateTeacher(teacher models.Teacher) (err error) {
 	query := "UPDATE back2school.teachers" +
 		" SET name = $1, surname = $2, mail = $3, info = $4 " +
@@ -326,4 +307,10 @@ func (r *postgresRepository) UpdateStudent(student models.Student) (err error) {
 		" SET name = $1, surname = $2, mail = $3, info = $4 " +
 		"where id = $5"
 	return r.update(query, student.Name, student.Surname, student.Mail, student.Info, student.ID)
+}
+
+func (r *postgresRepository) UpdateAppointments(appointment models.Appointment) (err error) {
+	query := "UPDATE back2school.appointments " +
+		"SET student = $1, teacher = $2, location = $3, time = $4 where id = $5"
+	return r.update(query, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time, appointment.ID)
 }
