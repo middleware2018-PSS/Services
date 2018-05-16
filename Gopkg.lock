@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/appleboy/gin-jwt"
+  packages = ["."]
+  revision = "f7347d7c16fc8297bf5b7215b9e4847a5ca05d90"
+  version = "v2.3.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
@@ -76,6 +82,12 @@
   revision = "7c87d13f8e835d2fb3a70a2912c811ed0c1d241b"
 
 [[projects]]
+  name = "gopkg.in/dgrijalva/jwt-go.v3"
+  packages = ["."]
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
+
+[[projects]]
   name = "gopkg.in/go-playground/validator.v8"
   packages = ["."]
   revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
@@ -90,6 +102,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "70e463c9c6eb1caec597c65b6410bf45b261af641ebdc0145bf255b9d0767a9b"
+  inputs-digest = "29ef159617951e2acd1fca5576bf760de2fce7c921fdb8635aac01d533f8fede"
   solver-name = "gps-cdcl"
   solver-version = 1

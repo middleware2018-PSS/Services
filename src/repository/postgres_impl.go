@@ -5,6 +5,21 @@ import (
 	"github.com/middleware2018-PSS/Services/src/models"
 )
 
+func (r *postgresRepository) CheckUser(userID string, password string) (string, bool) {
+	query := `select "user", password from back2school.accounts where "user" = $1 and password = $2`
+	var id, pass string
+	err := r.QueryRow(query, userID, password).Scan(&id, &pass)
+	return userID, err==nil
+}
+
+func (r *postgresRepository) UserKind(userID string) map[string]interface{} {
+	query := `select kind, id from back2school.accounts where "user" = $1`
+	var kind string
+	var id int
+	r.QueryRow(query, userID).Scan(&kind, &id)
+	return map[string]interface{}{"kind":kind,"dbID":id}
+}
+
 func (r *postgresRepository) AppointmentByID(id int64) (interface{}, error) {
 	appointment := models.Appointment{}
 	err := r.QueryRow("SELECT id, student, teacher, time, location "+

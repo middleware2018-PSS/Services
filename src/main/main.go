@@ -13,6 +13,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"github.com/appleboy/gin-jwt"
+	"time"
 )
 
 var (
@@ -28,11 +30,23 @@ func main() {
 
 	con := repository.NewPostgresRepository(db)
 
-	api := gin.Default()
-	// TODO implement AUTH with data from db
-	// TODO implement AUTH instead of relying on url
+	g := gin.Default()
+	authMiddleware := jwt.GinJWTMiddleware{
+		Realm: "test",
+		Key: []byte("password"),
+		Timeout: time.Hour,
+		MaxRefresh:time.Hour,
+		Authenticator: func(userID string, password string, c *gin.Context) (string, bool) {
+			return con.CheckUser(userID, password)
+		},
+		PayloadFunc: con.UserKind,
+		}
+	g.POST("/login", authMiddleware.LoginHandler)
 
-	parent := api.Group("/parents/:id") //, gin.BasicAuth(gin.Accounts{"3": "prova"}), Access())
+	api := g.Group("", authMiddleware.MiddlewareFunc())
+	api.GET("/refresh_token", authMiddleware.RefreshHandler)
+
+	parent := api.Group("/parents/:id", authAdminOrParent(authMiddleware.Realm) )
 	{
 		parent.GET("", byID("id", con.ParentByID))
 		parent.PUT("", func(c *gin.Context) {
@@ -47,17 +61,14 @@ func main() {
 			}
 		})
 		parent.GET("/students", byIDWithOffsetAndLimit("id", con.ChildrenByParent))
-		// TODO redirect or deeper links? e.g. /parents/id/students/student/grades...
-		// "natural join isparent as i", "and i.parent = "
 		parent.GET("/appointments", byIDWithOffsetAndLimit("id", con.AppointmentsByParent))
-		//TODO how to check accessing right student?!?!
 		parent.GET("/payments", byIDWithOffsetAndLimit("id", con.PaymentsByParent))
 		parent.GET("/notifications", byIDWithOffsetAndLimit("id", con.NotificationsByParent))
 	}
 
 	// TODO add hypermedia
 
-	teachers := api.Group("/teachers/:id") //, gin.BasicAuth(gin.Accounts{"1": "prova"}), Access())
+	teachers := api.Group("/teachers/:id",authAdminOrTeacher(authMiddleware.Realm))
 	{
 		teachers.GET("", byID("id", con.TeacherByID))
 		teachers.PUT("", func(c *gin.Context) {
@@ -119,7 +130,7 @@ func main() {
 	api.GET("/classes/:id", byID("id", con.ClassByID))
 	api.GET("/classes/:id/students", byIDWithOffsetAndLimit("id", con.StudentsByClass))
 
-	api.Run(":5000")
+	g.Run(":5000")
 }
 
 func byID(key string, f func(int64) (interface{}, error)) func(c *gin.Context) {
@@ -232,3 +243,44 @@ func handleErr(err error, res interface{}, c *gin.Context) {
 		c.JSON(http.StatusNoContent, nil)
 	}
 }
+
+func authAdminOrParent(realm string) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		claims := jwt.ExtractClaims(c)
+		s, err := strconv.Atoi(c.Param("id"))
+		if k := claims["kind"]; err != nil || k == "admin" || (k.(string) == "parent" && (claims["dbID"] == float64(s))) {
+			c.Next()
+		} else {
+			c.Header("WWW-Authenticate", realm)
+			c.AbortWithStatus(http.StatusForbidden)
+			return
+		}
+	}
+	}
+
+func authAdminOrTeacher(realm string) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		claims := jwt.ExtractClaims(c)
+		s, err := strconv.Atoi(c.Param("id"))
+		if k := claims["kind"]; err != nil || k == "admin" || (k.(string) == "teacher" && (claims["dbID"] == float64(s))) {
+			c.Next()
+		} else {
+			c.Header("WWW-Authenticate", realm)
+			c.AbortWithStatus(http.StatusForbidden)
+			return
+		}
+	}
+	}
+
+func authAdmin(realm string) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		claims := jwt.ExtractClaims(c)
+		if k := claims["kind"]; k == "admin" {
+			c.Next()
+		} else {
+			c.Header("WWW-Authenticate", realm)
+			c.AbortWithStatus(http.StatusForbidden)
+			return
+		}
+	}
+	}

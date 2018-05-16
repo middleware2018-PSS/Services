@@ -14,6 +14,8 @@ func NewPostgresRepository(DB *sql.DB) *postgresRepository {
 	return &postgresRepository{DB}
 }
 
+
+
 func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (interface{}, error), limit int, offset int, params ...interface{}) (list []interface{}, err error) {
 	query = query + fmt.Sprintf(" limit $%d offset $%d", len(params)+1, len(params)+2)
 	params = append(params, limit, offset)
