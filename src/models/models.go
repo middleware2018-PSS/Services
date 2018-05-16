@@ -13,76 +13,76 @@ type Location = string
 // remove connections
 
 type Student struct {
-	ID      ID     `json:"id",xml:"id"`
-	Name    string `json:"name,omitempty"`
-	Surname string `json:"surname,omitempty"`
-	Mail    string `json:"mail,omitempty"`
-	Info    string `json:"info,omitempty"`
+	ID      ID      `json:"id",xml:"id"`
+	Name    *string `json:"name"`
+	Surname *string `json:"surname"`
+	Mail    *string `json:"mail"`
+	Info    *string `json:"info"`
 }
 
 type Grade struct {
-	Student Student    `json:"student,omitempty"`
-	Subject Subject    `json:"subject,omitempty"`
-	Date    *time.Time `json:"date,omitempty"`
-	Grade   int        `json:"grade,omitempty"`
-	Teacher Teacher    `json:"teacher,omitempty"`
+	Student Student    `json:"student"`
+	Subject *Subject   `json:"subject"`
+	Date    *time.Time `json:"date"`
+	Grade   *int       `json:"grade"`
+	Teacher *Teacher   `json:"teacher"`
 }
 
 type Appointment struct {
 	ID       ID         `json:"id",xml:"id"`
-	Time     *time.Time `json:"time,omitempty"`
-	Location Location   `json:"location,omitempty"`
-	Student  Student    `json:"student,omitempty"`
-	Teacher  Teacher    `json:"student,omitempty"`
+	Time     *time.Time `json:"time"`
+	Location *Location  `json:"location"`
+	Student  *Student   `json:"student"`
+	Teacher  *Teacher   `json:"student"`
 }
 
 type Notification struct {
 	ID           ID         `json:"id",xml:"id"`
-	Receiver     int64      `json:"receiver,omitempty"`
-	Time         *time.Time `json:"time,omitempty"`
-	Message      string     `json:"message,omitempty"`
-	ReceiverKind string     `json:"receiver_kind,omitempty"`
+	Receiver     *int64     `json:"receiver"`
+	Time         *time.Time `json:"time"`
+	Message      *string    `json:"message"`
+	ReceiverKind *string    `json:"receiver_kind"`
 }
 
 type Parent struct {
-	ID      ID     `json:"id",xml:"id"`
-	Name    string `json:"name,omitempty"`
-	Surname string `json:"surname,omitempty"`
-	Mail    string `json:"mail,omitempty"`
-	Info    string `json:"info,omitempty"`
+	ID      ID      `json:"id",xml:"id"`
+	Name    *string `json:"name"`
+	Surname *string `json:"surname"`
+	Mail    *string `json:"mail"`
+	Info    *string `json:"info"`
 }
 
 type Teacher struct {
-	ID      ID     `json:"id",xml:"id"`
-	Name    string `json:"name,omitempty"`
-	Surname string `json:"surname,omitempty"`
-	Mail    string `json:"mail,omitempty"`
-	Info    string `json:"info,omitempty"`
+	ID      ID      `json:"id",xml:"id"`
+	Name    *string `json:"name"`
+	Surname *string `json:"surname"`
+	Mail    *string `json:"mail"`
+	Info    *string `json:"info"`
 }
 
 type TimeTable struct {
 	ID       ID         `json:"id",xml:"id"`
-	Class    Class      `json:"class,omitempty"`
-	Location Location   `json:"location,omitempty"`
-	Subject  Subject    `json:"subject,omitempty"`
-	Start    *time.Time `json:"start,omitempty"`
-	End      *time.Time `json:"end,omitempty"`
-	Info     string     `json:"info,omitempty"`
+	Class    *Class     `json:"class"`
+	Location *Location  `json:"location"`
+	Subject  *Subject   `json:"subject"`
+	Start    *time.Time `json:"start"`
+	End      *time.Time `json:"end"`
+	Info     *string    `json:"info"`
 }
 
 type Payment struct {
 	ID      ID         `json:"id",xml:"id"`
-	Amount  int64      `json:"amount,omitempty"`
-	Payed   bool       `json:"payed,omitempty"`
-	Emitted *time.Time `json:"emitted,omitempty"`
-	Reason  string     `json:"reason,omitempty"`
-	Student Student    `json:"student,omitempty"`
+	Amount  *int64     `json:"amount"`
+	Payed   *bool      `json:"payed"`
+	Emitted *time.Time `json:"emitted"`
+	Reason  *string    `json:"reason"`
+	Student *Student   `json:"student"`
 }
 
 type Class struct {
-	ID      ID     `json:"id",xml:"id"`
-	Year    int    `json:"year,omitempty"`
-	Section string `json:"section,omitempty"` // as "A" in 5'A
-	Grade   int    `json:"grade,omitempty"`   // as "5" in 5'A
-	Info    string `json:"info,omitempty"`
+	ID      ID      `json:"id",xml:"id"`
+	Year    *int    `json:"year"`
+	Section *string `json:"section"` // as "A" in 5'A
+	Grade   *int    `json:"grade"`   // as "5" in 5'A
+	Info    *string `json:"info"`
 }

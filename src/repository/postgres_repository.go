@@ -79,7 +79,3 @@ func switchErrors(e error) error {
 	}
 
 }
-
-type WithID interface{
-	ID() string
-}

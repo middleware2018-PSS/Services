@@ -5,27 +5,31 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/middleware2018-PSS/Services/src/models"
 	"log"
-	"strings"
 )
 
 type Student struct {
-	Data   models.Student `json:"data",xml:"data"`
 	Self   string         `json:"self",xml:"self"`
+	Data   models.Student `json:"data",xml:"data"`
 	Grades string         `json:"grades",xml:"grades"`
 }
 
+type Notification struct {
+	Self string              `json:"self",xml:"self"`
+	Data models.Notification `json:"data",xml:"data"`
+}
+
 type Parent struct {
-	Data          models.Parent `json:"data",xml:"data"`
-	Childrens     string        `json:"childrens",xml:"childrens"`
 	Self          string        `json:"self",xml:"self"`
+	Data          models.Parent `json:"data",xml:"data"`
+	Children      string        `json:"children",xml:"children"`
 	Appointments  string        `json:"appointments",xml:"appointments"`
 	Payments      string        `json:"payments",xml:"payments"`
 	Notifications string        `json:"notifications",xml:"notifications"`
 }
 
 type Teacher struct {
-	Data          models.Teacher `json:"data", xml:"data"`
 	Self          string         `json:"self",xml:"self"`
+	Data          models.Teacher `json:"data",xml:"data"`
 	Lectures      string         `json:"lectures",xml:"lectures"`
 	Appointments  string         `json:"appointments",xml:"appointments"`
 	Notifications string         `json:"notifications",xml:"notifications"`
@@ -34,42 +38,46 @@ type Teacher struct {
 }
 
 type List struct {
-	Self    string        `json:"self",xml:"self"`
-	Results []interface{} `json:"results", xml:"results"`
-	Next    string        `json:"next,omitempty",xml:"next"`
+	Self     string        `json:"self",xml:"self"`
+	Results  []interface{} `json:"results",xml:"results"`
+	Next     string        `json:"next,omitempty",xml:"next"`
+	Previous string        `json:"previous,omitempty",xml:"previous"`
 }
 
 type Class struct {
 	Self     string       `json:"self",xml:"self"`
-	Data     models.Class `json:"data", xml:"data"`
-	Students string       `json:"students", xml:"students"`
+	Data     models.Class `json:"data",xml:"data"`
+	Students string       `json:"students",xml:"students"`
 }
 
 func ToRepresentation(res interface{}, c *gin.Context) (interface{}, error) {
 	switch r := res.(type) {
 	case models.Parent:
 		self := "/parents/" + fmt.Sprintf("%d", r.ID)
-		return Parent{r,
-			self + "/students",
+		return Parent{
 			self,
+			r,
+			self + "/students",
 			self + "/appointments",
 			self + "/payments",
 			self + "/notifications",
 		}, nil
 	case models.Teacher:
 		self := "/teachers/" + fmt.Sprintf("%d", r.ID)
-		return Teacher{r,
+		return Teacher{
 			self,
+			r,
 			self + "/lectures",
 			self + "/appointments",
 			self + "/notifications",
 			self + "/subjects",
-			self + "/classes"}, nil
+			self + "/classes",
+		}, nil
 	case models.Student:
 		self := "/students/" + fmt.Sprintf("%d", r.ID)
 		return Student{
-			r,
 			self,
+			r,
 			self + "/grades",
 		}, nil
 	case models.Class:
@@ -79,21 +87,21 @@ func ToRepresentation(res interface{}, c *gin.Context) (interface{}, error) {
 			r,
 			self + "/students",
 		}, nil
+	case models.Notification:
+		self := "/notifications/" + fmt.Sprintf("%d", r.ID)
+		return Notification{
+			self,
+			r,
+		}, nil
 
 	default:
-		log.Print(fmt.Sprintf("implement representation for %T", res))
+		log.Fatal(fmt.Sprintf("implement representation for %T", res))
 		return struct {
-			Data interface{} `json:"data",xml:"data"`
 			Self string      `json:"self",xml:"self"`
-		}{res, c.Request.RequestURI}, nil
+			Data interface{} `json:"data",xml:"data"`
+		}{
+			c.Request.RequestURI,
+			res,
+		}, nil
 	}
-}
-
-func fixID(url string, ID models.ID) string {
-	id := fmt.Sprintf("%d", ID)
-	i := strings.LastIndex(url, "/")
-	if url[i+1:] != id {
-		url = url + "/" + id
-	}
-	return url
 }

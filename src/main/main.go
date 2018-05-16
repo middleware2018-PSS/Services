@@ -160,23 +160,40 @@ func byIDWithOffsetAndLimit(id string, f func(int64, int, int) ([]interface{}, e
 		offset, limit := offsetLimit(c)
 		res, err := f(int64(id), limit, offset)
 		for i, el := range res {
+			//TODO handle err
 			res[i], _ = representations.ToRepresentation(el, c)
 		}
-		result := representations.List{c.Request.RequestURI, res, next(c.Request.RequestURI, offset, limit, res)}
+		result := representations.List{c.Request.RequestURI,
+			res,
+			next(c.Request.RequestURI, offset, limit, res),
+			prev(c.Request.RequestURI, offset, limit),
+		}
 		handleErr(err, result, c)
 	}
 }
 
-func next(uri string, offset int, limit int, input []interface{}) (res string) {
-	if n := strings.Index(uri, "?"); n >= 0 {
-		res = uri[:n]
-	} else {
-		res = uri
+func prev(uri string, offset int, limit int) string {
+	if offset == 0 {
+		return ""
+	} else if n := strings.Index(uri, "?"); n >= 0 {
+		uri = uri[:n]
 	}
+	if prev := offset - limit; prev < 0 {
+		offset = 0
+	} else {
+		offset = prev
+	}
+	return strings.Join([]string{uri, fmt.Sprintf("?offset=%d&limit=%d", offset, limit)}, "")
+}
+
+func next(uri string, offset int, limit int, input []interface{}) string {
 	if l := len(input); l < limit {
 		return ""
 	}
-	return strings.Join([]string{res, fmt.Sprintf("?offset=%d&limit=%d", offset+limit, limit)}, "")
+	if n := strings.Index(uri, "?"); n >= 0 {
+		uri = uri[:n]
+	}
+	return strings.Join([]string{uri, fmt.Sprintf("?offset=%d&limit=%d", offset+limit, limit)}, "")
 }
 
 func Access() gin.HandlerFunc {
@@ -211,4 +228,3 @@ func handleErr(err error, res interface{}, c *gin.Context) {
 		c.JSON(http.StatusNoContent, nil)
 	}
 }
-
