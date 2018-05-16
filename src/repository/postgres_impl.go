@@ -82,6 +82,17 @@ func (r *postgresRepository) ParentByID(id int64) (interface{}, error) {
 	return switchResult(p, err)
 }
 
+func (r *postgresRepository) Grades(limit int, offset int) ([]interface{}, error) {
+	return r.listByParams("select id, student, grade, subject, date, teacher "+
+		"from back2school.grades "+
+		"order by date desc, teacher asc",
+		func(rows *sql.Rows) (interface{}, error) {
+			g := models.Grade{}
+			err := rows.Scan(&g.ID, &g.Student.ID, &g.Grade, &g.Subject, &g.Date, &g.Teacher)
+			return g, err
+		}, limit, offset)
+}
+
 func (r *postgresRepository) Parents(limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("select id, name, surname, mail, info "+
 		"from back2school.parents "+
@@ -164,6 +175,17 @@ func (r *postgresRepository) Payments(limit int, offset int) ([]interface{}, err
 		}, limit, offset)
 }
 
+func (r *postgresRepository) Appointments(limit int, offset int) ([]interface{}, error) {
+	return r.listByParams("select id, student, teacher, location, time "+
+		"from back2school.appointments "+
+		"order by time desc, teacher asc",
+		func(rows *sql.Rows) (interface{}, error) {
+			appointment := models.Appointment{}
+			err := rows.Scan(&appointment.ID, &appointment.Student.ID, &appointment.Teacher.ID, &appointment.Location, &appointment.Time)
+			return appointment, err
+	}, limit, offset)
+}
+
 func (r *postgresRepository) Students(limit int, offset int) (student []interface{}, err error) {
 	return r.listByParams("select id, name, surname, mail, info  "+
 		"from back2school.students "+
@@ -183,13 +205,13 @@ func (r *postgresRepository) StudentByID(id int64) (student interface{}, err err
 }
 
 func (r *postgresRepository) GradesByStudent(id int64, limit int, offset int) ([]interface{}, error) {
-	return r.listByParams("SELECT student, subject, date, grade, teacher "+
+	return r.listByParams("SELECT id, student, subject, date, grade, teacher "+
 		"FROM back2school.grades "+
 		"WHERE student = $1 "+
 		"order by date desc",
 		func(rows *sql.Rows) (interface{}, error) {
 			grade := models.Grade{}
-			err := rows.Scan(&grade.Student.ID, &grade.Subject, &grade.Date, &grade.Grade, &grade.Teacher.ID)
+			err := rows.Scan(&grade.ID, &grade.Student.ID, &grade.Subject, &grade.Date, &grade.Grade, &grade.Teacher.ID)
 			return grade, err
 		}, limit, offset, id)
 }

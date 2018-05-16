@@ -31,6 +31,7 @@ func main() {
 	api := gin.Default()
 	// TODO implement AUTH with data from db
 	// TODO implement AUTH instead of relying on url
+
 	parent := api.Group("/parents/:id") //, gin.BasicAuth(gin.Accounts{"3": "prova"}), Access())
 	{
 		parent.GET("", byID("id", con.ParentByID))
@@ -85,6 +86,7 @@ func main() {
 		teachers.GET("/classes", byIDWithOffsetAndLimit("id", con.ClassesByTeacher))
 	}
 
+	api.GET("/appointments", getOffsetLimit(con.Appointments))
 	api.GET("/appointments/:appointment", byID("appointment", con.AppointmentByID))
 	api.PUT("/appointments/:appointment", func(c *gin.Context) {
 		var a models.Appointment
@@ -99,21 +101,23 @@ func main() {
 	// TODO remove admin from path and use token
 
 	api.GET("/parents", getOffsetLimit(con.Parents))
+	api.GET("/grades", getOffsetLimit(con.Grades))
 
 	api.GET("/students", getOffsetLimit(con.Students))
-	api.GET("/students/:student/grades", byIDWithOffsetAndLimit("student", con.GradesByStudent))
+	api.GET("/students/:id", byID("id", con.StudentByID))
+	api.GET("/students/:id/grades", byIDWithOffsetAndLimit("id", con.GradesByStudent))
 
 	api.GET("/notifications", getOffsetLimit(con.Notifications))
-	api.GET("/notifications/:notification", byID("notification", con.NotificationByID))
+	api.GET("/notifications/:id", byID("id", con.NotificationByID))
 
 	api.GET("/payments", getOffsetLimit(con.Payments))
-	api.GET("/payments/:payment", byID("payment", con.PaymentByID))
+	api.GET("/payments/:id", byID("id", con.PaymentByID))
 
 	api.GET("/teachers", getOffsetLimit(con.Teachers))
 
 	api.GET("/classes", getOffsetLimit(con.Classes))
-	api.GET("/classes/:class", byID("class", con.ClassByID))
-	api.GET("/classes/:class/students", byIDWithOffsetAndLimit("class", con.StudentsByClass))
+	api.GET("/classes/:id", byID("id", con.ClassByID))
+	api.GET("/classes/:id/students", byIDWithOffsetAndLimit("id", con.StudentsByClass))
 
 	api.Run(":5000")
 }
