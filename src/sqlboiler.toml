@@ -1,0 +1,7 @@
+schema = "back2school"
+[postgres]
+dbname = "postgres"
+user = "postgres"
+pass = ""
+host = "localhost" 
+sslmode = "disable"

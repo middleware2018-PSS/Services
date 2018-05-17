@@ -1,8 +1,11 @@
 package main
 
+//go:generate sqlboiler postgres
+
 import (
 	"database/sql"
 	"fmt"
+	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/middleware2018-PSS/Services/src/models"
@@ -13,7 +16,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"github.com/appleboy/gin-jwt"
 	"time"
 )
 
@@ -32,21 +34,21 @@ func main() {
 
 	g := gin.Default()
 	authMiddleware := jwt.GinJWTMiddleware{
-		Realm: "test",
-		Key: []byte("password"),
-		Timeout: time.Hour,
-		MaxRefresh:time.Hour,
+		Realm:      "test",
+		Key:        []byte("password"),
+		Timeout:    time.Hour,
+		MaxRefresh: time.Hour,
 		Authenticator: func(userID string, password string, c *gin.Context) (string, bool) {
 			return con.CheckUser(userID, password)
 		},
 		PayloadFunc: con.UserKind,
-		}
+	}
 	g.POST("/login", authMiddleware.LoginHandler)
 
 	api := g.Group("", authMiddleware.MiddlewareFunc())
 	api.GET("/refresh_token", authMiddleware.RefreshHandler)
 
-	parent := api.Group("/parents/:id", authAdminOrParent(authMiddleware.Realm) )
+	parent := api.Group("/parents/:id", authAdminOrParent(authMiddleware.Realm))
 	{
 		parent.GET("", byID("id", con.ParentByID))
 		parent.PUT("", func(c *gin.Context) {
@@ -68,7 +70,7 @@ func main() {
 
 	// TODO add hypermedia
 
-	teachers := api.Group("/teachers/:id",authAdminOrTeacher(authMiddleware.Realm))
+	teachers := api.Group("/teachers/:id", authAdminOrTeacher(authMiddleware.Realm))
 	{
 		teachers.GET("", byID("id", con.TeacherByID))
 		teachers.PUT("", func(c *gin.Context) {
@@ -256,7 +258,7 @@ func authAdminOrParent(realm string) func(c *gin.Context) {
 			return
 		}
 	}
-	}
+}
 
 func authAdminOrTeacher(realm string) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -270,7 +272,7 @@ func authAdminOrTeacher(realm string) func(c *gin.Context) {
 			return
 		}
 	}
-	}
+}
 
 func authAdmin(realm string) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -283,4 +285,4 @@ func authAdmin(realm string) func(c *gin.Context) {
 			return
 		}
 	}
-	}
+}
