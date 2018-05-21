@@ -9,9 +9,10 @@ type controller struct {
 	r repository.Repository
 }
 type Token struct {
-	Token string  `json:"token"`
-	Expire string  `json:"expire"`
+	Token  string `json:"token"`
+	Expire string `json:"expire"`
 }
+
 func NewController(r repository.Repository) *controller {
 	return &controller{r}
 }
@@ -199,9 +200,10 @@ func (c *controller) UpdateTeacher(teacher models.Teacher) (err error) {
 // see the classrooms in which they teach, with information regarding the argument that they teach
 // in that class, the students that make up the class, and the complete lesson timetable for that
 // class
-type Subjects struct{
+type Subjects struct {
 	Subjects []string `json:"subjects" example:"science"`
 }
+
 // @Summary Get subject taught by the teacher
 // @Param id path int true "Teacher ID"
 // @Param limit query int false "number of elements to return"
@@ -429,7 +431,7 @@ func (c *controller) Grades(limit int, offset int) ([]interface{}, error) {
 // @Tags Students
 // @Router /students [post]
 // @Success 201 {object} models.Student
-func (c*controller) CreateStudent(student models.Student) (int64, error) {
+func (c *controller) CreateStudent(student models.Student) (int64, error) {
 	return c.r.CreateStudent(student)
 }
 
@@ -451,6 +453,7 @@ func (c *controller) CreateClass(class models.Class) (int64, error) {
 func (c *controller) UpdateClass(class models.Class) error {
 	return c.r.UpdateClass(class)
 }
+
 // @Summary Create notification
 // @Param class body models.Notification true "data"
 // @Tags Notifications
@@ -459,24 +462,27 @@ func (c *controller) UpdateClass(class models.Class) error {
 func (c *controller) CreateNotification(notification models.Notification) (int64, error) {
 	return c.r.CreateNotification(notification)
 }
+
 // @Summary Update notification
 // @Param id path int true "Notification ID"
 // @Param class body models.Notification true "data"
 // @Tags Notifications
 // @Router /notifications/{id} [put]
 // @Success 201 {object} models.Notification
-func (c *controller) UpdateNotification(notification models.Notification) error  {
+func (c *controller) UpdateNotification(notification models.Notification) error {
 	return c.r.UpdateNotification(notification)
 }
+
 // @Summary Update Grade
 // @Param id path int true "Grade ID"
 // @Param class body models.Grade true "data"
 // @Tags Grades
 // @Router /grades/{id} [put]
 // @Success 201 {object} models.Grade
-func (c *controller) UpdateGrade(grade models.Grade) error  {
+func (c *controller) UpdateGrade(grade models.Grade) error {
 	return c.r.UpdateGrade(grade)
 }
+
 // @Summary Create grade
 // @Param class body models.Grade true "data"
 // @Tags Grades
@@ -492,9 +498,10 @@ func (c *controller) CreateGrade(grade models.Grade) (int64, error) {
 // @Tags Payments
 // @Router /payments/{id} [put]
 // @Success 201 {object} models.Payment
-func (c *controller) UpdatePayment(payment models.Payment) error  {
+func (c *controller) UpdatePayment(payment models.Payment) error {
 	return c.r.UpdatePayment(payment)
 }
+
 // @Summary Create payment
 // @Param class body models.Payment true "data"
 // @Tags Payments

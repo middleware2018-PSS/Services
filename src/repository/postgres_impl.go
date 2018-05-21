@@ -32,7 +32,7 @@ func (r *postgresRepository) GradeByID(id int64) (interface{}, error) {
 	grade := models.Grade{}
 	err := r.QueryRow("SELECT id, student, teacher, subject, date, grade "+
 		"FROM back2school.grades WHERE id = $1 ", id).Scan(
-			&grade.ID, &grade.Student.ID, &grade.Teacher.ID, &grade.Subject, &grade.Date, &grade.Grade)
+		&grade.ID, &grade.Student.ID, &grade.Teacher.ID, &grade.Subject, &grade.Date, &grade.Grade)
 	return switchResult(grade, err)
 }
 
@@ -380,18 +380,18 @@ func (r *postgresRepository) CreateTeacher(teacher models.Teacher) (int64, error
 	return r.exec(query, teacher.Name, teacher.Surname, teacher.Mail, teacher.Info)
 }
 
-func (r *postgresRepository) CreateStudent(student models.Student) (int64, error){
+func (r *postgresRepository) CreateStudent(student models.Student) (int64, error) {
 	query := "INSERT INTO back2school.students" +
 		" (name, surname, mail, info) " +
 		" VALUES ($1, $2, $3, $4)"
 	return r.exec(query, student.Name, student.Surname, student.Mail, student.Info)
 }
 
-func (r *postgresRepository) CreateClass(class models.Class) (int64, error){
+func (r *postgresRepository) CreateClass(class models.Class) (int64, error) {
 	query := "INSERT INTO back2school.classes" +
 		" (year, section, info, grade) " +
 		" VALUES ($1, $2, $3, $4)"
-		return r.exec(query, class.Year, class.Section, class.Info, class.Grade)
+	return r.exec(query, class.Year, class.Section, class.Info, class.Grade)
 }
 
 func (r *postgresRepository) UpdateClass(class models.Class) (err error) {
@@ -401,7 +401,7 @@ func (r *postgresRepository) UpdateClass(class models.Class) (err error) {
 	return r.execUpdate(query, class.Year, class.Section, class.Info, class.Grade, class.ID)
 }
 
-func (r *postgresRepository) CreateNotification(notification models.Notification) (int64, error)  {
+func (r *postgresRepository) CreateNotification(notification models.Notification) (int64, error) {
 	query := "insert into back2school.classes " +
 		" (receiver, message, time, receiver_kind) " +
 		" VALUES ($1, $2, $3, $4) "
@@ -414,12 +414,11 @@ func (r *postgresRepository) UpdateNotification(notification models.Notification
 	return r.execUpdate(query, notification.Receiver, notification.Message, notification.Time, notification.ReceiverKind, notification.ID)
 }
 
-
-func (r *postgresRepository) CreateGrade(grade models.Grade) (int64, error)  {
+func (r *postgresRepository) CreateGrade(grade models.Grade) (int64, error) {
 	query := "insert into back2school.grades " +
 		" (student, grade, subject, date, teacher) " +
 		" VALUES ($1, $2, $3, $4, $5) "
-		return r.exec(query, grade.Student.ID, grade.Grade, grade.Subject, grade.Date, grade.Teacher.ID)
+	return r.exec(query, grade.Student.ID, grade.Grade, grade.Subject, grade.Date, grade.Teacher.ID)
 }
 func (r *postgresRepository) UpdateGrade(grade models.Grade) error {
 	query := "UPDATE back2school.grades " +
@@ -428,7 +427,7 @@ func (r *postgresRepository) UpdateGrade(grade models.Grade) error {
 	return r.execUpdate(query, grade.Student.ID, grade.Grade, grade.Subject, grade.Date, grade.Teacher.ID, grade.ID)
 }
 
-func (r *postgresRepository) CreatePayment(payment models.Payment) (int64, error)  {
+func (r *postgresRepository) CreatePayment(payment models.Payment) (int64, error) {
 	query := "insert into back2school.payments " +
 		" (amount, student, payed, reason, emitted) " +
 		" VALUES ($1, $2, $3, $4, $5) "

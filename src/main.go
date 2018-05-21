@@ -263,7 +263,6 @@ func main() {
 		}
 	})
 
-
 	g.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	g.Run(":5000")
 }

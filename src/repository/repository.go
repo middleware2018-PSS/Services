@@ -84,14 +84,13 @@ type Repository interface {
 	CreateTeacher(teacher models.Teacher) (int64, error)
 	Appointments(int, int) ([]interface{}, error)
 	Grades(int, int) ([]interface{}, error)
-	CreateStudent( models.Student) (int64, error)
-	CreateClass( models.Class) (int64, error)
-	UpdateClass( models.Class) error
-	CreateNotification( models.Notification) (int64, error)
-	UpdateNotification( models.Notification) error
-	CreateGrade( models.Grade) (int64, error)
-	UpdateGrade( models.Grade) error
-	CreatePayment( models.Payment) (int64, error)
-	UpdatePayment( models.Payment) error
-
+	CreateStudent(models.Student) (int64, error)
+	CreateClass(models.Class) (int64, error)
+	UpdateClass(models.Class) error
+	CreateNotification(models.Notification) (int64, error)
+	UpdateNotification(models.Notification) error
+	CreateGrade(models.Grade) (int64, error)
+	UpdateGrade(models.Grade) error
+	CreatePayment(models.Payment) (int64, error)
+	UpdatePayment(models.Payment) error
 }
