@@ -12,13 +12,14 @@ import (
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	_ "github.com/middleware2018-PSS/Services/src/docs"
 	"github.com/middleware2018-PSS/Services/src/models"
 	"github.com/middleware2018-PSS/Services/src/repository"
 	"github.com/middleware2018-PSS/Services/src/representations"
 	"github.com/pkg/errors"
-	_ "github.com/middleware2018-PSS/Services/src/docs"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
+	"github.com/middleware2018-PSS/Services/src/controller"
 )
 
 var (
@@ -36,7 +37,6 @@ var (
 // @securitydefinitions.jwt.application OAuth2Application
 // @tokenUrl http://localhost:5000/login
 
-
 // @host localhost:5000
 // @BasePath /
 func main() {
@@ -45,9 +45,9 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
+	r := repository.NewPostgresRepository(db)
 
-	var con  repository.Repository = repository.NewPostgresRepository(db)
-
+	con := controller.NewController(r)
 
 	authMiddleware := jwt.GinJWTMiddleware{
 		Realm:      "test",
@@ -61,13 +61,10 @@ func main() {
 	}
 
 	g := gin.Default()
-	{
-		g.POST("/login", authMiddleware.LoginHandler)
-	}
+	g.POST("/login", authMiddleware.LoginHandler)
 
 	api := g.Group("", authMiddleware.MiddlewareFunc())
 	api.GET("/refresh_token", authMiddleware.RefreshHandler)
-
 	api.POST("/parents", authAdmin(authMiddleware.Realm), func(c *gin.Context) {
 		var p models.Parent
 		if err := c.ShouldBind(&p); err == nil {
@@ -151,7 +148,7 @@ func main() {
 		teachers.GET("/classes", byIDWithOffsetAndLimit("id", con.ClassesByTeacher))
 	}
 
-	api.GET("/appointments",authAdmin(authMiddleware.Realm), getOffsetLimit(con.Appointments))
+	api.GET("/appointments", authAdmin(authMiddleware.Realm), getOffsetLimit(con.Appointments))
 	api.GET("/appointments/:appointment", byID("appointment", con.AppointmentByID))
 	api.PUT("/appointments/:appointment", func(c *gin.Context) {
 		var a models.Appointment
@@ -273,7 +270,6 @@ func Access() gin.HandlerFunc {
 		} else {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Not Authorized User."})
 		}
-
 	}
 }
 

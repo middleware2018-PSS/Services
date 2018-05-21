@@ -43,7 +43,7 @@ func (r *postgresRepository) exec(query string, params ...interface{}) (id int64
 	if err != nil {
 		log.Print(err.Error())
 	}
-	if id, e := res.LastInsertId(); e != nil{
+	if id, e := res.LastInsertId(); e != nil {
 		return id, switchErrors(err)
 	} else {
 		return 0, err
@@ -51,7 +51,7 @@ func (r *postgresRepository) exec(query string, params ...interface{}) (id int64
 }
 
 func (r *postgresRepository) execUpdate(query string, params ...interface{}) (err error) {
-	_, err =  r.exec(query, params...)
+	_, err = r.exec(query, params...)
 	return err
 }
 

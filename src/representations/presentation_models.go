@@ -9,39 +9,39 @@ import (
 
 type Student struct {
 	SelfAndData
-	Grades string         `json:"grades",xml:"grades"`
+	Grades string `json:"grades",xml:"grades"`
 }
 
 type Parent struct {
 	SelfAndData
-	Children      string        `json:"children",xml:"children"`
-	Appointments  string        `json:"appointments",xml:"appointments"`
-	Payments      string        `json:"payments",xml:"payments"`
-	Notifications string        `json:"notifications",xml:"notifications"`
+	Children      string `json:"children",xml:"children"`
+	Appointments  string `json:"appointments",xml:"appointments"`
+	Payments      string `json:"payments",xml:"payments"`
+	Notifications string `json:"notifications",xml:"notifications"`
 }
 
 type Teacher struct {
 	SelfAndData
-	Lectures      string         `json:"lectures",xml:"lectures"`
-	Appointments  string         `json:"appointments",xml:"appointments"`
-	Notifications string         `json:"notifications",xml:"notifications"`
-	Subjects      string         `json:"subjects",xml:"subjects"`
-	Classes       string         `json:"classes",xml:"classes"`
+	Lectures      string `json:"lectures",xml:"lectures"`
+	Appointments  string `json:"appointments",xml:"appointments"`
+	Notifications string `json:"notifications",xml:"notifications"`
+	Subjects      string `json:"subjects",xml:"subjects"`
+	Classes       string `json:"classes",xml:"classes"`
 }
 
 type SelfAndData struct {
-	Self          string         `json:"self",xml:"self"`
-	Data          interface{} `json:"data",xml:"data"`
+	Self string      `json:"self",xml:"self"`
+	Data interface{} `json:"data",xml:"data"`
 }
 
 type Class struct {
 	SelfAndData
-	Students string       `json:"students",xml:"students"`
+	Students string `json:"students",xml:"students"`
 }
 
 type List struct {
 	Self     string        `json:"self",xml:"self"`
-	Data  []interface{} `json:"data",xml:"data"`
+	Data     []interface{} `json:"data",xml:"data"`
 	Next     string        `json:"next,omitempty",xml:"next"`
 	Previous string        `json:"previous,omitempty",xml:"previous"`
 }
@@ -52,7 +52,7 @@ func ToRepresentation(res interface{}, c *gin.Context) (interface{}, error) {
 		self := "/parents/" + fmt.Sprintf("%d", r.ID)
 		return &Parent{
 			SelfAndData{self,
-			r},
+				r},
 			self + "/students",
 			self + "/appointments",
 			self + "/payments",
@@ -62,7 +62,7 @@ func ToRepresentation(res interface{}, c *gin.Context) (interface{}, error) {
 		self := "/teachers/" + fmt.Sprintf("%d", r.ID)
 		return &Teacher{
 			SelfAndData{self,
-			r},
+				r},
 			self + "/lectures",
 			self + "/appointments",
 			self + "/notifications",
@@ -73,14 +73,14 @@ func ToRepresentation(res interface{}, c *gin.Context) (interface{}, error) {
 		self := "/students/" + fmt.Sprintf("%d", r.ID)
 		return &Student{
 			SelfAndData{self,
-			r},
+				r},
 			self + "/grades",
 		}, nil
 	case models.Class:
 		self := "/classes/" + fmt.Sprintf("%d", r.ID)
 		return &Class{
 			SelfAndData{self,
-			r},
+				r},
 			self + "/students",
 		}, nil
 	case models.Notification:

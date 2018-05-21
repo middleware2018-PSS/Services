@@ -34,31 +34,6 @@
                         "in": "query"
                     }
                 ]
-            },
-            "post": {
-                "tags": [
-                    "Appointments"
-                ],
-                "summary": "Create appointment",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Appointment ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "data",
-                        "name": "appointment",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.Appointment"
-                        }
-                    }
-                ]
             }
         },
         "/appointments/{id}": {
@@ -115,11 +90,11 @@
                 "tags": [
                     "Classes"
                 ],
-                "summary": "Get a class by id",
+                "summary": "Get a appointment by id",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Class ID",
+                        "description": "Appointment ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -192,7 +167,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/repository.Login"
+                            "$ref": "#/definitions/models.Account"
                         }
                     }
                 ]
@@ -503,11 +478,23 @@
                 "tags": [
                     "Students"
                 ],
-                "summary": "Get a student by id",
+                "summary": "Get a lecture by class",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Student ID",
+                        "description": "number of elements to return",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "offset in the list of elements to return",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -834,16 +821,29 @@
         }
     },
     "definitions": {
+        "models.Account": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "Password"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "John"
+                }
+            }
+        },
         "models.Appointment": {
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.ID"
+                    "type": "integer",
+                    "example": 1
                 },
                 "location": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.Location"
+                    "type": "string",
+                    "example": "Aula Magna"
                 },
                 "student": {
                     "type": "object",
@@ -854,18 +854,12 @@
                 }
             }
         },
-        "models.ID": {
-            "type": "object"
-        },
-        "models.Location": {
-            "type": "object"
-        },
         "models.Parent": {
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.ID"
+                    "type": "integer",
+                    "example": 1
                 },
                 "info": {
                     "type": "string"
@@ -885,8 +879,8 @@
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.ID"
+                    "type": "integer",
+                    "example": 1
                 },
                 "info": {
                     "type": "string"
@@ -906,8 +900,8 @@
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.ID"
+                    "type": "integer",
+                    "example": 1
                 },
                 "info": {
                     "type": "string"
@@ -920,19 +914,6 @@
                 },
                 "surname": {
                     "type": "string"
-                }
-            }
-        },
-        "repository.Login": {
-            "type": "object",
-            "properties": {
-                "password": {
-                    "type": "string",
-                    "example": "Password"
-                },
-                "username": {
-                    "type": "string",
-                    "example": "John"
                 }
             }
         }

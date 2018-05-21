@@ -1,28 +1,33 @@
 basePath: /
 definitions:
+  models.Account:
+    properties:
+      password:
+        example: Password
+        type: string
+      username:
+        example: John
+        type: string
+    type: object
   models.Appointment:
     properties:
       id:
-        $ref: '#/definitions/models.ID'
-        type: object
+        example: 1
+        type: integer
       location:
-        $ref: '#/definitions/models.Location'
-        type: object
+        example: Aula Magna
+        type: string
       student:
         $ref: '#/definitions/models.Teacher'
         type: object
       time:
         type: string
     type: object
-  models.ID:
-    type: object
-  models.Location:
-    type: object
   models.Parent:
     properties:
       id:
-        $ref: '#/definitions/models.ID'
-        type: object
+        example: 1
+        type: integer
       info:
         type: string
       mail:
@@ -35,8 +40,8 @@ definitions:
   models.Student:
     properties:
       id:
-        $ref: '#/definitions/models.ID'
-        type: object
+        example: 1
+        type: integer
       info:
         type: string
       mail:
@@ -49,8 +54,8 @@ definitions:
   models.Teacher:
     properties:
       id:
-        $ref: '#/definitions/models.ID'
-        type: object
+        example: 1
+        type: integer
       info:
         type: string
       mail:
@@ -58,15 +63,6 @@ definitions:
       name:
         type: string
       surname:
-        type: string
-    type: object
-  repository.Login:
-    properties:
-      password:
-        example: Password
-        type: string
-      username:
-        example: John
         type: string
     type: object
 host: localhost:5000
@@ -92,23 +88,6 @@ paths:
         name: offset
         type: integer
       summary: Get all appointments
-      tags:
-      - Appointments
-    post:
-      parameters:
-      - description: Appointment ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: data
-        in: body
-        name: appointment
-        required: true
-        schema:
-          $ref: '#/definitions/models.Appointment'
-          type: object
-      summary: Create appointment
       tags:
       - Appointments
   /appointments/{id}:
@@ -146,12 +125,12 @@ paths:
   /classes/{id}:
     get:
       parameters:
-      - description: Class ID
+      - description: Appointment ID
         in: path
         name: id
         required: true
         type: integer
-      summary: Get a class by id
+      summary: Get a appointment by id
       tags:
       - Classes
   /classes/{id}/students:
@@ -195,7 +174,7 @@ paths:
         name: account
         required: true
         schema:
-          $ref: '#/definitions/repository.Login'
+          $ref: '#/definitions/models.Account'
           type: object
       summary: Get a login token
       tags:
@@ -399,12 +378,20 @@ paths:
   /students/{id}:
     get:
       parameters:
-      - description: Student ID
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      - description: Class ID
         in: path
         name: id
         required: true
         type: integer
-      summary: Get a student by id
+      summary: Get a lecture by class
       tags:
       - Students
     put:

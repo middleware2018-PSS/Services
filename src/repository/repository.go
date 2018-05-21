@@ -11,7 +11,6 @@ var (
 )
 
 type Repository interface {
-
 	ClassByID(id int64) (interface{}, error)
 
 	NotificationByID(id int64) (interface{}, error)
@@ -81,7 +80,7 @@ type Repository interface {
 	UserKind(userID string) map[string]interface{}
 	CreateParent(parent models.Parent) (int64, error)
 	CreateAppointment(appointment models.Appointment) (int64, error)
-	CreateTeacher(teacher models.Teacher)  (int64, error)
+	CreateTeacher(teacher models.Teacher) (int64, error)
 	Appointments(int, int) ([]interface{}, error)
 	Grades(int, int) ([]interface{}, error)
 }
