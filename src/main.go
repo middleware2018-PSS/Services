@@ -12,6 +12,7 @@ import (
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"github.com/middleware2018-PSS/Services/src/controller"
 	_ "github.com/middleware2018-PSS/Services/src/docs"
 	"github.com/middleware2018-PSS/Services/src/models"
 	"github.com/middleware2018-PSS/Services/src/repository"
@@ -19,7 +20,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
-	"github.com/middleware2018-PSS/Services/src/controller"
 )
 
 var (

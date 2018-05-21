@@ -28,6 +28,7 @@ func (c controller) ClassByID(id int64) (interface{}, error) {
 func (c *controller) NotificationByID(id int64) (interface{}, error) {
 	return c.r.NotificationByID(id)
 }
+
 // Get payment by id
 // @Summary Get a payment by id
 // @Param id path int true "Payment ID"
@@ -46,6 +47,7 @@ func (c *controller) PaymentByID(id int64) (interface{}, error) {
 func (c *controller) ParentByID(id int64) (interface{}, error) {
 	return c.r.ParentByID(id)
 }
+
 // @Summary Update parents's data
 // @Param id path int true "Parent ID"
 // @Param parent body models.Parent true "data"
@@ -74,6 +76,7 @@ func (c *controller) UpdateStudent(student models.Student) error {
 func (c *controller) ChildrenByParent(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.ChildrenByParent(id, limit, offset)
 }
+
 // Get student by id
 // @Summary Get a student by id
 // @Param id path int true "Student ID"
@@ -137,6 +140,7 @@ func (c *controller) AppointmentsByParent(id int64, limit int, offset int) ([]in
 func (c *controller) UpdateAppointment(appointment models.Appointment) error {
 	return c.r.UpdateAppointment(appointment)
 }
+
 // @Summary Get a appointment by id
 // @Param id path int true "Appointment ID"
 // @Tags Classes
@@ -197,6 +201,7 @@ func (c *controller) ClassesBySubjectAndTeacher(teacher int64, subject string, l
 func (c *controller) StudentsByClass(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.StudentsByClass(id, limit, offset)
 }
+
 // @Summary Get a lecture by class
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
@@ -274,6 +279,7 @@ func (c *controller) Students(limit int, offset int) ([]interface{}, error) {
 func (c *controller) Teachers(limit int, offset int) ([]interface{}, error) {
 	return c.r.Teachers(limit, offset)
 }
+
 // @Summary Get all parents
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
@@ -282,6 +288,7 @@ func (c *controller) Teachers(limit int, offset int) ([]interface{}, error) {
 func (c *controller) Parents(limit int, offset int) ([]interface{}, error) {
 	return c.r.Parents(limit, offset)
 }
+
 // @Summary Get all payments
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
@@ -290,6 +297,7 @@ func (c *controller) Parents(limit int, offset int) ([]interface{}, error) {
 func (c *controller) Payments(limit int, offset int) ([]interface{}, error) {
 	return c.r.Payments(limit, offset)
 }
+
 // List all notifications
 // @Summary Get all notifications
 // @Param limit query int false "number of elements to return"
@@ -299,6 +307,7 @@ func (c *controller) Payments(limit int, offset int) ([]interface{}, error) {
 func (c *controller) Notifications(limit int, offset int) ([]interface{}, error) {
 	return c.r.Notifications(limit, offset)
 }
+
 // @Summary Get all classes
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
@@ -307,6 +316,7 @@ func (c *controller) Notifications(limit int, offset int) ([]interface{}, error)
 func (c *controller) Classes(limit int, offset int) ([]interface{}, error) {
 	return c.r.Classes(limit, offset)
 }
+
 // @Summary Get a login token
 // @Param account body models.Account true "Add account"
 // @Tags Auth
@@ -317,6 +327,7 @@ func (c *controller) CheckUser(id string, pass string) (string, bool) {
 func (c *controller) UserKind(userID string) map[string]interface{} {
 	return c.r.UserKind(userID)
 }
+
 // @Summary Create parent
 // @Tags Parents
 // @Param parent body models.Parent true "data"
@@ -325,6 +336,7 @@ func (c *controller) UserKind(userID string) map[string]interface{} {
 func (c *controller) CreateParent(parent models.Parent) (int64, error) {
 	return c.r.CreateParent(parent)
 }
+
 // @Summary Create appointment
 // @Param id path int true "Appointment ID"
 // @Param appointment body models.Appointment true "data"
@@ -351,6 +363,7 @@ func (c *controller) CreateTeacher(teacher models.Teacher) (int64, error) {
 func (c *controller) Appointments(limit int, offset int) ([]interface{}, error) {
 	return c.r.Appointments(limit, offset)
 }
+
 // @Summary Get all grades
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
