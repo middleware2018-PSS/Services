@@ -33,12 +33,11 @@ var (
 
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @securitydefinitions.jwt.application OAuth2Application
-// @tokenUrl http://localhost:5000/login
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 
 // @host localhost:5000
-// @BasePath /
 func main() {
 	db, err := sql.Open("postgres", "user=postgres dbname=postgres sslmode=disable")
 	if err != nil {
@@ -117,7 +116,6 @@ func main() {
 				c.JSON(http.StatusCreated, t)
 			}
 		}
-
 	})
 
 	teachers := api.Group("/teachers/:id", authAdminOrTeacher(authMiddleware.Realm))
@@ -163,22 +161,108 @@ func main() {
 
 	api.GET("/parents", getOffsetLimit(con.Parents))
 	api.GET("/grades", getOffsetLimit(con.Grades))
-
+	api.GET("/grades/:id", byID("id", con.GradeByID))
+	api.PUT("/grades/:id", func(c *gin.Context) {
+		var a models.Grade
+		if err := c.ShouldBind(&a); err == nil {
+			id, _ := strconv.Atoi(c.Param("id"))
+			a.ID = int64(id)
+			if err := con.UpdateGrade(a); err == nil {
+				c.JSON(http.StatusCreated, a)
+			}
+		}
+	})
 	api.GET("/students", getOffsetLimit(con.Students))
+	api.PUT("/students/:id", func(c *gin.Context) {
+		var a models.Student
+		if err := c.ShouldBind(&a); err == nil {
+			id, _ := strconv.Atoi(c.Param("id"))
+			a.ID = int64(id)
+			if err := con.UpdateStudent(a); err == nil {
+				c.JSON(http.StatusCreated, a)
+			}
+		}
+	})
+	api.POST("/students", func(c *gin.Context) {
+		var s models.Student
+		if err := c.ShouldBind(&s); err == nil {
+			if id, err := con.CreateStudent(s); err != nil {
+				s.ID = id
+				c.JSON(http.StatusCreated, s)
+			}
+		}
+	})
 	api.GET("/students/:id", byID("id", con.StudentByID))
 	api.GET("/students/:id/grades", byIDWithOffsetAndLimit("id", con.GradesByStudent))
 
 	api.GET("/notifications", getOffsetLimit(con.Notifications))
+	api.POST("/notifications", func(c *gin.Context) {
+		var s models.Notification
+		if err := c.ShouldBind(&s); err == nil {
+			if id, err := con.CreateNotification(s); err != nil {
+				s.ID = id
+				c.JSON(http.StatusCreated, s)
+			}
+		}
+	})
 	api.GET("/notifications/:id", byID("id", con.NotificationByID))
-
+	api.PUT("/notifications/:id", func(c *gin.Context) {
+		var a models.Notification
+		if err := c.ShouldBind(&a); err == nil {
+			id, _ := strconv.Atoi(c.Param("id"))
+			a.ID = int64(id)
+			if err := con.UpdateNotification(a); err == nil {
+				c.JSON(http.StatusCreated, a)
+			}
+		}
+	})
 	api.GET("/payments", getOffsetLimit(con.Payments))
+	api.POST("/payments", func(c *gin.Context) {
+		var s models.Payment
+		if err := c.ShouldBind(&s); err == nil {
+			if id, err := con.CreatePayment(s); err != nil {
+				s.ID = id
+				c.JSON(http.StatusCreated, s)
+			}
+		}
+	})
 	api.GET("/payments/:id", byID("id", con.PaymentByID))
+	api.PUT("/payments/:id", func(c *gin.Context) {
+		var a models.Payment
+		if err := c.ShouldBind(&a); err == nil {
+			id, _ := strconv.Atoi(c.Param("id"))
+			a.ID = int64(id)
+			if err := con.UpdatePayment(a); err == nil {
+				c.JSON(http.StatusCreated, a)
+			}
+		}
+	})
 
 	api.GET("/teachers", getOffsetLimit(con.Teachers))
 
 	api.GET("/classes", getOffsetLimit(con.Classes))
 	api.GET("/classes/:id", byID("id", con.ClassByID))
+	api.PUT("/classes/:id", func(c *gin.Context) {
+		var a models.Class
+		if err := c.ShouldBind(&a); err == nil {
+			id, _ := strconv.Atoi(c.Param("id"))
+			a.ID = int64(id)
+			if err := con.UpdateClass(a); err == nil {
+				c.JSON(http.StatusCreated, a)
+			}
+		}
+	})
 	api.GET("/classes/:id/students", byIDWithOffsetAndLimit("id", con.StudentsByClass))
+	api.POST("/classes", func(c *gin.Context) {
+		var s models.Class
+		if err := c.ShouldBind(&s); err == nil {
+			if id, err := con.CreateClass(s); err != nil {
+				s.ID = id
+				c.JSON(http.StatusCreated, s)
+			}
+		}
+	})
+
 
 	g.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	g.Run(":5000")

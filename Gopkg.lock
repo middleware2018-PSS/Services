@@ -126,11 +126,7 @@
 
 [[projects]]
   name = "github.com/swaggo/swag"
-  packages = [
-    ".",
-    "cmd/swag",
-    "gen"
-  ]
+  packages = ["."]
   revision = "c6c1ad9d395477eead01b6f208cb7fcd34604141"
   version = "v1.1.1"
 
@@ -139,12 +135,6 @@
   packages = ["codec"]
   revision = "b4c50a2b199d93b13dc15e78929cfb23bfdf21ab"
   version = "v1.1.1"
-
-[[projects]]
-  name = "github.com/urfave/cli"
-  packages = ["."]
-  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
-  version = "v1.20.0"
 
 [[projects]]
   branch = "master"
@@ -206,6 +196,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2803b4b65116cb79c796b5f083b186aef9761c77f3665a69c4ca6ed82f25a50e"
+  inputs-digest = "76b03681af9537a09a9c0505dd30f77d4ed2d30bad8844d81d04cd952da8f83a"
   solver-name = "gps-cdcl"
   solver-version = 1

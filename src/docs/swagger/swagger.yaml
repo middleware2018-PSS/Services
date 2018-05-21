@@ -1,5 +1,20 @@
-basePath: /
 definitions:
+  controller.Subjects:
+    properties:
+      subjects:
+        example:
+        - science
+        items:
+          type: string
+        type: array
+    type: object
+  controller.Token:
+    properties:
+      expire:
+        type: string
+      token:
+        type: string
+    type: object
   models.Account:
     properties:
       password:
@@ -23,6 +38,53 @@ definitions:
       time:
         type: string
     type: object
+  models.Class:
+    properties:
+      grade:
+        type: integer
+      id:
+        example: 1
+        type: integer
+      info:
+        type: string
+      section:
+        type: string
+      year:
+        type: integer
+    type: object
+  models.Grade:
+    properties:
+      date:
+        type: string
+      grade:
+        type: integer
+      id:
+        example: 1
+        type: integer
+      student:
+        $ref: '#/definitions/models.Student'
+        type: object
+      subject:
+        example: science
+        type: string
+      teacher:
+        $ref: '#/definitions/models.Teacher'
+        type: object
+    type: object
+  models.Notification:
+    properties:
+      id:
+        example: 1
+        type: integer
+      message:
+        type: string
+      receiver:
+        type: integer
+      receiver_kind:
+        type: string
+      time:
+        type: string
+    type: object
   models.Parent:
     properties:
       id:
@@ -36,6 +98,23 @@ definitions:
         type: string
       surname:
         type: string
+    type: object
+  models.Payment:
+    properties:
+      amount:
+        type: integer
+      emitted:
+        type: string
+      id:
+        example: 1
+        type: integer
+      payed:
+        type: boolean
+      reason:
+        type: string
+      student:
+        $ref: '#/definitions/models.Student'
+        type: object
     type: object
   models.Student:
     properties:
@@ -65,6 +144,40 @@ definitions:
       surname:
         type: string
     type: object
+  models.TimeTable:
+    properties:
+      class:
+        $ref: '#/definitions/models.Class'
+        type: object
+      end:
+        type: string
+      id:
+        example: 1
+        type: integer
+      info:
+        type: string
+      location:
+        example: Aula Magna
+        type: string
+      start:
+        type: string
+      subject:
+        example: science
+        type: string
+    type: object
+  representations.List:
+    properties:
+      data:
+        items:
+          type: '&{%!s(token.Pos=1100) %!s(*ast.FieldList=&{1109 [] 1110}) %!s(bool=false)}'
+        type: array
+      next:
+        type: string
+      previous:
+        type: string
+      self:
+        type: string
+    type: object
 host: localhost:5000
 info:
   contact: {}
@@ -87,10 +200,57 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/representations.List'
+            type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get all appointments
       tags:
       - Appointments
+    post:
+      parameters:
+      - description: Appointment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: appointment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Appointment'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Appointment'
+            type: object
+      summary: Create appointment
+      tags:
+      - Appointments
   /appointments/{id}:
+    get:
+      parameters:
+      - description: Appointment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Appointment'
+            type: object
+      summary: Get a appointment by id
+      tags:
+      - Appointments
     put:
       parameters:
       - description: Appointment ID
@@ -105,6 +265,12 @@ paths:
         schema:
           $ref: '#/definitions/models.Appointment'
           type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Appointment'
+            type: object
       summary: Update appointment's data
       tags:
       - Appointments
@@ -119,18 +285,72 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Class'
+            type: array
       summary: Get all classes
+      tags:
+      - Classes
+    post:
+      parameters:
+      - description: data
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Class'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Class'
+            type: object
+      summary: Create class
       tags:
       - Classes
   /classes/{id}:
     get:
       parameters:
-      - description: Appointment ID
+      - description: Class ID
         in: path
         name: id
         required: true
         type: integer
-      summary: Get a appointment by id
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Class'
+            type: object
+      summary: Get a class by id
+      tags:
+      - Classes
+    put:
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: parent
+        required: true
+        schema:
+          $ref: '#/definitions/models.Class'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Class'
+            type: object
+      summary: Update Class's data
       tags:
       - Classes
   /classes/{id}/students:
@@ -149,6 +369,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Student'
+            type: array
       summary: Get a student by class
       tags:
       - Classes
@@ -163,7 +390,72 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Grade'
+            type: array
       summary: Get all grades
+      tags:
+      - Grades
+    post:
+      parameters:
+      - description: data
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Grade'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Grade'
+            type: object
+      summary: Create grade
+      tags:
+      - Grades
+  /grades/{id}:
+    get:
+      parameters:
+      - description: Grade ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Grade'
+            type: object
+      summary: Get a grade by id
+      tags:
+      - Grades
+    put:
+      parameters:
+      - description: Grade ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Grade'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Grade'
+            type: object
+      summary: Update Grade
       tags:
       - Grades
   /login:
@@ -176,6 +468,12 @@ paths:
         schema:
           $ref: '#/definitions/models.Account'
           type: object
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Token'
+            type: object
       summary: Get a login token
       tags:
       - Auth
@@ -190,7 +488,32 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Notification'
+            type: array
       summary: Get all notifications
+      tags:
+      - Notifications
+    post:
+      parameters:
+      - description: data
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Notification'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Notification'
+            type: object
+      summary: Create notification
       tags:
       - Notifications
   /notifications/{id}:
@@ -201,7 +524,36 @@ paths:
         name: id
         required: true
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Notification'
+            type: object
       summary: Get a notification by id
+      tags:
+      - Notifications
+    put:
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Notification'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Notification'
+            type: object
+      summary: Update notification
       tags:
       - Notifications
   /parents:
@@ -215,6 +567,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Parent'
+            type: array
       summary: Get all parents
       tags:
       - Parents
@@ -227,6 +586,12 @@ paths:
         schema:
           $ref: '#/definitions/models.Parent'
           type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Parent'
+            type: object
       summary: Create parent
       tags:
       - Parents
@@ -239,6 +604,12 @@ paths:
         name: id
         required: true
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Parent'
+            type: object
       summary: Get a parent by id
       tags:
       - Parents
@@ -256,6 +627,12 @@ paths:
         schema:
           $ref: '#/definitions/models.Parent'
           type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Parent'
+            type: object
       summary: Update parents's data
       tags:
       - Parents
@@ -275,6 +652,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Appointment'
+            type: array
       summary: Get appointments of the parent
       tags:
       - Parents
@@ -295,6 +679,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Notification'
+            type: array
       summary: Get notifications of the parent
       tags:
       - Parents
@@ -314,6 +705,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Payment'
+            type: array
       summary: Get payments of the parent
       tags:
       - Parents
@@ -333,6 +731,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Student'
+            type: array
       summary: Get children of the parent
       tags:
       - Parents
@@ -347,7 +752,32 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Payment'
+            type: array
       summary: Get all payments
+      tags:
+      - Payments
+    post:
+      parameters:
+      - description: data
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Payment'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Payment'
+            type: object
+      summary: Create payment
       tags:
       - Payments
   /payments/{id}:
@@ -358,7 +788,36 @@ paths:
         name: id
         required: true
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Payment'
+            type: object
       summary: Get a payment by id
+      tags:
+      - Payments
+    put:
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Payment'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Payment'
+            type: object
+      summary: Update payment
       tags:
       - Payments
   /students:
@@ -372,7 +831,32 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Student'
+            type: array
       summary: Get all students
+      tags:
+      - Students
+    post:
+      parameters:
+      - description: data
+        in: body
+        name: student
+        required: true
+        schema:
+          $ref: '#/definitions/models.Student'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Student'
+            type: object
+      summary: Create student
       tags:
       - Students
   /students/{id}:
@@ -391,6 +875,13 @@ paths:
         name: id
         required: true
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Appointment'
+            type: array
       summary: Get a lecture by class
       tags:
       - Students
@@ -408,6 +899,12 @@ paths:
         schema:
           $ref: '#/definitions/models.Student'
           type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Student'
+            type: object
       summary: Update student's data
       tags:
       - Students
@@ -427,6 +924,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Grade'
+            type: array
       summary: Get grades of the student
       tags:
       - Students
@@ -441,6 +945,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Teacher'
+            type: array
       summary: Get all teachers
       tags:
       - Teachers
@@ -453,6 +964,12 @@ paths:
         schema:
           $ref: '#/definitions/models.Teacher'
           type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Teacher'
+            type: object
       summary: Create teacher
       tags:
       - Teachers
@@ -464,6 +981,12 @@ paths:
         name: id
         required: true
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Teacher'
+            type: object
       summary: Get a teacher by id
       tags:
       - Teachers
@@ -481,6 +1004,12 @@ paths:
         schema:
           $ref: '#/definitions/models.Teacher'
           type: object
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.Teacher'
+            type: object
       summary: Update teacher's data
       tags:
       - Teachers
@@ -500,6 +1029,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Appointment'
+            type: array
       summary: Get appointments of the teacher
       tags:
       - Teachers
@@ -519,6 +1055,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Class'
+            type: array
       summary: Get classes in which the teacher teaches
       tags:
       - Teachers
@@ -538,6 +1081,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TimeTable'
+            type: array
       summary: Get lectures taught by the teacher
       tags:
       - Teachers
@@ -557,6 +1107,13 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TimeTable'
+            type: array
       summary: Get notifications of the teacher
       tags:
       - Teachers
@@ -576,6 +1133,12 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Subjects'
+            type: object
       summary: Get subject taught by the teacher
       tags:
       - Teachers
@@ -600,7 +1163,19 @@ paths:
         in: query
         name: offset
         type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Class'
+            type: array
       summary: Get classes in which the subject is taught by the teacher
       tags:
       - Teachers
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

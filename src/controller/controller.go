@@ -8,7 +8,10 @@ import (
 type controller struct {
 	r repository.Repository
 }
-
+type Token struct {
+	Token string  `json:"token"`
+	Expire string  `json:"expire"`
+}
 func NewController(r repository.Repository) *controller {
 	return &controller{r}
 }
@@ -16,14 +19,25 @@ func NewController(r repository.Repository) *controller {
 // @Summary Get a class by id
 // @Param id path int true "Class ID"
 // @Tags Classes
+// @Success 200 {object} models.Class
 // @Router /classes/{id} [get]
 func (c controller) ClassByID(id int64) (interface{}, error) {
 	return c.r.ClassByID(id)
 }
 
+// @Summary Get a grade by id
+// @Param id path int true "Grade ID"
+// @Tags Grades
+// @Success 200 {object} models.Grade
+// @Router /grades/{id} [get]
+func (c controller) GradeByID(id int64) (interface{}, error) {
+	return c.r.GradeByID(id)
+}
+
 // @Summary Get a notification by id
 // @Param id path int true "Notification ID"
 // @Tags Notifications
+// @Success 200 {object} models.Notification
 // @Router /notifications/{id} [get]
 func (c *controller) NotificationByID(id int64) (interface{}, error) {
 	return c.r.NotificationByID(id)
@@ -33,6 +47,7 @@ func (c *controller) NotificationByID(id int64) (interface{}, error) {
 // @Summary Get a payment by id
 // @Param id path int true "Payment ID"
 // @Tags Payments
+// @Success 200 {object} models.Payment
 // @Router /payments/{id} [get]
 func (c *controller) PaymentByID(id int64) (interface{}, error) {
 	return c.r.PaymentByID(id)
@@ -43,6 +58,7 @@ func (c *controller) PaymentByID(id int64) (interface{}, error) {
 // @Summary Get a parent by id
 // @Param id path int true "Account ID"
 // @Tags Parents
+// @Success 200 {object} models.Parent
 // @Router /parents/{id} [get]
 func (c *controller) ParentByID(id int64) (interface{}, error) {
 	return c.r.ParentByID(id)
@@ -52,6 +68,7 @@ func (c *controller) ParentByID(id int64) (interface{}, error) {
 // @Param id path int true "Parent ID"
 // @Param parent body models.Parent true "data"
 // @Tags Parents
+// @Success 201 {object} models.Parent
 // @Router /parents/{id} [put]
 func (c *controller) UpdateParent(p models.Parent) error {
 	return c.r.UpdateParent(p)
@@ -61,6 +78,7 @@ func (c *controller) UpdateParent(p models.Parent) error {
 // @Param id path int true "Student ID"
 // @Param student body models.Student true "data"
 // @Tags Students
+// @Success 201 {object} models.Student
 // @Router /students/{id} [put]
 func (c *controller) UpdateStudent(student models.Student) error {
 	return c.r.UpdateStudent(student)
@@ -72,6 +90,7 @@ func (c *controller) UpdateStudent(student models.Student) error {
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Parents
+// @Success 200 {array} models.Student
 // @Router /parents/{id}/students [get]
 func (c *controller) ChildrenByParent(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.ChildrenByParent(id, limit, offset)
@@ -81,6 +100,7 @@ func (c *controller) ChildrenByParent(id int64, limit int, offset int) ([]interf
 // @Summary Get a student by id
 // @Param id path int true "Student ID"
 // @Tags Students
+// @Success 200 {object} models.Student
 // @Router /students/{id} [get]
 func (c *controller) StudentByID(id int64) (interface{}, error) {
 	return c.r.StudentByID(id)
@@ -92,6 +112,7 @@ func (c *controller) StudentByID(id int64) (interface{}, error) {
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Students
+// @Success 200 {array} models.Grade
 // @Router /students/{id}/grades [get]
 func (c *controller) GradesByStudent(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.GradesByStudent(id, limit, offset)
@@ -103,6 +124,7 @@ func (c *controller) GradesByStudent(id int64, limit int, offset int) ([]interfa
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Parents
+// @Success 200 {array} models.Payment
 // @Router /parents/{id}/payments [get]
 func (c *controller) PaymentsByParent(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.PaymentsByParent(id, limit, offset)
@@ -114,6 +136,7 @@ func (c *controller) PaymentsByParent(id int64, limit int, offset int) ([]interf
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Parents
+// @Success 200 {array} models.Notification
 // @Router /parents/{id}/notifications [get]
 func (c *controller) NotificationsByParent(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.NotificationsByParent(id, limit, offset)
@@ -127,6 +150,7 @@ func (c *controller) NotificationsByParent(id int64, limit int, offset int) ([]i
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Parents
+// @Success 200 {array} models.Appointment
 // @Router /parents/{id}/appointments [get]
 func (c *controller) AppointmentsByParent(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.AppointmentsByParent(id, limit, offset)
@@ -136,6 +160,7 @@ func (c *controller) AppointmentsByParent(id int64, limit int, offset int) ([]in
 // @Param id path int true "Appointment ID"
 // @Param appointment body models.Appointment true "data"
 // @Tags Appointments
+// @Success 201 {object} models.Appointment
 // @Router /appointments/{id} [put]
 func (c *controller) UpdateAppointment(appointment models.Appointment) error {
 	return c.r.UpdateAppointment(appointment)
@@ -143,8 +168,9 @@ func (c *controller) UpdateAppointment(appointment models.Appointment) error {
 
 // @Summary Get a appointment by id
 // @Param id path int true "Appointment ID"
-// @Tags Classes
-// @Router /classes/{id} [get]
+// @Tags Appointments
+// @Success 200 {object} models.Appointment
+// @Router /appointments/{id} [get]
 func (c *controller) AppointmentByID(id int64) (interface{}, error) {
 	return c.r.AppointmentByID(id)
 }
@@ -154,6 +180,7 @@ func (c *controller) AppointmentByID(id int64) (interface{}, error) {
 // @Summary Get a teacher by id
 // @Param id path int true "Teacher ID"
 // @Tags Teachers
+// @Success 200 {object} models.Teacher
 // @Router /teachers/{id} [get]
 func (c *controller) TeacherByID(id int64) (teacher interface{}, err error) {
 	return c.r.TeacherByID(id)
@@ -163,6 +190,7 @@ func (c *controller) TeacherByID(id int64) (teacher interface{}, err error) {
 // @Param id path int true "Teacher ID"
 // @Param teacher body models.Teacher true "data"
 // @Tags Teachers
+// @Success 204 {object} models.Teacher
 // @Router /teachers/{id} [put]
 func (c *controller) UpdateTeacher(teacher models.Teacher) (err error) {
 	return c.r.UpdateTeacher(teacher)
@@ -171,10 +199,14 @@ func (c *controller) UpdateTeacher(teacher models.Teacher) (err error) {
 // see the classrooms in which they teach, with information regarding the argument that they teach
 // in that class, the students that make up the class, and the complete lesson timetable for that
 // class
+type Subjects struct{
+	Subjects []string `json:"subjects" example:"science"`
+}
 // @Summary Get subject taught by the teacher
 // @Param id path int true "Teacher ID"
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
+// @Success 200 {object} controller.Subjects
 // @Tags Teachers
 // @Router /teachers/{id}/subjects [get]
 func (c *controller) SubjectsByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
@@ -186,6 +218,7 @@ func (c *controller) SubjectsByTeacher(id int64, limit int, offset int) ([]inter
 // @Param subject path int true "Subject ID"
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
+// @Success 200 {array} models.Class
 // @Tags Teachers
 // @Router /teachers/{id}/subjects/{subject} [get]
 func (c *controller) ClassesBySubjectAndTeacher(teacher int64, subject string, limit int, offset int) ([]interface{}, error) {
@@ -197,6 +230,7 @@ func (c *controller) ClassesBySubjectAndTeacher(teacher int64, subject string, l
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Classes
+// @Success 200 {array} models.Student
 // @Router /classes/{id}/students [get]
 func (c *controller) StudentsByClass(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.StudentsByClass(id, limit, offset)
@@ -207,6 +241,7 @@ func (c *controller) StudentsByClass(id int64, limit int, offset int) ([]interfa
 // @Param offset query int false "offset in the list of elements to return"
 // @Param id path int true "Class ID"
 // @Tags Students
+// @Success 200 {array} models.Appointment
 // @Router /students/{id} [get]
 func (c *controller) LectureByClass(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.LectureByClass(id, limit, offset)
@@ -219,6 +254,7 @@ func (c *controller) LectureByClass(id int64, limit int, offset int) ([]interfac
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Teachers
+// @Success 200 {array} models.Appointment
 // @Router /teachers/{id}/appointments [get]
 func (c *controller) AppointmentsByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.AppointmentsByTeacher(id, limit, offset)
@@ -229,6 +265,7 @@ func (c *controller) AppointmentsByTeacher(id int64, limit int, offset int) ([]i
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Teachers
+// @Success 200 {array} models.TimeTable
 // @Router /teachers/{id}/notifications [get]
 func (c *controller) NotificationsByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.NotificationsByTeacher(id, limit, offset)
@@ -239,6 +276,7 @@ func (c *controller) NotificationsByTeacher(id int64, limit int, offset int) ([]
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Teachers
+// @Success 200 {array} models.TimeTable
 // @Router /teachers/{id}/lectures [get]
 func (c *controller) LecturesByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.LecturesByTeacher(id, limit, offset)
@@ -249,6 +287,7 @@ func (c *controller) LecturesByTeacher(id int64, limit int, offset int) ([]inter
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Teachers
+// @Success 200 {array} models.Class
 // @Router /teachers/{id}/classes [get]
 func (c *controller) ClassesByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
 	return c.r.ClassesByTeacher(id, limit, offset)
@@ -265,6 +304,7 @@ func (c *controller) ClassesByTeacher(id int64, limit int, offset int) ([]interf
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Students
+// @Success 200 {array} models.Student
 // @Router /students [get]
 func (c *controller) Students(limit int, offset int) ([]interface{}, error) {
 	return c.r.Students(limit, offset)
@@ -275,6 +315,7 @@ func (c *controller) Students(limit int, offset int) ([]interface{}, error) {
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Teachers
+// @Success 200 {array} models.Teacher
 // @Router /teachers [get]
 func (c *controller) Teachers(limit int, offset int) ([]interface{}, error) {
 	return c.r.Teachers(limit, offset)
@@ -284,6 +325,7 @@ func (c *controller) Teachers(limit int, offset int) ([]interface{}, error) {
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Parents
+// @Success 200 {array} models.Parent
 // @Router /parents [get]
 func (c *controller) Parents(limit int, offset int) ([]interface{}, error) {
 	return c.r.Parents(limit, offset)
@@ -293,6 +335,7 @@ func (c *controller) Parents(limit int, offset int) ([]interface{}, error) {
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Payments
+// @Success 200 {array} models.Payment
 // @Router /payments [get]
 func (c *controller) Payments(limit int, offset int) ([]interface{}, error) {
 	return c.r.Payments(limit, offset)
@@ -303,6 +346,7 @@ func (c *controller) Payments(limit int, offset int) ([]interface{}, error) {
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Notifications
+// @Success 200 {array} models.Notification
 // @Router /notifications [get]
 func (c *controller) Notifications(limit int, offset int) ([]interface{}, error) {
 	return c.r.Notifications(limit, offset)
@@ -312,6 +356,7 @@ func (c *controller) Notifications(limit int, offset int) ([]interface{}, error)
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Classes
+// @Success 200 {array} models.Class
 // @Router /classes [get]
 func (c *controller) Classes(limit int, offset int) ([]interface{}, error) {
 	return c.r.Classes(limit, offset)
@@ -320,6 +365,7 @@ func (c *controller) Classes(limit int, offset int) ([]interface{}, error) {
 // @Summary Get a login token
 // @Param account body models.Account true "Add account"
 // @Tags Auth
+// @Success 200 {object} controller.Token
 // @Router /login [post]
 func (c *controller) CheckUser(id string, pass string) (string, bool) {
 	return c.r.CheckUser(id, pass)
@@ -332,6 +378,7 @@ func (c *controller) UserKind(userID string) map[string]interface{} {
 // @Tags Parents
 // @Param parent body models.Parent true "data"
 // @Tags Parents
+// @Success 201 {object} models.Parent
 // @Router /parents [post]
 func (c *controller) CreateParent(parent models.Parent) (int64, error) {
 	return c.r.CreateParent(parent)
@@ -342,7 +389,7 @@ func (c *controller) CreateParent(parent models.Parent) (int64, error) {
 // @Param appointment body models.Appointment true "data"
 // @Tags Appointments
 // @Router /appointments [post]
-
+// @Success 201 {object} models.Appointment
 func (c *controller) CreateAppointment(appointment models.Appointment) (int64, error) {
 	return c.r.CreateAppointment(appointment)
 }
@@ -351,6 +398,7 @@ func (c *controller) CreateAppointment(appointment models.Appointment) (int64, e
 // @Param teacher body models.Teacher true "data"
 // @Tags Teachers
 // @Router /teachers [post]
+// @Success 201 {object} models.Teacher
 func (c *controller) CreateTeacher(teacher models.Teacher) (int64, error) {
 	return c.r.CreateTeacher(teacher)
 }
@@ -360,6 +408,8 @@ func (c *controller) CreateTeacher(teacher models.Teacher) (int64, error) {
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Appointments
 // @Router /appointments [get]
+// @Success 200 {object} representations.List
+// @Security ApiKeyAuth
 func (c *controller) Appointments(limit int, offset int) ([]interface{}, error) {
 	return c.r.Appointments(limit, offset)
 }
@@ -368,7 +418,88 @@ func (c *controller) Appointments(limit int, offset int) ([]interface{}, error) 
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Grades
+// @Success 200 {array} models.Grade
 // @Router /grades [get]
 func (c *controller) Grades(limit int, offset int) ([]interface{}, error) {
 	return c.r.Grades(limit, offset)
+}
+
+// @Summary Create student
+// @Param student body models.Student true "data"
+// @Tags Students
+// @Router /students [post]
+// @Success 201 {object} models.Student
+func (c*controller) CreateStudent(student models.Student) (int64, error) {
+	return c.r.CreateStudent(student)
+}
+
+// @Summary Create class
+// @Param class body models.Class true "data"
+// @Tags Classes
+// @Router /classes [post]
+// @Success 201 {object} models.Class
+func (c *controller) CreateClass(class models.Class) (int64, error) {
+	return c.r.CreateClass(class)
+}
+
+// @Summary Update Class's data
+// @Param id path int true "Class ID"
+// @Param parent body models.Class true "data"
+// @Tags Classes
+// @Success 201 {object} models.Class
+// @Router /classes/{id} [put]
+func (c *controller) UpdateClass(class models.Class) error {
+	return c.r.UpdateClass(class)
+}
+// @Summary Create notification
+// @Param class body models.Notification true "data"
+// @Tags Notifications
+// @Router /notifications [post]
+// @Success 201 {object} models.Notification
+func (c *controller) CreateNotification(notification models.Notification) (int64, error) {
+	return c.r.CreateNotification(notification)
+}
+// @Summary Update notification
+// @Param id path int true "Notification ID"
+// @Param class body models.Notification true "data"
+// @Tags Notifications
+// @Router /notifications/{id} [put]
+// @Success 201 {object} models.Notification
+func (c *controller) UpdateNotification(notification models.Notification) error  {
+	return c.r.UpdateNotification(notification)
+}
+// @Summary Update Grade
+// @Param id path int true "Grade ID"
+// @Param class body models.Grade true "data"
+// @Tags Grades
+// @Router /grades/{id} [put]
+// @Success 201 {object} models.Grade
+func (c *controller) UpdateGrade(grade models.Grade) error  {
+	return c.r.UpdateGrade(grade)
+}
+// @Summary Create grade
+// @Param class body models.Grade true "data"
+// @Tags Grades
+// @Router /grades [post]
+// @Success 201 {object} models.Grade
+func (c *controller) CreateGrade(grade models.Grade) (int64, error) {
+	return c.r.CreateGrade(grade)
+}
+
+// @Summary Update payment
+// @Param id path int true "Payment ID"
+// @Param class body models.Payment true "data"
+// @Tags Payments
+// @Router /payments/{id} [put]
+// @Success 201 {object} models.Payment
+func (c *controller) UpdatePayment(payment models.Payment) error  {
+	return c.r.UpdatePayment(payment)
+}
+// @Summary Create payment
+// @Param class body models.Payment true "data"
+// @Tags Payments
+// @Router /payments [post]
+// @Success 201 {object} models.Payment
+func (c *controller) CreatePayment(payment models.Payment) (int64, error) {
+	return c.r.CreatePayment(payment)
 }

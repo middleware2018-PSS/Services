@@ -12,10 +12,14 @@
         "version": "1.0"
     },
     "host": "localhost:5000",
-    "basePath": "/",
     "paths": {
         "/appointments": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Appointments"
                 ],
@@ -33,10 +37,77 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/representations.List"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Create appointment",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Appointment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "data",
+                        "name": "appointment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Appointment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Appointment"
+                        }
+                    }
+                }
             }
         },
         "/appointments/{id}": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Get a appointment by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Appointment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Appointment"
+                        }
+                    }
+                }
+            },
             "put": {
                 "tags": [
                     "Appointments"
@@ -60,7 +131,16 @@
                             "$ref": "#/definitions/models.Appointment"
                         }
                     }
-                ]
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Appointment"
+                        }
+                    }
+                }
             }
         },
         "/classes": {
@@ -82,7 +162,45 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Class"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Classes"
+                ],
+                "summary": "Create class",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Class"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Class"
+                        }
+                    }
+                }
             }
         },
         "/classes/{id}": {
@@ -90,16 +208,59 @@
                 "tags": [
                     "Classes"
                 ],
-                "summary": "Get a appointment by id",
+                "summary": "Get a class by id",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Appointment ID",
+                        "description": "Class ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Class"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Classes"
+                ],
+                "summary": "Update Class's data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "data",
+                        "name": "parent",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Class"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Class"
+                        }
+                    }
+                }
             }
         },
         "/classes/{id}/students": {
@@ -128,7 +289,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Student"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/grades": {
@@ -150,7 +322,105 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Grade"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Grades"
+                ],
+                "summary": "Create grade",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Grade"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Grade"
+                        }
+                    }
+                }
+            }
+        },
+        "/grades/{id}": {
+            "get": {
+                "tags": [
+                    "Grades"
+                ],
+                "summary": "Get a grade by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Grade ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Grade"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Grades"
+                ],
+                "summary": "Update Grade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Grade ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "data",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Grade"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Grade"
+                        }
+                    }
+                }
             }
         },
         "/login": {
@@ -170,7 +440,16 @@
                             "$ref": "#/definitions/models.Account"
                         }
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Token"
+                        }
+                    }
+                }
             }
         },
         "/notifications": {
@@ -192,7 +471,45 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Notification"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Create notification",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Notification"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Notification"
+                        }
+                    }
+                }
             }
         },
         "/notifications/{id}": {
@@ -209,7 +526,50 @@
                         "in": "path",
                         "required": true
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Notification"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Update notification",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Notification ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "data",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Notification"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Notification"
+                        }
+                    }
+                }
             }
         },
         "/parents": {
@@ -231,7 +591,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Parent"
+                            }
+                        }
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -250,7 +621,16 @@
                             "$ref": "#/definitions/models.Parent"
                         }
                     }
-                ]
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Parent"
+                        }
+                    }
+                }
             }
         },
         "/parents/{id}": {
@@ -267,7 +647,16 @@
                         "in": "path",
                         "required": true
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Parent"
+                        }
+                    }
+                }
             },
             "put": {
                 "tags": [
@@ -292,7 +681,16 @@
                             "$ref": "#/definitions/models.Parent"
                         }
                     }
-                ]
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Parent"
+                        }
+                    }
+                }
             }
         },
         "/parents/{id}/appointments": {
@@ -322,7 +720,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Appointment"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/parents/{id}/notifications": {
@@ -351,7 +760,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Notification"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/parents/{id}/payments": {
@@ -380,7 +800,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Payment"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/parents/{id}/students": {
@@ -409,7 +840,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Student"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/payments": {
@@ -431,7 +873,45 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Payment"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Create payment",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Payment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Payment"
+                        }
+                    }
+                }
             }
         },
         "/payments/{id}": {
@@ -448,7 +928,50 @@
                         "in": "path",
                         "required": true
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Payment"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Update payment",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Payment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "data",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Payment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Payment"
+                        }
+                    }
+                }
             }
         },
         "/students": {
@@ -470,7 +993,45 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Student"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Create student",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "student",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Student"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Student"
+                        }
+                    }
+                }
             }
         },
         "/students/{id}": {
@@ -499,7 +1060,18 @@
                         "in": "path",
                         "required": true
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Appointment"
+                            }
+                        }
+                    }
+                }
             },
             "put": {
                 "tags": [
@@ -524,7 +1096,16 @@
                             "$ref": "#/definitions/models.Student"
                         }
                     }
-                ]
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Student"
+                        }
+                    }
+                }
             }
         },
         "/students/{id}/grades": {
@@ -553,7 +1134,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Grade"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/teachers": {
@@ -575,7 +1167,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Teacher"
+                            }
+                        }
+                    }
+                }
             },
             "post": {
                 "tags": [
@@ -593,7 +1196,16 @@
                             "$ref": "#/definitions/models.Teacher"
                         }
                     }
-                ]
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Teacher"
+                        }
+                    }
+                }
             }
         },
         "/teachers/{id}": {
@@ -610,7 +1222,16 @@
                         "in": "path",
                         "required": true
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Teacher"
+                        }
+                    }
+                }
             },
             "put": {
                 "tags": [
@@ -635,7 +1256,16 @@
                             "$ref": "#/definitions/models.Teacher"
                         }
                     }
-                ]
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Teacher"
+                        }
+                    }
+                }
             }
         },
         "/teachers/{id}/appointments": {
@@ -664,7 +1294,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Appointment"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/teachers/{id}/classes": {
@@ -693,7 +1334,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Class"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/teachers/{id}/lectures": {
@@ -722,7 +1374,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TimeTable"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/teachers/{id}/notifications": {
@@ -751,7 +1414,18 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TimeTable"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/teachers/{id}/subjects": {
@@ -780,7 +1454,16 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/controller.Subjects"
+                        }
+                    }
+                }
             }
         },
         "/teachers/{id}/subjects/{subject}": {
@@ -816,11 +1499,47 @@
                         "name": "offset",
                         "in": "query"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Class"
+                            }
+                        }
+                    }
+                }
             }
         }
     },
     "definitions": {
+        "controller.Subjects": {
+            "type": "object",
+            "properties": {
+                "subjects": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "science"
+                    ]
+                }
+            }
+        },
+        "controller.Token": {
+            "type": "object",
+            "properties": {
+                "expire": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Account": {
             "type": "object",
             "properties": {
@@ -854,6 +1573,75 @@
                 }
             }
         },
+        "models.Class": {
+            "type": "object",
+            "properties": {
+                "grade": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "info": {
+                    "type": "string"
+                },
+                "section": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Grade": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "grade": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "student": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Student"
+                },
+                "subject": {
+                    "type": "string",
+                    "example": "science"
+                },
+                "teacher": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Teacher"
+                }
+            }
+        },
+        "models.Notification": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "message": {
+                    "type": "string"
+                },
+                "receiver": {
+                    "type": "integer"
+                },
+                "receiver_kind": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Parent": {
             "type": "object",
             "properties": {
@@ -872,6 +1660,31 @@
                 },
                 "surname": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Payment": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "emitted": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "payed": {
+                    "type": "boolean"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "student": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Student"
                 }
             }
         },
@@ -916,6 +1729,63 @@
                     "type": "string"
                 }
             }
+        },
+        "models.TimeTable": {
+            "type": "object",
+            "properties": {
+                "class": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Class"
+                },
+                "end": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "info": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string",
+                    "example": "Aula Magna"
+                },
+                "start": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string",
+                    "example": "science"
+                }
+            }
+        },
+        "representations.List": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "\u0026{%!s(token.Pos=1100) %!s(*ast.FieldList=\u0026{1109 [] 1110}) %!s(bool=false)}"
+                    }
+                },
+                "next": {
+                    "type": "string"
+                },
+                "previous": {
+                    "type": "string"
+                },
+                "self": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }
