@@ -1,0 +1,619 @@
+basePath: /
+definitions:
+  models.Appointment:
+    properties:
+      id:
+        $ref: '#/definitions/models.ID'
+        type: object
+      location:
+        $ref: '#/definitions/models.Location'
+        type: object
+      student:
+        $ref: '#/definitions/models.Teacher'
+        type: object
+      time:
+        type: string
+    type: object
+  models.ID:
+    type: object
+  models.Location:
+    type: object
+  models.Parent:
+    properties:
+      id:
+        $ref: '#/definitions/models.ID'
+        type: object
+      info:
+        type: string
+      mail:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+    type: object
+  models.Student:
+    properties:
+      id:
+        $ref: '#/definitions/models.ID'
+        type: object
+      info:
+        type: string
+      mail:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+    type: object
+  models.Teacher:
+    properties:
+      id:
+        $ref: '#/definitions/models.ID'
+        type: object
+      info:
+        type: string
+      mail:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+    type: object
+  repository.Login:
+    properties:
+      password:
+        example: Password
+        type: string
+      username:
+        example: John
+        type: string
+    type: object
+host: localhost:5000
+info:
+  contact: {}
+  description: These are a School management system's API .
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Back2School API
+  version: "1.0"
+paths:
+  /appointments:
+    get:
+      parameters:
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get all appointments
+      tags:
+      - Appointments
+    post:
+      parameters:
+      - description: Appointment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: appointment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Appointment'
+          type: object
+      summary: Create appointment
+      tags:
+      - Appointments
+  /appointments/{id}:
+    put:
+      parameters:
+      - description: Appointment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: appointment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Appointment'
+          type: object
+      summary: Update appointment's data
+      tags:
+      - Appointments
+  /classes:
+    get:
+      parameters:
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get all classes
+      tags:
+      - Classes
+  /classes/{id}:
+    get:
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Get a class by id
+      tags:
+      - Classes
+  /classes/{id}/students:
+    get:
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get a student by class
+      tags:
+      - Classes
+  /grades:
+    get:
+      parameters:
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get all grades
+      tags:
+      - Grades
+  /login:
+    post:
+      parameters:
+      - description: Add account
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/repository.Login'
+          type: object
+      summary: Get a login token
+      tags:
+      - Auth
+  /notifications:
+    get:
+      parameters:
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get all notifications
+      tags:
+      - Notifications
+  /notifications/{id}:
+    get:
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Get a notification by id
+      tags:
+      - Notifications
+  /parents:
+    get:
+      parameters:
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get all parents
+      tags:
+      - Parents
+    post:
+      parameters:
+      - description: data
+        in: body
+        name: parent
+        required: true
+        schema:
+          $ref: '#/definitions/models.Parent'
+          type: object
+      summary: Create parent
+      tags:
+      - Parents
+      - Parents
+  /parents/{id}:
+    get:
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Get a parent by id
+      tags:
+      - Parents
+    put:
+      parameters:
+      - description: Parent ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: parent
+        required: true
+        schema:
+          $ref: '#/definitions/models.Parent'
+          type: object
+      summary: Update parents's data
+      tags:
+      - Parents
+  /parents/{id}/appointments:
+    get:
+      parameters:
+      - description: Parent ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get appointments of the parent
+      tags:
+      - Parents
+      - Parents
+  /parents/{id}/notifications:
+    get:
+      parameters:
+      - description: Parent ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get notifications of the parent
+      tags:
+      - Parents
+  /parents/{id}/payments:
+    get:
+      parameters:
+      - description: Parent ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get payments of the parent
+      tags:
+      - Parents
+  /parents/{id}/students:
+    get:
+      parameters:
+      - description: Parent ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get children of the parent
+      tags:
+      - Parents
+  /payments:
+    get:
+      parameters:
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get all payments
+      tags:
+      - Payments
+  /payments/{id}:
+    get:
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Get a payment by id
+      tags:
+      - Payments
+  /students:
+    get:
+      parameters:
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get all students
+      tags:
+      - Students
+  /students/{id}:
+    get:
+      parameters:
+      - description: Student ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Get a student by id
+      tags:
+      - Students
+    put:
+      parameters:
+      - description: Student ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: student
+        required: true
+        schema:
+          $ref: '#/definitions/models.Student'
+          type: object
+      summary: Update student's data
+      tags:
+      - Students
+  /students/{id}/grades:
+    get:
+      parameters:
+      - description: Student ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get grades of the student
+      tags:
+      - Students
+  /teachers:
+    get:
+      parameters:
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get all teachers
+      tags:
+      - Teachers
+    post:
+      parameters:
+      - description: data
+        in: body
+        name: teacher
+        required: true
+        schema:
+          $ref: '#/definitions/models.Teacher'
+          type: object
+      summary: Create teacher
+      tags:
+      - Teachers
+  /teachers/{id}:
+    get:
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Get a teacher by id
+      tags:
+      - Teachers
+    put:
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: teacher
+        required: true
+        schema:
+          $ref: '#/definitions/models.Teacher'
+          type: object
+      summary: Update teacher's data
+      tags:
+      - Teachers
+  /teachers/{id}/appointments:
+    get:
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get appointments of the teacher
+      tags:
+      - Teachers
+  /teachers/{id}/classes:
+    get:
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get classes in which the teacher teaches
+      tags:
+      - Teachers
+  /teachers/{id}/lectures:
+    get:
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get lectures taught by the teacher
+      tags:
+      - Teachers
+  /teachers/{id}/notifications:
+    get:
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get notifications of the teacher
+      tags:
+      - Teachers
+  /teachers/{id}/subjects:
+    get:
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get subject taught by the teacher
+      tags:
+      - Teachers
+  /teachers/{id}/subjects/{subject}:
+    get:
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Subject ID
+        in: path
+        name: subject
+        required: true
+        type: integer
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      summary: Get classes in which the subject is taught by the teacher
+      tags:
+      - Teachers
+swagger: "2.0"

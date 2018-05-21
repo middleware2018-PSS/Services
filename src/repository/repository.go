@@ -11,6 +11,7 @@ var (
 )
 
 type Repository interface {
+
 	ClassByID(id int64) (interface{}, error)
 
 	NotificationByID(id int64) (interface{}, error)
@@ -39,7 +40,7 @@ type Repository interface {
 	// see/modify appointments that they have with their children's teachers
 	// (calendar-like support for requesting appointments, err error)
 	AppointmentsByParent(id int64, limit int, offset int) ([]interface{}, error)
-	UpdateAppointments(appointment models.Appointment) error
+	UpdateAppointment(appointment models.Appointment) error
 	AppointmentByID(id int64) (interface{}, error)
 
 	// see/modify their personal data
@@ -76,4 +77,11 @@ type Repository interface {
 	Payments(limit int, offset int) ([]interface{}, error)
 	Notifications(limit int, offset int) ([]interface{}, error)
 	Classes(limit int, offset int) ([]interface{}, error)
+	CheckUser(s string, s2 string) (string, bool)
+	UserKind(userID string) map[string]interface{}
+	CreateParent(parent models.Parent) (int64, error)
+	CreateAppointment(appointment models.Appointment) (int64, error)
+	CreateTeacher(teacher models.Teacher)  (int64, error)
+	Appointments(int, int) ([]interface{}, error)
+	Grades(int, int) ([]interface{}, error)
 }

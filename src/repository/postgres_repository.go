@@ -11,10 +11,9 @@ type postgresRepository struct {
 }
 
 func NewPostgresRepository(DB *sql.DB) *postgresRepository {
+	//TODO prepare all statement at startup
 	return &postgresRepository{DB}
 }
-
-
 
 func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (interface{}, error), limit int, offset int, params ...interface{}) (list []interface{}, err error) {
 	query = query + fmt.Sprintf(" limit $%d offset $%d", len(params)+1, len(params)+2)
@@ -39,12 +38,21 @@ func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (inter
 	}
 }
 
-func (r *postgresRepository) update(query string, params ...interface{}) (err error) {
-	_, err = r.DB.Exec(query, params...)
+func (r *postgresRepository) exec(query string, params ...interface{}) (id int64, err error) {
+	res, err := r.DB.Exec(query, params...)
 	if err != nil {
 		log.Print(err.Error())
 	}
-	return switchErrors(err)
+	if id, e := res.LastInsertId(); e != nil{
+		return id, switchErrors(err)
+	} else {
+		return 0, err
+	}
+}
+
+func (r *postgresRepository) execUpdate(query string, params ...interface{}) (err error) {
+	_, err =  r.exec(query, params...)
+	return err
 }
 
 func switchResult(res interface{}, e error) (interface{}, error) {

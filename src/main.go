@@ -3,24 +3,42 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/middleware2018-PSS/Services/src/models"
 	"github.com/middleware2018-PSS/Services/src/repository"
 	"github.com/middleware2018-PSS/Services/src/representations"
 	"github.com/pkg/errors"
-	"log"
-	"net/http"
-	"strconv"
-	"strings"
-	"github.com/appleboy/gin-jwt"
-	"time"
+	_ "github.com/middleware2018-PSS/Services/src/docs"
+	"github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 var (
 	LimitError = errors.New("Limit Must Be Greater Than Zero.")
 )
 
+// @title Back2School API
+// @version 1.0
+// @description These are a School management system's API .
+// @termsOfService http://swagger.io/terms/
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @securitydefinitions.jwt.application OAuth2Application
+// @tokenUrl http://localhost:5000/login
+
+
+// @host localhost:5000
+// @BasePath /
 func main() {
 	db, err := sql.Open("postgres", "user=postgres dbname=postgres sslmode=disable")
 	if err != nil {
@@ -28,27 +46,43 @@ func main() {
 	}
 	defer db.Close()
 
-	con := repository.NewPostgresRepository(db)
+	var con  repository.Repository = repository.NewPostgresRepository(db)
 
-	g := gin.Default()
+
 	authMiddleware := jwt.GinJWTMiddleware{
-		Realm: "test",
-		Key: []byte("password"),
-		Timeout: time.Hour,
-		MaxRefresh:time.Hour,
+		Realm:      "test",
+		Key:        []byte("password"),
+		Timeout:    time.Hour,
+		MaxRefresh: time.Hour,
 		Authenticator: func(userID string, password string, c *gin.Context) (string, bool) {
 			return con.CheckUser(userID, password)
 		},
 		PayloadFunc: con.UserKind,
-		}
-	g.POST("/login", authMiddleware.LoginHandler)
+	}
+
+	g := gin.Default()
+	{
+		g.POST("/login", authMiddleware.LoginHandler)
+	}
 
 	api := g.Group("", authMiddleware.MiddlewareFunc())
 	api.GET("/refresh_token", authMiddleware.RefreshHandler)
 
-	parent := api.Group("/parents/:id", authAdminOrParent(authMiddleware.Realm) )
+	api.POST("/parents", authAdmin(authMiddleware.Realm), func(c *gin.Context) {
+		var p models.Parent
+		if err := c.ShouldBind(&p); err == nil {
+			if id, err := con.CreateParent(p); err == nil {
+				p.ID = id
+				c.JSON(http.StatusCreated, p)
+			}
+		}
+	})
+
+	parent := api.Group("/parents/:id", authAdminOrParent(authMiddleware.Realm))
 	{
 		parent.GET("", byID("id", con.ParentByID))
+		// TODO add admin auth on Post
+
 		parent.PUT("", func(c *gin.Context) {
 			// not possible to refactor (at the best of my knowledge)
 			var p models.Parent
@@ -56,19 +90,40 @@ func main() {
 				id, _ := strconv.Atoi(c.Param("id"))
 				p.ID = int64(id)
 				if err := con.UpdateParent(p); err == nil {
-					c.JSON(http.StatusCreated, p)
+					c.JSON(http.StatusNoContent, p)
 				}
 			}
 		})
 		parent.GET("/students", byIDWithOffsetAndLimit("id", con.ChildrenByParent))
 		parent.GET("/appointments", byIDWithOffsetAndLimit("id", con.AppointmentsByParent))
+		parent.POST("/appointments", func(c *gin.Context) {
+			var a models.Appointment
+			if err := c.ShouldBind(&a); err == nil {
+				if id, err := con.CreateAppointment(a); err == nil {
+					a.ID = id
+					c.JSON(http.StatusCreated, a)
+				}
+			}
+
+		})
 		parent.GET("/payments", byIDWithOffsetAndLimit("id", con.PaymentsByParent))
 		parent.GET("/notifications", byIDWithOffsetAndLimit("id", con.NotificationsByParent))
 	}
 
 	// TODO add hypermedia
 
-	teachers := api.Group("/teachers/:id",authAdminOrTeacher(authMiddleware.Realm))
+	api.POST("/teachers", func(c *gin.Context) {
+		var t models.Teacher
+		if err := c.ShouldBind(&t); err == nil {
+			if id, err := con.CreateTeacher(t); err != nil {
+				t.ID = id
+				c.JSON(http.StatusCreated, t)
+			}
+		}
+
+	})
+
+	teachers := api.Group("/teachers/:id", authAdminOrTeacher(authMiddleware.Realm))
 	{
 		teachers.GET("", byID("id", con.TeacherByID))
 		teachers.PUT("", func(c *gin.Context) {
@@ -80,7 +135,6 @@ func main() {
 					c.JSON(http.StatusNoContent, nil)
 				}
 			}
-
 		})
 		teachers.GET("/lectures", byIDWithOffsetAndLimit("id", con.LecturesByTeacher))
 		teachers.GET("/appointments", byIDWithOffsetAndLimit("id", con.AppointmentsByTeacher))
@@ -97,19 +151,18 @@ func main() {
 		teachers.GET("/classes", byIDWithOffsetAndLimit("id", con.ClassesByTeacher))
 	}
 
-	api.GET("/appointments", getOffsetLimit(con.Appointments))
+	api.GET("/appointments",authAdmin(authMiddleware.Realm), getOffsetLimit(con.Appointments))
 	api.GET("/appointments/:appointment", byID("appointment", con.AppointmentByID))
 	api.PUT("/appointments/:appointment", func(c *gin.Context) {
 		var a models.Appointment
 		if err := c.ShouldBind(&a); err == nil {
 			id, _ := strconv.Atoi(c.Param("id"))
 			a.ID = int64(id)
-			if err := con.UpdateAppointments(a); err == nil {
+			if err := con.UpdateAppointment(a); err == nil {
 				c.JSON(http.StatusCreated, a)
 			}
 		}
 	})
-	// TODO remove admin from path and use token
 
 	api.GET("/parents", getOffsetLimit(con.Parents))
 	api.GET("/grades", getOffsetLimit(con.Grades))
@@ -130,6 +183,7 @@ func main() {
 	api.GET("/classes/:id", byID("id", con.ClassByID))
 	api.GET("/classes/:id/students", byIDWithOffsetAndLimit("id", con.StudentsByClass))
 
+	g.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	g.Run(":5000")
 }
 
@@ -178,10 +232,11 @@ func byIDWithOffsetAndLimit(id string, f func(int64, int, int) ([]interface{}, e
 			//TODO handle err
 			res[i], _ = representations.ToRepresentation(el, c)
 		}
-		result := representations.List{c.Request.RequestURI,
-			res,
-			next(c.Request.RequestURI, offset, limit, res),
-			prev(c.Request.RequestURI, offset, limit),
+		result := representations.List{
+			Self:     c.Request.RequestURI,
+			Data:     res,
+			Next:     next(c.Request.RequestURI, offset, limit, res),
+			Previous: prev(c.Request.RequestURI, offset, limit),
 		}
 		handleErr(err, result, c)
 	}
@@ -256,7 +311,7 @@ func authAdminOrParent(realm string) func(c *gin.Context) {
 			return
 		}
 	}
-	}
+}
 
 func authAdminOrTeacher(realm string) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -270,7 +325,7 @@ func authAdminOrTeacher(realm string) func(c *gin.Context) {
 			return
 		}
 	}
-	}
+}
 
 func authAdmin(realm string) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -283,4 +338,4 @@ func authAdmin(realm string) func(c *gin.Context) {
 			return
 		}
 	}
-	}
+}

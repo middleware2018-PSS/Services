@@ -5,12 +5,23 @@ import (
 	"github.com/middleware2018-PSS/Services/src/models"
 )
 
+type Login struct {
+	Username string `form:"username" json:"username" binding:"required" example:"John"`
+	Password string `form:"password" json:"password" binding:"required" example:"Password"`
+}
+
+
+// @Summary Get a login token
+// @Param account body repository.Login true "Add account"
+// @Tags Auth
+// @Router /login [post]
 func (r *postgresRepository) CheckUser(userID string, password string) (string, bool) {
 	query := `select "user", password from back2school.accounts where "user" = $1 and password = $2`
 	var id, pass string
 	err := r.QueryRow(query, userID, password).Scan(&id, &pass)
 	return userID, err==nil
 }
+
 
 func (r *postgresRepository) UserKind(userID string) map[string]interface{} {
 	query := `select kind, id from back2school.accounts where "user" = $1`
@@ -20,6 +31,10 @@ func (r *postgresRepository) UserKind(userID string) map[string]interface{} {
 	return map[string]interface{}{"kind":kind,"dbID":id}
 }
 
+// @Summary Get a appointment by id
+// @Param id path int true "Appointment ID"
+// @Tags Classes 
+// @Router /classes/{id} [get]
 func (r *postgresRepository) AppointmentByID(id int64) (interface{}, error) {
 	appointment := models.Appointment{}
 	err := r.QueryRow("SELECT id, student, teacher, time, location "+
@@ -28,6 +43,10 @@ func (r *postgresRepository) AppointmentByID(id int64) (interface{}, error) {
 	return switchResult(appointment, err)
 }
 
+// @Summary Get a class by id
+// @Param id path int true "Class ID"
+// @Tags Classes 
+// @Router /classes/{id} [get]
 func (r *postgresRepository) ClassByID(id int64) (interface{}, error) {
 	class := models.Class{}
 	err := r.QueryRow("SELECT id, year, section, info, grade FROM back2school.classes "+
@@ -35,6 +54,11 @@ func (r *postgresRepository) ClassByID(id int64) (interface{}, error) {
 	return switchResult(class, err)
 }
 
+// @Summary Get all classes
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Classes 
+// @Router /classes [get]
 func (r *postgresRepository) Classes(limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("select id, year, section, info, grade "+
 		"from back2school.classes "+
@@ -45,6 +69,12 @@ func (r *postgresRepository) Classes(limit int, offset int) ([]interface{}, erro
 	}, limit, offset)
 }
 
+// @Summary Get a student by class
+// @Param id path int true "Class ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Classes 
+// @Router /classes/{id}/students [get]
 func (r *postgresRepository) StudentsByClass(id int64, limit int, offset int) (students []interface{}, err error) {
 	return r.listByParams("select distinct id, name, surname, mail, info "+
 		"from back2school.students join back2school.enrolled on student = id "+
@@ -57,6 +87,12 @@ func (r *postgresRepository) StudentsByClass(id int64, limit int, offset int) (s
 		}, limit, offset, id)
 }
 
+// @Summary Get a lecture by class
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Param id path int true "Class ID"
+// @Tags Students 
+// @Router /students/{id} [get]
 func (r *postgresRepository) LectureByClass(id int64, limit int, offset int) ([]interface{}, error) {
 	return r.listByParams(
 		"select id, class, subject, \"start\", \"end\", location, info "+
@@ -70,6 +106,10 @@ func (r *postgresRepository) LectureByClass(id int64, limit int, offset int) ([]
 		}, limit, offset, id)
 }
 
+// @Summary Get a notification by id
+// @Param id path int true "Notification ID"
+// @Tags Notifications 
+// @Router /notifications/{id} [get]
 func (r *postgresRepository) NotificationByID(id int64) (interface{}, error) {
 	n := models.Notification{}
 	err := r.QueryRow("SELECT id, receiver, message, time, receiver_kind "+
@@ -78,6 +118,13 @@ func (r *postgresRepository) NotificationByID(id int64) (interface{}, error) {
 	return switchResult(n, err)
 }
 
+
+// List all notifications
+// @Summary Get all notifications
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Notifications 
+// @Router /notifications [get]
 func (r *postgresRepository) Notifications(limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("select id, receiver, message, time, receiver_kind "+
 		"from back2school.notification "+
@@ -89,6 +136,11 @@ func (r *postgresRepository) Notifications(limit int, offset int) ([]interface{}
 		}, limit, offset)
 }
 
+
+// @Summary Get a parent by id
+// @Param id path int true "Account ID"
+// @Tags Parents
+// @Router /parents/{id} [get]
 func (r *postgresRepository) ParentByID(id int64) (interface{}, error) {
 	p := models.Parent{}
 	err := r.QueryRow("SELECT id,	name, surname, mail, info "+
@@ -97,6 +149,12 @@ func (r *postgresRepository) ParentByID(id int64) (interface{}, error) {
 	return switchResult(p, err)
 }
 
+
+// @Summary Get all grades
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Grades 
+// @Router /grades [get]
 func (r *postgresRepository) Grades(limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("select id, student, grade, subject, date, teacher "+
 		"from back2school.grades "+
@@ -108,6 +166,12 @@ func (r *postgresRepository) Grades(limit int, offset int) ([]interface{}, error
 		}, limit, offset)
 }
 
+
+// @Summary Get all parents
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Parents
+// @Router /parents [get]
 func (r *postgresRepository) Parents(limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("select id, name, surname, mail, info "+
 		"from back2school.parents "+
@@ -119,6 +183,13 @@ func (r *postgresRepository) Parents(limit int, offset int) ([]interface{}, erro
 		}, limit, offset)
 }
 
+
+// @Summary Get children of the parent
+// @Param id path int true "Parent ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Parents
+// @Router /parents/{id}/students [get]
 func (r *postgresRepository) ChildrenByParent(id int64, limit int, offset int) (children []interface{}, err error) {
 	return r.listByParams("SELECT distinct s.id, s.name, s.surname, s.mail, s.info "+
 		"FROM back2school.isparent join back2school.students as s on student = s.id  "+
@@ -131,6 +202,13 @@ func (r *postgresRepository) ChildrenByParent(id int64, limit int, offset int) (
 		}, limit, offset, id)
 }
 
+
+// @Summary Get payments of the parent
+// @Param id path int true "Parent ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Parents
+// @Router /parents/{id}/payments [get]
 func (r *postgresRepository) PaymentsByParent(id int64, limit int, offset int) (payments []interface{}, err error) {
 	return r.listByParams("select p.id, p.amount, p.student, p.payed, p.reason, p.emitted "+
 		"from back2school.payments as p natural join back2school.isparent "+
@@ -142,6 +220,13 @@ func (r *postgresRepository) PaymentsByParent(id int64, limit int, offset int) (
 	}, limit, offset, id)
 }
 
+
+// @Summary Get notifications of the parent
+// @Param id path int true "Parent ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Parents
+// @Router /parents/{id}/notifications [get]
 func (r *postgresRepository) NotificationsByParent(id int64, limit int, offset int) (list []interface{}, err error) {
 	return r.listByParams("select * from ( "+
 		"select n.id, n.receiver, n.message, n.receiver_kind, n.time "+
@@ -160,6 +245,14 @@ func (r *postgresRepository) NotificationsByParent(id int64, limit int, offset i
 		}, limit, offset, id)
 }
 
+
+// @Summary Get appointments of the parent
+// @Param id path int true "Parent ID"
+// @Tags Parents
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Parents
+// @Router /parents/{id}/appointments [get]
 func (r *postgresRepository) AppointmentsByParent(id int64, limit int, offset int) (appointments []interface{}, err error) {
 	return r.listByParams("select a.id, a.student, a.teacher, a.location, a.time "+
 		"from back2school.appointments as a natural join back2school.isparent  "+
@@ -172,6 +265,11 @@ func (r *postgresRepository) AppointmentsByParent(id int64, limit int, offset in
 		}, limit, offset, id)
 }
 
+// Get payment by id
+// @Summary Get a payment by id
+// @Param id path int true "Payment ID"
+// @Tags Payments 
+// @Router /payments/{id} [get]
 func (r *postgresRepository) PaymentByID(id int64) (interface{}, error) {
 	payment := &models.Payment{}
 	err := r.QueryRow("SELECT id, amount, payed, emitted, reason "+
@@ -179,6 +277,12 @@ func (r *postgresRepository) PaymentByID(id int64) (interface{}, error) {
 	return switchResult(payment, err)
 }
 
+
+// @Summary Get all payments
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Payments 
+// @Router /payments [get]
 func (r *postgresRepository) Payments(limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("select id, amount, student, payed, reason, emitted "+
 		"from back2school.payments "+
@@ -190,6 +294,11 @@ func (r *postgresRepository) Payments(limit int, offset int) ([]interface{}, err
 		}, limit, offset)
 }
 
+// @Summary Get all appointments
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Appointments 
+// @Router /appointments [get]
 func (r *postgresRepository) Appointments(limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("select id, student, teacher, location, time "+
 		"from back2school.appointments "+
@@ -201,6 +310,12 @@ func (r *postgresRepository) Appointments(limit int, offset int) ([]interface{},
 	}, limit, offset)
 }
 
+
+// @Summary Get all students
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Students 
+// @Router /students [get]
 func (r *postgresRepository) Students(limit int, offset int) (student []interface{}, err error) {
 	return r.listByParams("select id, name, surname, mail, info  "+
 		"from back2school.students "+
@@ -211,6 +326,11 @@ func (r *postgresRepository) Students(limit int, offset int) (student []interfac
 	}, limit, offset)
 }
 
+// Get student by id
+// @Summary Get a student by id
+// @Param id path int true "Student ID"
+// @Tags Students 
+// @Router /students/{id} [get]
 func (r *postgresRepository) StudentByID(id int64) (student interface{}, err error) {
 	s := models.Student{}
 	err = r.QueryRow("SELECT id,	name, surname, mail, info  "+
@@ -219,6 +339,13 @@ func (r *postgresRepository) StudentByID(id int64) (student interface{}, err err
 	return switchResult(s, err)
 }
 
+
+// @Summary Get grades of the student
+// @Param id path int true "Student ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Students 
+// @Router /students/{id}/grades [get]
 func (r *postgresRepository) GradesByStudent(id int64, limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("SELECT id, student, subject, date, grade, teacher "+
 		"FROM back2school.grades "+
@@ -231,6 +358,11 @@ func (r *postgresRepository) GradesByStudent(id int64, limit int, offset int) ([
 		}, limit, offset, id)
 }
 
+// Get teacher by id
+// @Summary Get a teacher by id
+// @Param id path int true "Teacher ID"
+// @Tags Teachers 
+// @Router /teachers/{id} [get]
 func (r *postgresRepository) TeacherByID(id int64) (interface{}, error) {
 	teacher := models.Teacher{}
 	err := r.QueryRow("SELECT id, name, surname, mail  "+
@@ -241,6 +373,13 @@ func (r *postgresRepository) TeacherByID(id int64) (interface{}, error) {
 
 }
 
+
+// List all teachers
+// @Summary Get all teachers
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers 
+// @Router /teachers [get]
 func (r *postgresRepository) Teachers(limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("select id, name, surname, mail, info  "+
 		"from back2school.teachers "+
@@ -251,6 +390,13 @@ func (r *postgresRepository) Teachers(limit int, offset int) ([]interface{}, err
 	}, limit, offset)
 }
 
+
+// @Summary Get appointments of the teacher
+// @Param id path int true "Teacher ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers 
+// @Router /teachers/{id}/appointments [get]
 func (r *postgresRepository) AppointmentsByTeacher(id int64, limit int, offset int) (appointments []interface{}, err error) {
 	return r.listByParams("SELECT id, student, teacher, location, time "+
 		"FROM back2school.appointments  "+
@@ -263,6 +409,13 @@ func (r *postgresRepository) AppointmentsByTeacher(id int64, limit int, offset i
 		}, limit, offset, id)
 }
 
+
+// @Summary Get notifications of the teacher
+// @Param id path int true "Teacher ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers 
+// @Router /teachers/{id}/notifications [get]
 func (r *postgresRepository) NotificationsByTeacher(id int64, limit int, offset int) (notifications []interface{}, err error) {
 	return r.listByParams("SELECT id, receiver, message, receiver_kind, time  "+
 		"FROM back2school.notification  "+
@@ -275,6 +428,13 @@ func (r *postgresRepository) NotificationsByTeacher(id int64, limit int, offset 
 		}, limit, offset, id)
 }
 
+
+// @Summary Get subject taught by the teacher
+// @Param id path int true "Teacher ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers 
+// @Router /teachers/{id}/subjects [get]
 func (r *postgresRepository) SubjectsByTeacher(id int64, limit int, offset int) (notifications []interface{}, err error) {
 	return r.listByParams("SELECT DISTINCT subject FROM back2school.teaches where teacher = $1 order by subject",
 		func(rows *sql.Rows) (interface{}, error) {
@@ -284,6 +444,14 @@ func (r *postgresRepository) SubjectsByTeacher(id int64, limit int, offset int) 
 		}, limit, offset, id)
 }
 
+
+// @Summary Get classes in which the subject is taught by the teacher
+// @Param id path int true "Teacher ID"
+// @Param subject path int true "Subject ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers 
+// @Router /teachers/{id}/subjects/{subject} [get]
 func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int64, subject string, limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("SELECT id, year, section, info, grade "+
 		"FROM back2school.teaches join back2school.classes on id = class  "+
@@ -296,6 +464,13 @@ func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int64, subject s
 		}, limit, offset, teacher, subject)
 }
 
+
+// @Summary Get lectures taught by the teacher
+// @Param id path int true "Teacher ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers 
+// @Router /teachers/{id}/lectures [get]
 func (r *postgresRepository) LecturesByTeacher(id int64, limit int, offset int) (lectures []interface{}, err error) {
 	return r.listByParams("SELECT id, class, subject, location, start, \"end\", info	 "+
 		"from back2school.timetable natural join back2school.teaches as t "+
@@ -309,6 +484,13 @@ func (r *postgresRepository) LecturesByTeacher(id int64, limit int, offset int) 
 		}, limit, offset, id)
 }
 
+
+// @Summary Get classes in which the teacher teaches
+// @Param id path int true "Teacher ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers 
+// @Router /teachers/{id}/classes [get]
 func (r *postgresRepository) ClassesByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
 	type Class struct {
 		models.Class
@@ -325,29 +507,90 @@ func (r *postgresRepository) ClassesByTeacher(id int64, limit int, offset int) (
 		}, limit, offset, id)
 }
 
+
+// @Summary Update teacher's data
+// @Param id path int true "Teacher ID"
+// @Param teacher body models.Teacher true "data"
+// @Tags Teachers 
+// @Router /teachers/{id} [put]
 func (r *postgresRepository) UpdateTeacher(teacher models.Teacher) (err error) {
 	query := "UPDATE back2school.teachers" +
 		" SET name = $1, surname = $2, mail = $3, info = $4 " +
 		"where id = $5"
-	return r.update(query, teacher.Name, teacher.Surname, teacher.Mail, teacher.Info, teacher.ID)
+	return r.execUpdate(query, teacher.Name, teacher.Surname, teacher.Mail, teacher.Info, teacher.ID)
 }
 
+
+// @Summary Update parents's data
+// @Param id path int true "Parent ID"
+// @Param parent body models.Parent true "data"
+// @Tags Parents
+// @Router /parents/{id} [put]
 func (r *postgresRepository) UpdateParent(parent models.Parent) (err error) {
 	query := "UPDATE back2school.parents" +
 		" SET name = $1, surname = $2, mail = $3, info = $4 " +
 		"where id = $5"
-	return r.update(query, parent.Name, parent.Surname, parent.Mail, parent.Info, parent.ID)
+	return r.execUpdate(query, parent.Name, parent.Surname, parent.Mail, parent.Info, parent.ID)
 }
 
+
+// @Summary Update student's data
+// @Param id path int true "Student ID"
+// @Param student body models.Student true "data"
+// @Tags Students 
+// @Router /students/{id} [put]
 func (r *postgresRepository) UpdateStudent(student models.Student) (err error) {
 	query := "UPDATE back2school.student" +
 		" SET name = $1, surname = $2, mail = $3, info = $4 " +
 		"where id = $5"
-	return r.update(query, student.Name, student.Surname, student.Mail, student.Info, student.ID)
+	return r.execUpdate(query, student.Name, student.Surname, student.Mail, student.Info, student.ID)
 }
 
-func (r *postgresRepository) UpdateAppointments(appointment models.Appointment) (err error) {
+
+// @Summary Update appointment's data
+// @Param id path int true "Appointment ID"
+// @Param appointment body models.Appointment true "data"
+// @Tags Appointments 
+// @Router /appointments/{id} [put]
+func (r *postgresRepository) UpdateAppointment(appointment models.Appointment) (err error) {
 	query := "UPDATE back2school.appointments " +
 		"SET student = $1, teacher = $2, location = $3, time = $4 where id = $5"
-	return r.update(query, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time, appointment.ID)
+	return r.execUpdate(query, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time, appointment.ID)
+}
+
+
+// @Summary Create appointment
+// @Param id path int true "Appointment ID"
+// @Param appointment body models.Appointment true "data"
+// @Tags Appointments 
+// @Router /appointments [post]
+func (r *postgresRepository) CreateAppointment(appointment models.Appointment) (id int64, err error) {
+	query := "INSERT INTO back2school.appointments " +
+		" (student, teacher, location, time) VALUES ($1, $2, $3, $4)"
+	return r.exec(query, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time)
+}
+
+
+// @Summary Create parent
+// @Tags Parents
+// @Param parent body models.Parent true "data"
+// @Tags Parents
+// @Router /parents [post]
+func (r *postgresRepository) CreateParent(parent models.Parent) (int64, error) {
+	query := "INSERT INTO back2school.parents " +
+		"(name, surname, mail, info) VALUES ($1, $2, $3, $4)"
+	return r.exec(query, parent.Name, parent.Surname, parent.Mail, parent.Info)
+
+}
+
+
+// @Summary Create teacher
+// @Param teacher body models.Teacher true "data"
+// @Tags Teachers 
+// @Router /teachers [post]
+func (r *postgresRepository) CreateTeacher(teacher models.Teacher) (int64, error) {
+	query := "INSERT INTO back2school.teachers" +
+		" (name, surname, mail, info)" +
+		" VALUES ($1, $2, $3, $4)"
+	return r.exec(query, teacher.Name, teacher.Surname, teacher.Mail, teacher.Info)
 }
