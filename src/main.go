@@ -10,7 +10,6 @@ import (
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
-	"github.com/middleware2018-PSS/Services/src/controller"
 	_ "github.com/middleware2018-PSS/Services/src/docs"
 	"github.com/middleware2018-PSS/Services/src/models"
 	"github.com/middleware2018-PSS/Services/src/repository"
@@ -18,6 +17,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
+	"encoding/base64"
 )
 
 var (
@@ -43,9 +43,9 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
-	r := repository.NewPostgresRepository(db)
+	con := repository.NewPostgresRepository(db)
 
-	con := controller.NewController(r)
+	//con := controller.NewController(r)
 
 	/*authMiddleware := jwt.GinJWTMiddleware{
 		Realm:      "test",
@@ -68,7 +68,8 @@ func main() {
 	api.POST("/parents", /*authAdmin(authMiddleware.Realm),*/ func(c *gin.Context) {
 		var p models.Parent
 		if err := c.ShouldBind(&p); err == nil {
-			if id, err := con.CreateParent(p); err == nil {
+			who, whoKind := idKind(c)
+			if id, err := con.CreateParent(p, who, whoKind); err == nil {
 				p.ID = id
 				c.JSON(http.StatusCreated, p)
 			}
@@ -86,7 +87,8 @@ func main() {
 			if err := c.ShouldBind(&p); err == nil {
 				id, _ := strconv.Atoi(c.Param("id"))
 				p.ID = id
-				if err := con.UpdateParent(p); err == nil {
+				who, whoKind := idKind(c)
+				if err := con.UpdateParent(p, who, whoKind); err == nil {
 					c.JSON(http.StatusNoContent, p)
 				}
 			}
@@ -97,7 +99,8 @@ func main() {
 			var a models.Appointment
 			if err := c.ShouldBind(&a); err == nil {
 				// TODO check parent is same parent of the appointment => isParent student
-				if id, err := con.CreateAppointment(a); err == nil {
+				who, whoKind := idKind(c)
+				if id, err := con.CreateAppointment(a, who, whoKind); err == nil {
 					a.ID = id
 					c.JSON(http.StatusCreated, a)
 				}
@@ -113,7 +116,8 @@ func main() {
 	api.POST("/teachers", func(c *gin.Context) {
 		var t models.Teacher
 		if err := c.ShouldBind(&t); err == nil {
-			if id, err := con.CreateTeacher(t); err != nil {
+			who, whoKind := idKind(c)
+			if id, err := con.CreateTeacher(t, who, whoKind); err != nil {
 				t.ID = id
 				c.JSON(http.StatusCreated, t)
 			}
@@ -128,7 +132,8 @@ func main() {
 			if err := c.ShouldBind(&t); err == nil {
 				id, _ := strconv.Atoi(c.Param("id"))
 				t.ID = id
-				if err := con.UpdateTeacher(t); err != nil {
+				who, whoKind := idKind(c)
+				if err := con.UpdateTeacher(t, who, whoKind); err != nil {
 					c.JSON(http.StatusNoContent, nil)
 				}
 			}
@@ -142,7 +147,8 @@ func main() {
 			subj := c.Param("subject")
 			offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
 			limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
-			res, err := con.ClassesBySubjectAndTeacher(id, subj, limit, offset)
+			who, whoKind := idKind(c)
+			res, err := con.ClassesBySubjectAndTeacher(id, subj, limit, offset, who, whoKind)
 			handleErr(err, res, c)
 		})
 		teachers.GET("/classes", byIDWithOffsetAndLimit("id", con.ClassesByTeacher))
@@ -155,7 +161,8 @@ func main() {
 		if err := c.ShouldBind(&a); err == nil {
 			id, _ := strconv.Atoi(c.Param("id"))
 			a.ID = id
-			if err := con.UpdateAppointment(a); err == nil {
+			who, whoKind := idKind(c)
+			if err := con.UpdateAppointment(a, who, whoKind); err == nil {
 				c.JSON(http.StatusCreated, a)
 			}
 		}
@@ -169,7 +176,8 @@ func main() {
 		if err := c.ShouldBind(&a); err == nil {
 			id, _ := strconv.Atoi(c.Param("id"))
 			a.ID = id
-			if err := con.UpdateGrade(a); err == nil {
+			who, whoKind := idKind(c)
+			if err := con.UpdateGrade(a, who, whoKind); err == nil {
 				c.JSON(http.StatusCreated, a)
 			}
 		}
@@ -180,7 +188,8 @@ func main() {
 		if err := c.ShouldBind(&a); err == nil {
 			id, _ := strconv.Atoi(c.Param("id"))
 			a.ID = id
-			if err := con.UpdateStudent(a); err == nil {
+			who, whoKind := idKind(c)
+			if err := con.UpdateStudent(a, who, whoKind); err == nil {
 				c.JSON(http.StatusCreated, a)
 			}
 		}
@@ -188,7 +197,8 @@ func main() {
 	api.POST("/students", func(c *gin.Context) {
 		var s models.Student
 		if err := c.ShouldBind(&s); err == nil {
-			if id, err := con.CreateStudent(s); err != nil {
+			who, whoKind := idKind(c)
+			if id, err := con.CreateStudent(s, who, whoKind); err != nil {
 				s.ID = id
 				c.JSON(http.StatusCreated, s)
 			}
@@ -201,7 +211,8 @@ func main() {
 	api.POST("/notifications", func(c *gin.Context) {
 		var s models.Notification
 		if err := c.ShouldBind(&s); err == nil {
-			if id, err := con.CreateNotification(s); err != nil {
+			who, whoKind := idKind(c)
+			if id, err := con.CreateNotification(s,who, whoKind); err != nil {
 				s.ID = id
 				c.JSON(http.StatusCreated, s)
 			}
@@ -213,7 +224,8 @@ func main() {
 		if err := c.ShouldBind(&a); err == nil {
 			id, _ := strconv.Atoi(c.Param("id"))
 			a.ID = id
-			if err := con.UpdateNotification(a); err == nil {
+			who, whoKind := idKind(c)
+			if err := con.UpdateNotification(a, who, whoKind); err == nil {
 				c.JSON(http.StatusCreated, a)
 			}
 		}
@@ -222,7 +234,8 @@ func main() {
 	api.POST("/payments", func(c *gin.Context) {
 		var s models.Payment
 		if err := c.ShouldBind(&s); err == nil {
-			if id, err := con.CreatePayment(s); err != nil {
+			who, whoKind := idKind(c)
+			if id, err := con.CreatePayment(s, who, whoKind); err != nil {
 				s.ID = id
 				c.JSON(http.StatusCreated, s)
 			}
@@ -234,7 +247,8 @@ func main() {
 		if err := c.ShouldBind(&a); err == nil {
 			id, _ := strconv.Atoi(c.Param("id"))
 			a.ID = id
-			if err := con.UpdatePayment(a); err == nil {
+			who, whoKind := idKind(c)
+			if err := con.UpdatePayment(a, who, whoKind); err == nil {
 				c.JSON(http.StatusCreated, a)
 			}
 		}
@@ -249,7 +263,8 @@ func main() {
 		if err := c.ShouldBind(&a); err == nil {
 			id, _ := strconv.Atoi(c.Param("id"))
 			a.ID = id
-			if err := con.UpdateClass(a); err == nil {
+			who, whoKind := idKind(c)
+			if err := con.UpdateClass(a, who, whoKind); err == nil {
 				c.JSON(http.StatusCreated, a)
 			}
 		}
@@ -258,7 +273,8 @@ func main() {
 	api.POST("/classes", func(c *gin.Context) {
 		var s models.Class
 		if err := c.ShouldBind(&s); err == nil {
-			if id, err := con.CreateClass(s); err != nil {
+			who, whoKind := idKind(c)
+			if id, err := con.CreateClass(s, who, whoKind); err != nil {
 				s.ID = id
 				c.JSON(http.StatusCreated, s)
 			}
@@ -269,11 +285,12 @@ func main() {
 	g.Run(":5000")
 }
 
-func byID(key string, f func(int) (interface{}, error)) func(c *gin.Context) {
+func byID(key string, f func(int, int, string) (interface{}, error)) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// TODO: check err
 		id, err := strconv.Atoi(c.Param(key))
-		res, err := f(id)
+		who, whoKind := idKind(c)
+		res, err := f(id, who, whoKind)
 		res, _ = representations.ToRepresentation(res, c)
 		handleErr(err, res, c)
 	}
@@ -288,17 +305,18 @@ func offsetLimit(c *gin.Context) (int, int) {
 }
 
 func idKind(c *gin.Context) (int, string){
-	who, _ := strconv.Atoi(c.MustGet("id").(string))
-	kind := c.MustGet("kind").(string)
+	who := c.MustGet(repository.USER).(int)
+	kind := c.MustGet(repository.KIND).(string)
 	return who, kind
 }
 
-func getOffsetLimit(f func(int, int) ([]interface{}, error)) func(c *gin.Context) {
+func getOffsetLimit(f func(int, int, int, string) ([]interface{}, error)) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		//TODO Check id and errors
 		offset, limit := offsetLimit(c)
+		who, whoKind := idKind(c)
 		if limit > 0 {
-			res, err := f(limit, offset)
+			res, err := f(limit, offset, who, whoKind)
 			for i, el := range res {
 				res[i], _ = representations.ToRepresentation(el, c)
 			}
@@ -310,12 +328,13 @@ func getOffsetLimit(f func(int, int) ([]interface{}, error)) func(c *gin.Context
 	}
 }
 
-func byIDWithOffsetAndLimit(id string, f func(int, int, int) ([]interface{}, error)) func(c *gin.Context) {
+func byIDWithOffsetAndLimit(id string, f func(int, int, int, int, string) ([]interface{}, error)) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		//TODO Check id and errors (4 real)
 		id, err := strconv.Atoi(c.Param(id))
+		who, whoKind := idKind(c)
 		offset, limit := offsetLimit(c)
-		res, err := f(id, limit, offset)
+		res, err := f(id, limit, offset, who, whoKind)
 		for i, el := range res {
 			//TODO handle err
 			res[i], _ = representations.ToRepresentation(el, c)
@@ -354,13 +373,18 @@ func next(uri string, offset int, limit int, input []interface{}) string {
 	return strings.Join([]string{uri, fmt.Sprintf("?offset=%d&limit=%d", offset+limit, limit)}, "")
 }
 
-func checkBasicUserPassword(con *controller.Controller) gin.HandlerFunc {
+func checkBasicUserPassword(con repository.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := strings.Fields(c.GetHeader("Authorization"))
-		cred := strings.Split(auth[1], ":")
+		if len(auth) == 0{
+			unauthorized(c)
+			return
+		}
+		decoded, _ := base64.StdEncoding.DecodeString(auth[1])
+		cred := strings.Split(string(decoded), ":")
 		if user, kind, ok := con.CheckUser(cred[0], cred[1]); ok {
-			c.Set(controller.USER, user)
-			c.Set(controller.KIND, kind)
+			c.Set(repository.USER, user)
+			c.Set(repository.KIND, kind)
 		} else {
 			// Credentials doesn't match, we return 401 and abort handlers chain.
 			unauthorized(c)
@@ -370,7 +394,7 @@ func checkBasicUserPassword(con *controller.Controller) gin.HandlerFunc {
 
 func unauthorized(c *gin.Context) {
 	c.Header("WWW-Authenticate", REALM)
-	c.AbortWithStatus(401)
+	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error":"unauthorized access"})
 }
 
 func negotiate(data interface{}) gin.Negotiate {
