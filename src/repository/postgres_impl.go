@@ -1085,16 +1085,3 @@ func (r *postgresRepository) UpdatePayment(payment models.Payment, who int, whoK
 	}
 	return r.execUpdate(query, args...)
 }
-
-func (r *postgresRepository) IsParent(parent int, child int) bool {
-	query := "SELECT count(1) from back2school.isParent where parent = $1 and student = $2"
-	var n int
-	r.QueryRow(query, parent, child).Scan(&n)
-	return n == 1
-}
-
-func (r *postgresRepository) ParentHasAppointment(parent int, appointment int) bool {
-	var n int
-	r.QueryRow("SELECT count(1) from back2school.isparent natural join back2school.appointments where parent = $1 and id = $2", parent, appointment).Scan(&n)
-	return n == 1
-}

@@ -112,6 +112,4 @@ type Repository interface {
 	UpdateGrade(models.Grade, int, string) error
 	CreatePayment(models.Payment, int, string) (int, error)
 	UpdatePayment(models.Payment, int, string) error
-	IsParent(int, int) bool
-	ParentHasAppointment(int, int) bool
 }

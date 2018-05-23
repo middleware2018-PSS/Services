@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	_ "github.com/middleware2018-PSS/Services/src/docs"
@@ -418,45 +417,3 @@ func handleErr(err error, res interface{}, c *gin.Context) {
 		c.JSON(http.StatusNoContent, nil)
 	}
 }
-
-func authAdminOrParent(realm string) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		claims := jwt.ExtractClaims(c)
-		s, err := strconv.Atoi(c.Param("id"))
-		if k := claims["kind"]; err != nil || k == "admin" || (k.(string) == "parent" && (claims["dbID"] == float64(s))) {
-			c.Next()
-		} else {
-			c.Header("WWW-Authenticate", realm)
-			c.AbortWithStatus(http.StatusForbidden)
-			return
-		}
-	}
-}
-
-func authAdminOrTeacher(realm string) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		claims := jwt.ExtractClaims(c)
-		s, err := strconv.Atoi(c.Param("id"))
-		if k := claims["kind"]; err != nil || k == "admin" || (k.(string) == "teacher" && (claims["dbID"] == float64(s))) {
-			c.Next()
-		} else {
-			c.Header("WWW-Authenticate", realm)
-			c.AbortWithStatus(http.StatusForbidden)
-			return
-		}
-	}
-}
-
-func authAdmin(realm string) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		claims := jwt.ExtractClaims(c)
-		if k := claims["kind"]; k == "admin" {
-			c.Next()
-		} else {
-			c.Header("WWW-Authenticate", realm)
-			c.AbortWithStatus(http.StatusForbidden)
-			return
-		}
-	}
-}
-
