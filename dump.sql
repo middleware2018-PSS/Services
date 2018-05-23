@@ -64,12 +64,25 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: accounts; Type: TABLE; Schema: back2school; Owner: postgres
+--
+
+CREATE TABLE back2school.accounts (
+    "user" text NOT NULL,
+    password text NOT NULL,
+    kind text NOT NULL,
+    id integer NOT NULL
+);
+
+
+ALTER TABLE back2school.accounts OWNER TO postgres;
+
+--
 -- Name: admins; Type: TABLE; Schema: back2school; Owner: postgres
 --
 
 CREATE TABLE back2school.admins (
     id integer NOT NULL,
-    password text DEFAULT ' '::text NOT NULL,
     info text DEFAULT ' '::text,
     name text DEFAULT ' '::text,
     surname text DEFAULT ' '::text
@@ -192,11 +205,34 @@ CREATE TABLE back2school.grades (
     grade integer,
     subject text DEFAULT ''::text,
     date timestamp without time zone NOT NULL,
-    teacher integer NOT NULL
+    teacher integer NOT NULL,
+    id integer NOT NULL
 );
 
 
 ALTER TABLE back2school.grades OWNER TO postgres;
+
+--
+-- Name: grades_id_seq; Type: SEQUENCE; Schema: back2school; Owner: postgres
+--
+
+CREATE SEQUENCE back2school.grades_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE back2school.grades_id_seq OWNER TO postgres;
+
+--
+-- Name: grades_id_seq; Type: SEQUENCE OWNED BY; Schema: back2school; Owner: postgres
+--
+
+ALTER SEQUENCE back2school.grades_id_seq OWNED BY back2school.grades.id;
+
 
 --
 -- Name: isparent; Type: TABLE; Schema: back2school; Owner: postgres
@@ -255,8 +291,7 @@ CREATE TABLE back2school.parents (
     name text DEFAULT ''::text,
     surname text DEFAULT ''::text,
     mail text DEFAULT ''::text,
-    info text DEFAULT ''::text,
-    password text DEFAULT ' '::text NOT NULL
+    info text DEFAULT ''::text
 );
 
 
@@ -376,8 +411,7 @@ CREATE TABLE back2school.teachers (
     name text DEFAULT ''::text,
     mail text DEFAULT ''::text,
     info text DEFAULT ''::text,
-    surname text DEFAULT ''::text,
-    password text DEFAULT ' '::text NOT NULL
+    surname text DEFAULT ''::text
 );
 
 
@@ -478,6 +512,13 @@ ALTER TABLE ONLY back2school.classes ALTER COLUMN id SET DEFAULT nextval('back2s
 
 
 --
+-- Name: grades id; Type: DEFAULT; Schema: back2school; Owner: postgres
+--
+
+ALTER TABLE ONLY back2school.grades ALTER COLUMN id SET DEFAULT nextval('back2school.grades_id_seq'::regclass);
+
+
+--
 -- Name: notification id; Type: DEFAULT; Schema: back2school; Owner: postgres
 --
 
@@ -520,10 +561,21 @@ ALTER TABLE ONLY back2school.timetable ALTER COLUMN id SET DEFAULT nextval('back
 
 
 --
+-- Data for Name: accounts; Type: TABLE DATA; Schema: back2school; Owner: postgres
+--
+
+COPY back2school.accounts ("user", password, kind, id) FROM stdin;
+pippo	pluto	Parent	3
+a	p	Admin	2
+admin	password	Admin	1
+\.
+
+
+--
 -- Data for Name: admins; Type: TABLE DATA; Schema: back2school; Owner: postgres
 --
 
-COPY back2school.admins (id, password, info, name, surname) FROM stdin;
+COPY back2school.admins (id, info, name, surname) FROM stdin;
 \.
 
 
@@ -552,7 +604,6 @@ COPY back2school.classes (id, year, section, info, grade) FROM stdin;
 
 COPY back2school.enrolled (student, class) FROM stdin;
 1	2
-1	2
 \.
 
 
@@ -560,8 +611,8 @@ COPY back2school.enrolled (student, class) FROM stdin;
 -- Data for Name: grades; Type: TABLE DATA; Schema: back2school; Owner: postgres
 --
 
-COPY back2school.grades (student, grade, subject, date, teacher) FROM stdin;
-1	10	science	2019-05-06 11:17:55.784	1
+COPY back2school.grades (student, grade, subject, date, teacher, id) FROM stdin;
+1	10	science	2019-05-06 11:17:55.784	1	1
 \.
 
 
@@ -570,7 +621,6 @@ COPY back2school.grades (student, grade, subject, date, teacher) FROM stdin;
 --
 
 COPY back2school.isparent (parent, student) FROM stdin;
-3	1
 3	1
 \.
 
@@ -581,7 +631,7 @@ COPY back2school.isparent (parent, student) FROM stdin;
 
 COPY back2school.notification (id, receiver, message, "time", receiver_kind) FROM stdin;
 1	1	prova	\N	student
-2	\N	\N	\N	general
+2	\N	prova	\N	general
 \.
 
 
@@ -589,9 +639,9 @@ COPY back2school.notification (id, receiver, message, "time", receiver_kind) FRO
 -- Data for Name: parents; Type: TABLE DATA; Schema: back2school; Owner: postgres
 --
 
-COPY back2school.parents (id, name, surname, mail, info, password) FROM stdin;
-3	pippo	pippi		\N	 
-4	pi	pi	\N	\N	 
+COPY back2school.parents (id, name, surname, mail, info) FROM stdin;
+4	pi	pi	\N	\N
+3	pippa	pippo		
 \.
 
 
@@ -629,8 +679,8 @@ science
 -- Data for Name: teachers; Type: TABLE DATA; Schema: back2school; Owner: postgres
 --
 
-COPY back2school.teachers (id, name, mail, info, surname, password) FROM stdin;
-1	mortola	mail	info	mail	 
+COPY back2school.teachers (id, name, mail, info, surname) FROM stdin;
+1	mantesso	mail		mail
 \.
 
 
@@ -672,6 +722,13 @@ SELECT pg_catalog.setval('back2school.appointments_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('back2school.classes_id_seq', 1, false);
+
+
+--
+-- Name: grades_id_seq; Type: SEQUENCE SET; Schema: back2school; Owner: postgres
+--
+
+SELECT pg_catalog.setval('back2school.grades_id_seq', 1, true);
 
 
 --
@@ -717,6 +774,14 @@ SELECT pg_catalog.setval('back2school.timetable_id_seq', 2, true);
 
 
 --
+-- Name: accounts accounts_user_pk; Type: CONSTRAINT; Schema: back2school; Owner: postgres
+--
+
+ALTER TABLE ONLY back2school.accounts
+    ADD CONSTRAINT accounts_user_pk PRIMARY KEY ("user");
+
+
+--
 -- Name: admins admins_pkey; Type: CONSTRAINT; Schema: back2school; Owner: postgres
 --
 
@@ -738,6 +803,30 @@ ALTER TABLE ONLY back2school.appointments
 
 ALTER TABLE ONLY back2school.classes
     ADD CONSTRAINT classes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: enrolled enrolled_student_class_pk; Type: CONSTRAINT; Schema: back2school; Owner: postgres
+--
+
+ALTER TABLE ONLY back2school.enrolled
+    ADD CONSTRAINT enrolled_student_class_pk PRIMARY KEY (student, class);
+
+
+--
+-- Name: grades grades_id_pk; Type: CONSTRAINT; Schema: back2school; Owner: postgres
+--
+
+ALTER TABLE ONLY back2school.grades
+    ADD CONSTRAINT grades_id_pk PRIMARY KEY (id);
+
+
+--
+-- Name: isparent isparent_parent_student_pk; Type: CONSTRAINT; Schema: back2school; Owner: postgres
+--
+
+ALTER TABLE ONLY back2school.isparent
+    ADD CONSTRAINT isparent_parent_student_pk PRIMARY KEY (parent, student);
 
 
 --
@@ -793,7 +882,7 @@ ALTER TABLE ONLY back2school.teachers
 --
 
 ALTER TABLE ONLY back2school.teaches
-    ADD CONSTRAINT teaches_teacher_subject_class_pk UNIQUE (teacher, subject, class);
+    ADD CONSTRAINT teaches_teacher_subject_class_pk PRIMARY KEY (teacher, subject, class);
 
 
 --
@@ -802,6 +891,20 @@ ALTER TABLE ONLY back2school.teaches
 
 ALTER TABLE ONLY back2school.timetable
     ADD CONSTRAINT timetable_id_pk PRIMARY KEY (id);
+
+
+--
+-- Name: accounts_password_uindex; Type: INDEX; Schema: back2school; Owner: postgres
+--
+
+CREATE UNIQUE INDEX accounts_password_uindex ON back2school.accounts USING btree (password);
+
+
+--
+-- Name: accounts_user_uindex; Type: INDEX; Schema: back2school; Owner: postgres
+--
+
+CREATE UNIQUE INDEX accounts_user_uindex ON back2school.accounts USING btree ("user");
 
 
 --

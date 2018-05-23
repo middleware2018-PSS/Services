@@ -5,7 +5,7 @@ import (
 	"github.com/middleware2018-PSS/Services/src/repository"
 )
 
-type controller struct {
+type Controller struct {
 	r repository.Repository
 }
 type Token struct {
@@ -13,8 +13,9 @@ type Token struct {
 	Expire string `json:"expire"`
 }
 
-func NewController(r repository.Repository) *controller {
-	return &controller{r}
+
+func NewController(r repository.Repository) *Controller {
+	return &Controller{r}
 }
 
 // @Summary Get a class by id
@@ -22,7 +23,7 @@ func NewController(r repository.Repository) *controller {
 // @Tags Classes
 // @Success 200 {object} models.Class
 // @Router /classes/{id} [get]
-func (c controller) ClassByID(id int64) (interface{}, error) {
+func (c Controller) ClassByID(id int) (interface{}, error) {
 	return c.r.ClassByID(id)
 }
 
@@ -31,7 +32,7 @@ func (c controller) ClassByID(id int64) (interface{}, error) {
 // @Tags Grades
 // @Success 200 {object} models.Grade
 // @Router /grades/{id} [get]
-func (c controller) GradeByID(id int64) (interface{}, error) {
+func (c Controller) GradeByID(id int) (interface{}, error) {
 	return c.r.GradeByID(id)
 }
 
@@ -40,7 +41,7 @@ func (c controller) GradeByID(id int64) (interface{}, error) {
 // @Tags Notifications
 // @Success 200 {object} models.Notification
 // @Router /notifications/{id} [get]
-func (c *controller) NotificationByID(id int64) (interface{}, error) {
+func (c *Controller) NotificationByID(id int) (interface{}, error) {
 	return c.r.NotificationByID(id)
 }
 
@@ -50,7 +51,7 @@ func (c *controller) NotificationByID(id int64) (interface{}, error) {
 // @Tags Payments
 // @Success 200 {object} models.Payment
 // @Router /payments/{id} [get]
-func (c *controller) PaymentByID(id int64) (interface{}, error) {
+func (c *Controller) PaymentByID(id int) (interface{}, error) {
 	return c.r.PaymentByID(id)
 }
 
@@ -61,7 +62,7 @@ func (c *controller) PaymentByID(id int64) (interface{}, error) {
 // @Tags Parents
 // @Success 200 {object} models.Parent
 // @Router /parents/{id} [get]
-func (c *controller) ParentByID(id int64) (interface{}, error) {
+func (c *Controller) ParentByID(id int) (interface{}, error) {
 	return c.r.ParentByID(id)
 }
 
@@ -71,7 +72,7 @@ func (c *controller) ParentByID(id int64) (interface{}, error) {
 // @Tags Parents
 // @Success 201 {object} models.Parent
 // @Router /parents/{id} [put]
-func (c *controller) UpdateParent(p models.Parent) error {
+func (c *Controller) UpdateParent(p models.Parent) error {
 	return c.r.UpdateParent(p)
 }
 
@@ -81,7 +82,7 @@ func (c *controller) UpdateParent(p models.Parent) error {
 // @Tags Students
 // @Success 201 {object} models.Student
 // @Router /students/{id} [put]
-func (c *controller) UpdateStudent(student models.Student) error {
+func (c *Controller) UpdateStudent(student models.Student) error {
 	return c.r.UpdateStudent(student)
 }
 
@@ -93,7 +94,7 @@ func (c *controller) UpdateStudent(student models.Student) error {
 // @Tags Parents
 // @Success 200 {array} models.Student
 // @Router /parents/{id}/students [get]
-func (c *controller) ChildrenByParent(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) ChildrenByParent(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.ChildrenByParent(id, limit, offset)
 }
 
@@ -103,7 +104,7 @@ func (c *controller) ChildrenByParent(id int64, limit int, offset int) ([]interf
 // @Tags Students
 // @Success 200 {object} models.Student
 // @Router /students/{id} [get]
-func (c *controller) StudentByID(id int64) (interface{}, error) {
+func (c *Controller) StudentByID(id int) (interface{}, error) {
 	return c.r.StudentByID(id)
 }
 
@@ -115,7 +116,7 @@ func (c *controller) StudentByID(id int64) (interface{}, error) {
 // @Tags Students
 // @Success 200 {array} models.Grade
 // @Router /students/{id}/grades [get]
-func (c *controller) GradesByStudent(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) GradesByStudent(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.GradesByStudent(id, limit, offset)
 }
 
@@ -127,7 +128,7 @@ func (c *controller) GradesByStudent(id int64, limit int, offset int) ([]interfa
 // @Tags Parents
 // @Success 200 {array} models.Payment
 // @Router /parents/{id}/payments [get]
-func (c *controller) PaymentsByParent(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) PaymentsByParent(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.PaymentsByParent(id, limit, offset)
 }
 
@@ -139,7 +140,7 @@ func (c *controller) PaymentsByParent(id int64, limit int, offset int) ([]interf
 // @Tags Parents
 // @Success 200 {array} models.Notification
 // @Router /parents/{id}/notifications [get]
-func (c *controller) NotificationsByParent(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) NotificationsByParent(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.NotificationsByParent(id, limit, offset)
 }
 
@@ -153,7 +154,7 @@ func (c *controller) NotificationsByParent(id int64, limit int, offset int) ([]i
 // @Tags Parents
 // @Success 200 {array} models.Appointment
 // @Router /parents/{id}/appointments [get]
-func (c *controller) AppointmentsByParent(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) AppointmentsByParent(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.AppointmentsByParent(id, limit, offset)
 }
 
@@ -163,7 +164,7 @@ func (c *controller) AppointmentsByParent(id int64, limit int, offset int) ([]in
 // @Tags Appointments
 // @Success 201 {object} models.Appointment
 // @Router /appointments/{id} [put]
-func (c *controller) UpdateAppointment(appointment models.Appointment) error {
+func (c *Controller) UpdateAppointment(appointment models.Appointment) error {
 	return c.r.UpdateAppointment(appointment)
 }
 
@@ -172,7 +173,7 @@ func (c *controller) UpdateAppointment(appointment models.Appointment) error {
 // @Tags Appointments
 // @Success 200 {object} models.Appointment
 // @Router /appointments/{id} [get]
-func (c *controller) AppointmentByID(id int64) (interface{}, error) {
+func (c *Controller) AppointmentByID(id int) (interface{}, error) {
 	return c.r.AppointmentByID(id)
 }
 
@@ -183,7 +184,7 @@ func (c *controller) AppointmentByID(id int64) (interface{}, error) {
 // @Tags Teachers
 // @Success 200 {object} models.Teacher
 // @Router /teachers/{id} [get]
-func (c *controller) TeacherByID(id int64) (teacher interface{}, err error) {
+func (c *Controller) TeacherByID(id int) (teacher interface{}, err error) {
 	return c.r.TeacherByID(id)
 }
 
@@ -193,7 +194,7 @@ func (c *controller) TeacherByID(id int64) (teacher interface{}, err error) {
 // @Tags Teachers
 // @Success 204 {object} models.Teacher
 // @Router /teachers/{id} [put]
-func (c *controller) UpdateTeacher(teacher models.Teacher) (err error) {
+func (c *Controller) UpdateTeacher(teacher models.Teacher) (err error) {
 	return c.r.UpdateTeacher(teacher)
 }
 
@@ -208,10 +209,10 @@ type Subjects struct {
 // @Param id path int true "Teacher ID"
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
-// @Success 200 {object} controller.Subjects
+// @Success 200 {object} Controller.Subjects
 // @Tags Teachers
 // @Router /teachers/{id}/subjects [get]
-func (c *controller) SubjectsByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) SubjectsByTeacher(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.SubjectsByTeacher(id, limit, offset)
 }
 
@@ -223,7 +224,7 @@ func (c *controller) SubjectsByTeacher(id int64, limit int, offset int) ([]inter
 // @Success 200 {array} models.Class
 // @Tags Teachers
 // @Router /teachers/{id}/subjects/{subject} [get]
-func (c *controller) ClassesBySubjectAndTeacher(teacher int64, subject string, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) ClassesBySubjectAndTeacher(teacher int, subject string, limit int, offset int) ([]interface{}, error) {
 	return c.r.ClassesBySubjectAndTeacher(teacher, subject, limit, offset)
 }
 
@@ -234,7 +235,7 @@ func (c *controller) ClassesBySubjectAndTeacher(teacher int64, subject string, l
 // @Tags Classes
 // @Success 200 {array} models.Student
 // @Router /classes/{id}/students [get]
-func (c *controller) StudentsByClass(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) StudentsByClass(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.StudentsByClass(id, limit, offset)
 }
 
@@ -245,11 +246,11 @@ func (c *controller) StudentsByClass(id int64, limit int, offset int) ([]interfa
 // @Tags Students
 // @Success 200 {array} models.Appointment
 // @Router /students/{id} [get]
-func (c *controller) LectureByClass(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) LectureByClass(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.LectureByClass(id, limit, offset)
 }
 
-// LectureByClass(id int64, limit int, offset int) (students []interface{}, err error)
+// LectureByClass(id int, limit int, offset int) (students []interface{}, err error)
 
 // @Summary Get appointments of the teacher
 // @Param id path int true "Teacher ID"
@@ -258,7 +259,7 @@ func (c *controller) LectureByClass(id int64, limit int, offset int) ([]interfac
 // @Tags Teachers
 // @Success 200 {array} models.Appointment
 // @Router /teachers/{id}/appointments [get]
-func (c *controller) AppointmentsByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) AppointmentsByTeacher(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.AppointmentsByTeacher(id, limit, offset)
 }
 
@@ -269,7 +270,7 @@ func (c *controller) AppointmentsByTeacher(id int64, limit int, offset int) ([]i
 // @Tags Teachers
 // @Success 200 {array} models.TimeTable
 // @Router /teachers/{id}/notifications [get]
-func (c *controller) NotificationsByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) NotificationsByTeacher(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.NotificationsByTeacher(id, limit, offset)
 }
 
@@ -280,7 +281,7 @@ func (c *controller) NotificationsByTeacher(id int64, limit int, offset int) ([]
 // @Tags Teachers
 // @Success 200 {array} models.TimeTable
 // @Router /teachers/{id}/lectures [get]
-func (c *controller) LecturesByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) LecturesByTeacher(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.LecturesByTeacher(id, limit, offset)
 }
 
@@ -291,11 +292,11 @@ func (c *controller) LecturesByTeacher(id int64, limit int, offset int) ([]inter
 // @Tags Teachers
 // @Success 200 {array} models.Class
 // @Router /teachers/{id}/classes [get]
-func (c *controller) ClassesByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+func (c *Controller) ClassesByTeacher(id int, limit int, offset int) ([]interface{}, error) {
 	return c.r.ClassesByTeacher(id, limit, offset)
 }
 
-// LectureByClass(id int64, limit int, offset int) (students []interface{}, err error)
+// LectureByClass(id int, limit int, offset int) (students []interface{}, err error)
 // TODO GradeStudent(grade models.Grade) error
 // TODO
 // parents:
@@ -308,7 +309,7 @@ func (c *controller) ClassesByTeacher(id int64, limit int, offset int) ([]interf
 // @Tags Students
 // @Success 200 {array} models.Student
 // @Router /students [get]
-func (c *controller) Students(limit int, offset int) ([]interface{}, error) {
+func (c *Controller) Students(limit int, offset int) ([]interface{}, error) {
 	return c.r.Students(limit, offset)
 }
 
@@ -319,7 +320,7 @@ func (c *controller) Students(limit int, offset int) ([]interface{}, error) {
 // @Tags Teachers
 // @Success 200 {array} models.Teacher
 // @Router /teachers [get]
-func (c *controller) Teachers(limit int, offset int) ([]interface{}, error) {
+func (c *Controller) Teachers(limit int, offset int) ([]interface{}, error) {
 	return c.r.Teachers(limit, offset)
 }
 
@@ -329,7 +330,7 @@ func (c *controller) Teachers(limit int, offset int) ([]interface{}, error) {
 // @Tags Parents
 // @Success 200 {array} models.Parent
 // @Router /parents [get]
-func (c *controller) Parents(limit int, offset int) ([]interface{}, error) {
+func (c *Controller) Parents(limit int, offset int) ([]interface{}, error) {
 	return c.r.Parents(limit, offset)
 }
 
@@ -339,7 +340,7 @@ func (c *controller) Parents(limit int, offset int) ([]interface{}, error) {
 // @Tags Payments
 // @Success 200 {array} models.Payment
 // @Router /payments [get]
-func (c *controller) Payments(limit int, offset int) ([]interface{}, error) {
+func (c *Controller) Payments(limit int, offset int) ([]interface{}, error) {
 	return c.r.Payments(limit, offset)
 }
 
@@ -350,7 +351,7 @@ func (c *controller) Payments(limit int, offset int) ([]interface{}, error) {
 // @Tags Notifications
 // @Success 200 {array} models.Notification
 // @Router /notifications [get]
-func (c *controller) Notifications(limit int, offset int) ([]interface{}, error) {
+func (c *Controller) Notifications(limit int, offset int) ([]interface{}, error) {
 	return c.r.Notifications(limit, offset)
 }
 
@@ -360,21 +361,20 @@ func (c *controller) Notifications(limit int, offset int) ([]interface{}, error)
 // @Tags Classes
 // @Success 200 {array} models.Class
 // @Router /classes [get]
-func (c *controller) Classes(limit int, offset int) ([]interface{}, error) {
+func (c *Controller) Classes(limit int, offset int) ([]interface{}, error) {
 	return c.r.Classes(limit, offset)
 }
 
 // @Summary Get a login token
 // @Param account body models.Account true "Add account"
 // @Tags Auth
-// @Success 200 {object} controller.Token
+// @Success 200 {object} Controller.Token
 // @Router /login [post]
-func (c *controller) CheckUser(id string, pass string) (string, bool) {
+func (c *Controller) CheckUser(id string, pass string) (int, string, bool) {
+	// TODO save kind and id in context
 	return c.r.CheckUser(id, pass)
 }
-func (c *controller) UserKind(userID string) map[string]interface{} {
-	return c.r.UserKind(userID)
-}
+
 
 // @Summary Create parent
 // @Tags Parents
@@ -382,7 +382,7 @@ func (c *controller) UserKind(userID string) map[string]interface{} {
 // @Tags Parents
 // @Success 201 {object} models.Parent
 // @Router /parents [post]
-func (c *controller) CreateParent(parent models.Parent) (int64, error) {
+func (c *Controller) CreateParent(parent models.Parent) (int, error) {
 	return c.r.CreateParent(parent)
 }
 
@@ -392,7 +392,7 @@ func (c *controller) CreateParent(parent models.Parent) (int64, error) {
 // @Tags Appointments
 // @Router /appointments [post]
 // @Success 201 {object} models.Appointment
-func (c *controller) CreateAppointment(appointment models.Appointment) (int64, error) {
+func (c *Controller) CreateAppointment(appointment models.Appointment) (int, error) {
 	return c.r.CreateAppointment(appointment)
 }
 
@@ -401,7 +401,7 @@ func (c *controller) CreateAppointment(appointment models.Appointment) (int64, e
 // @Tags Teachers
 // @Router /teachers [post]
 // @Success 201 {object} models.Teacher
-func (c *controller) CreateTeacher(teacher models.Teacher) (int64, error) {
+func (c *Controller) CreateTeacher(teacher models.Teacher) (int, error) {
 	return c.r.CreateTeacher(teacher)
 }
 
@@ -412,7 +412,7 @@ func (c *controller) CreateTeacher(teacher models.Teacher) (int64, error) {
 // @Router /appointments [get]
 // @Success 200 {object} representations.List
 // @Security ApiKeyAuth
-func (c *controller) Appointments(limit int, offset int) ([]interface{}, error) {
+func (c *Controller) Appointments(limit int, offset int) ([]interface{}, error) {
 	return c.r.Appointments(limit, offset)
 }
 
@@ -422,7 +422,7 @@ func (c *controller) Appointments(limit int, offset int) ([]interface{}, error) 
 // @Tags Grades
 // @Success 200 {array} models.Grade
 // @Router /grades [get]
-func (c *controller) Grades(limit int, offset int) ([]interface{}, error) {
+func (c *Controller) Grades(limit int, offset int) ([]interface{}, error) {
 	return c.r.Grades(limit, offset)
 }
 
@@ -431,7 +431,7 @@ func (c *controller) Grades(limit int, offset int) ([]interface{}, error) {
 // @Tags Students
 // @Router /students [post]
 // @Success 201 {object} models.Student
-func (c *controller) CreateStudent(student models.Student) (int64, error) {
+func (c *Controller) CreateStudent(student models.Student) (int, error) {
 	return c.r.CreateStudent(student)
 }
 
@@ -440,7 +440,7 @@ func (c *controller) CreateStudent(student models.Student) (int64, error) {
 // @Tags Classes
 // @Router /classes [post]
 // @Success 201 {object} models.Class
-func (c *controller) CreateClass(class models.Class) (int64, error) {
+func (c *Controller) CreateClass(class models.Class) (int, error) {
 	return c.r.CreateClass(class)
 }
 
@@ -450,7 +450,7 @@ func (c *controller) CreateClass(class models.Class) (int64, error) {
 // @Tags Classes
 // @Success 201 {object} models.Class
 // @Router /classes/{id} [put]
-func (c *controller) UpdateClass(class models.Class) error {
+func (c *Controller) UpdateClass(class models.Class) error {
 	return c.r.UpdateClass(class)
 }
 
@@ -459,7 +459,7 @@ func (c *controller) UpdateClass(class models.Class) error {
 // @Tags Notifications
 // @Router /notifications [post]
 // @Success 201 {object} models.Notification
-func (c *controller) CreateNotification(notification models.Notification) (int64, error) {
+func (c *Controller) CreateNotification(notification models.Notification) (int, error) {
 	return c.r.CreateNotification(notification)
 }
 
@@ -469,7 +469,7 @@ func (c *controller) CreateNotification(notification models.Notification) (int64
 // @Tags Notifications
 // @Router /notifications/{id} [put]
 // @Success 201 {object} models.Notification
-func (c *controller) UpdateNotification(notification models.Notification) error {
+func (c *Controller) UpdateNotification(notification models.Notification) error {
 	return c.r.UpdateNotification(notification)
 }
 
@@ -479,7 +479,7 @@ func (c *controller) UpdateNotification(notification models.Notification) error 
 // @Tags Grades
 // @Router /grades/{id} [put]
 // @Success 201 {object} models.Grade
-func (c *controller) UpdateGrade(grade models.Grade) error {
+func (c *Controller) UpdateGrade(grade models.Grade) error {
 	return c.r.UpdateGrade(grade)
 }
 
@@ -488,7 +488,7 @@ func (c *controller) UpdateGrade(grade models.Grade) error {
 // @Tags Grades
 // @Router /grades [post]
 // @Success 201 {object} models.Grade
-func (c *controller) CreateGrade(grade models.Grade) (int64, error) {
+func (c *Controller) CreateGrade(grade models.Grade) (int, error) {
 	return c.r.CreateGrade(grade)
 }
 
@@ -498,7 +498,7 @@ func (c *controller) CreateGrade(grade models.Grade) (int64, error) {
 // @Tags Payments
 // @Router /payments/{id} [put]
 // @Success 201 {object} models.Payment
-func (c *controller) UpdatePayment(payment models.Payment) error {
+func (c *Controller) UpdatePayment(payment models.Payment) error {
 	return c.r.UpdatePayment(payment)
 }
 
@@ -507,6 +507,6 @@ func (c *controller) UpdatePayment(payment models.Payment) error {
 // @Tags Payments
 // @Router /payments [post]
 // @Success 201 {object} models.Payment
-func (c *controller) CreatePayment(payment models.Payment) (int64, error) {
+func (c *Controller) CreatePayment(payment models.Payment) (int, error) {
 	return c.r.CreatePayment(payment)
 }
