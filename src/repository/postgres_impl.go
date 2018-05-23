@@ -13,95 +13,236 @@ func (r *postgresRepository) CheckUser(userID string, password string) (int, str
 	return id, kind, err == nil
 }
 
-func (r *postgresRepository) UserKind(userID string) map[string]interface{} {
-	query := `select kind, id from back2school.accounts where "user" = $1`
-	var kind string
-	var id int
-	r.QueryRow(query, userID).Scan(&kind, &id)
-	return map[string]interface{}{"kind": kind, "dbID": id}
-}
-
-func (r *postgresRepository) AppointmentByID(id int) (interface{}, error) {
+func (r *postgresRepository) AppointmentByID(id int, who int, whoKind string) (interface{}, error) {
 	appointment := models.Appointment{}
-	err := r.QueryRow("SELECT id, student, teacher, time, location "+
-		"FROM back2school.appointments WHERE id = $1 ", id).Scan(
+	var args []interface{}
+	var query string
+	switch whoKind {
+	case ParentUser:
+		query = "SELECT id, student, teacher, time, location "+
+			"FROM back2school.appointments natural join back2school.isParent WHERE id = $1 and parent = $2"
+		args = append(args, id, who)
+	case TeacherUser:
+		query = "SELECT id, student, teacher, time, location "+
+			"FROM back2school.appointments WHERE id = $1 and teacher = $2"
+		args = append(args, id, who)
+	case AdminUser:
+		query = "SELECT id, student, teacher, time, location "+
+			"FROM back2school.appointments WHERE id = $1 "
+		args = append(args, id)
+	default:
+		return nil, ErrorNotAuthorized
+	}
+	err := r.QueryRow(query, id, who).Scan(
 		&appointment.ID, &appointment.Student.ID, &appointment.Teacher.ID, &appointment.Time, &appointment.Location)
 	return switchResult(appointment, err)
 }
 
-func (r *postgresRepository) GradeByID(id int) (interface{}, error) {
+func (r *postgresRepository) GradeByID(id int, who int, whoKind string) (interface{}, error) {
 	grade := models.Grade{}
-	err := r.QueryRow("SELECT id, student, teacher, subject, date, grade "+
-		"FROM back2school.grades WHERE id = $1 ", id).Scan(
+	var query string
+	var args []interface{}
+	switch whoKind {
+	case ParentUser:
+		query = "SELECT id, student, teacher, subject, date, grade "+
+			"FROM back2school.grades natural join back2school.isParent WHERE id = $1 and parent = $2 "
+			args = append(args, id, who)
+	case TeacherUser:
+		query = "SELECT id, student, teacher, subject, date, grade "+
+			"FROM back2school.grades WHERE id = $1 and teacher = $2"
+		args = append(args, id, who)
+	case AdminUser:
+		query = "SELECT id, student, teacher, subject, date, grade "+
+			"FROM back2school.grades WHERE id = $1"
+	default:
+		return nil, ErrorNotAuthorized
+	}
+	err := r.QueryRow(query, id, who).Scan(
 		&grade.ID, &grade.Student.ID, &grade.Teacher.ID, &grade.Subject, &grade.Date, &grade.Grade)
 	return switchResult(grade, err)
 }
 
-func (r *postgresRepository) ClassByID(id int) (interface{}, error) {
+func (r *postgresRepository) ClassByID(id int, who int, whoKind string) (interface{}, error) {
 	class := models.Class{}
-	err := r.QueryRow("SELECT id, year, section, info, grade FROM back2school.classes "+
-		"WHERE id = $1", id).Scan(&class.ID, &class.Year, &class.Section, &class.Info, &class.Grade)
+	var query string
+	var args []interface{}
+	switch whoKind {
+	case TeacherUser:
+		query = "SELECT id, year, section, info, grade FROM back2school.classes join back2school.teaches on class = id"+
+			"WHERE id = $1 and teacher = $2"
+			args = append(args, id, who)
+	case AdminUser:
+		query ="SELECT id, year, section, info, grade FROM back2school.classes "+
+			"WHERE id = $1"
+		args = append(args, id)
+	default:
+		return nil, ErrorNotAuthorized
+	}
+	err := r.QueryRow(query, args...).Scan(&class.ID, &class.Year, &class.Section, &class.Info, &class.Grade)
 	return switchResult(class, err)
 }
 
-func (r *postgresRepository) Classes(limit int, offset int) ([]interface{}, error) {
-	return r.listByParams("select id, year, section, info, grade "+
-		"from back2school.classes "+
-		"order by year desc, grade asc, section asc", func(rows *sql.Rows) (interface{}, error) {
+func (r *postgresRepository) Classes(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
+	var query string
+	var args []interface{}
+	switch whoKind {
+	case TeacherUser:
+		query = "select id, year, section, info, grade "+
+			"from back2school.classes join back2school.teaches on class = id"+
+			"WHERE teacher = $1" +
+			"order by year desc, grade asc, section asc"
+			args = append(args, who)
+	case AdminUser:
+		query ="select id, year, section, info, grade "+
+			"from back2school.classes "+
+			"order by year desc, grade asc, section asc"
+	default:
+		return nil, ErrorNotAuthorized
+	}
+	return r.listByParams(query, func(rows *sql.Rows) (interface{}, error) {
 		class := models.Class{}
 		err := rows.Scan(&class.ID, &class.Year, &class.Section, &class.Info, &class.Grade)
 		return class, err
-	}, limit, offset)
+	}, limit, offset, args...)
 }
 
-func (r *postgresRepository) StudentsByClass(id int, limit int, offset int) (students []interface{}, err error) {
-	return r.listByParams("select distinct id, name, surname, mail, info "+
-		"from back2school.students join back2school.enrolled on student = id "+
-		"where class = $1 "+
-		"order by name desc, surname desc",
+func (r *postgresRepository) StudentsByClass(id int, limit int, offset int, who int, whoKind string) (students []interface{}, err error) {
+	var query string
+	var args []interface{}
+	switch whoKind {
+	case TeacherUser:
+		query = "select distinct s.id, s.name, s.surname, s.mail, s.info "+
+			"from back2school.students as s join back2school.enrolled as e " +
+			" join back2school.teaches as t on s.id = e.student and t.class = e.class"+
+			"where s.class = $1 and t.teacher = $2"+
+			"order by s.name desc, s.surname desc"
+			args = append(args, id, who)
+	case AdminUser:
+		query ="select distinct id, name, surname, mail, info "+
+			"from back2school.students join back2school.enrolled on student = id "+
+			"where class = $1 "+
+			"order by name desc, surname desc"
+		args = append(args, id)
+	default:
+		return nil, ErrorNotAuthorized
+	}
+	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			student := models.Student{}
 			err := rows.Scan(&student.ID, &student.Name, &student.Surname, &student.Mail, &student.Info)
 			return student, err
-		}, limit, offset, id)
+		}, limit, offset, args...)
 }
 
-func (r *postgresRepository) LectureByClass(id int, limit int, offset int) ([]interface{}, error) {
-	return r.listByParams(
-		"select id, class, subject, \"start\", \"end\", location, info "+
+//TODO add entrypoint !!!
+func (r *postgresRepository) LectureByClass(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
+	var query string
+	var args []interface{}
+	switch whoKind {
+	case TeacherUser:
+		query = "select id, class, subject, \"start\", \"end\", location, info "+
 			"from back2school.timetable natural join back2school.teaches "+
-			"where teacher = $1 "+
-			"order by \"start\" desc",
+			"where teacher = $1 and class = $2"+
+			"order by \"start\" desc"
+			args = append(args, who, id)
+	case AdminUser:
+		query ="select id, class, subject, \"start\", \"end\", location, info "+
+			"from back2school.timetable"+
+			"order by \"start\" desc"
+	default:
+		return nil, ErrorNotAuthorized
+	}
+	return r.listByParams(
+		query,
 		func(rows *sql.Rows) (interface{}, error) {
 			lecture := models.TimeTable{}
 			err := rows.Scan(&lecture.ID, &lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
 			return lecture, err
-		}, limit, offset, id)
+		}, limit, offset, args...)
 }
 
-func (r *postgresRepository) NotificationByID(id int) (interface{}, error) {
+func (r *postgresRepository) NotificationByID(id int, who int, whoKind string) (interface{}, error) {
 	n := models.Notification{}
-	err := r.QueryRow("SELECT id, receiver, message, time, receiver_kind "+
-		"FROM back2school.notification WHERE id = $1 ", id).Scan(&n.ID,
+	var query string
+	var args []interface{}
+	switch whoKind {
+	case TeacherUser:
+		query ="SELECT id, receiver, message, time, receiver_kind "+
+			"FROM back2school.notification" +
+			"WHERE id = $1 and receiver = $2 and receiver_kind = $3"
+			args = append(args, id, who, whoKind)
+	case ParentUser:
+		query ="SELECT id, receiver, message, time, receiver_kind "+
+			"FROM back2school.notification WHERE id = $1 and receiver = $2 and receiver_kind = $3"
+		args = append(args, id, who, whoKind)
+	case AdminUser:
+		query ="SELECT id, receiver, message, time, receiver_kind "+
+			"FROM back2school.notification WHERE id = $1"
+		args = append(args, id)
+
+	default:
+		return nil, ErrorNotAuthorized
+	}
+	err := r.QueryRow(query, args...).Scan(&n.ID,
 		&n.Receiver, &n.Message, &n.Time, &n.ReceiverKind)
 	return switchResult(n, err)
 }
 
-func (r *postgresRepository) Notifications(limit int, offset int) ([]interface{}, error) {
-	return r.listByParams("select id, receiver, message, time, receiver_kind "+
-		"from back2school.notification "+
-		"order by time desc, receiver_kind desc",
+func (r *postgresRepository) Notifications(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
+	var query string
+	var args []interface{}
+	switch whoKind {
+	case TeacherUser:
+		query ="select id, receiver, message, time, receiver_kind "+
+			"from back2school.notification " +
+			" where receiver = $1 and receiver_kind = $2"+
+			"order by time desc, receiver_kind desc"
+		args = append(args, who, whoKind)
+	case ParentUser:
+		query ="select id, receiver, message, time, receiver_kind "+
+			"from back2school.notification " +
+			" where receiver = $1 and receiver_kind = $2"+
+			"order by time desc, receiver_kind desc"
+		args = append(args, who, whoKind)
+	case AdminUser:
+		query ="select id, receiver, message, time, receiver_kind "+
+			"from back2school.notification "+
+			"order by time desc, receiver_kind desc"
+	default:
+		return nil, ErrorNotAuthorized
+	}
+	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			notification := models.Notification{}
 			err := rows.Scan(&notification.ID, &notification.Receiver, &notification.Message, &notification.Time, &notification.ReceiverKind)
 			return notification, err
-		}, limit, offset)
+		}, limit, offset, args...)
 }
 
-func (r *postgresRepository) ParentByID(id int) (interface{}, error) {
+func (r *postgresRepository) ParentByID(id int, who int, whoKind string) (interface{}, error) {
 	p := models.Parent{}
-	err := r.QueryRow("SELECT id,	name, surname, mail, info "+
-		"FROM back2school.parents WHERE id = $1",
+	var query string
+	var args []interface{}
+	switch whoKind {
+	case ParentUser:
+		if id == who {
+			query = "SELECT id,	name, surname, mail, info " +
+				"FROM back2school.parents WHERE id = $1"
+			args = append(args, id)
+		} else {
+			goto abort
+		}
+	case AdminUser:
+		query ="SELECT id,	name, surname, mail, info "+
+			"FROM back2school.parents WHERE id = $1"
+		args = append(args, id)
+
+	abort:
+		fallthrough
+	default:
+		return nil, ErrorNotAuthorized
+	}
+	err := r.QueryRow(query,
 		id).Scan(&p.ID, &p.Name, &p.Surname, &p.Mail, &p.Info)
 	return switchResult(p, err)
 }

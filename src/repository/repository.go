@@ -5,9 +5,29 @@ import (
 	"github.com/middleware2018-PSS/Services/src/models"
 )
 
+const (
+	USER = "User"
+	KIND = "Kind"
+	AdminUser = "Admin"
+	ParentUser = "Parent"
+	TeacherUser = "Teacher"
+	GET = "GET"
+	PUT = "PUT"
+	POST = "POST"
+	ALL = iota
+	CLASS
+	PARENT
+	TEACHER
+	ADM
+	STUDENT
+	APPOINTMENT
+
+)
+
 var (
 	ErrNoResult      = errors.New("No results found.")
 	ErrorNotBlocking = errors.New("Something went wrong but no worriez.")
+	ErrorNotAuthorized = errors.New("No authorization for this resource")
 )
 
 type Repository interface {
@@ -77,7 +97,7 @@ type Repository interface {
 	Payments(limit int, offset int) ([]interface{}, error)
 	Notifications(limit int, offset int) ([]interface{}, error)
 	Classes(limit int, offset int) ([]interface{}, error)
-	CheckUser(s string, s2 string) (string, string, bool)
+	CheckUser(s string, s2 string) (int, string, bool)
 	UserKind(userID string) map[string]interface{}
 	CreateParent(parent models.Parent) (int, error)
 	CreateAppointment(appointment models.Appointment) (int, error)

@@ -77,7 +77,7 @@ func main() {
 
 	parent := api.Group("/parents/:id")//, authAdminOrParent(authMiddleware.Realm))
 	{
-		parent.GET("", acl(con, controller.PARENT, "id"), byID("id", con.ParentByID))
+		parent.GET("", byID("id", con.ParentByID))
 		// TODO add admin auth on Post
 
 		parent.PUT("" ,func(c *gin.Context) {
@@ -91,9 +91,9 @@ func main() {
 				}
 			}
 		})
-		parent.GET("/students", acl(con, controller.STUDENT, ""), byIDWithOffsetAndLimit("id", con.ChildrenByParent))
-		parent.GET("/appointments", acl(con, controller.APPOINTMENT, ""), byIDWithOffsetAndLimit("id", con.AppointmentsByParent))
-		parent.POST("/appointments", acl(con, controller.APPOINTMENT, ""), func(c *gin.Context) {
+		parent.GET("/students", byIDWithOffsetAndLimit("id", con.ChildrenByParent))
+		parent.GET("/appointments", byIDWithOffsetAndLimit("id", con.AppointmentsByParent))
+		parent.POST("/appointments", func(c *gin.Context) {
 			var a models.Appointment
 			if err := c.ShouldBind(&a); err == nil {
 				// TODO check parent is same parent of the appointment => isParent student
@@ -363,22 +363,6 @@ func checkBasicUserPassword(con *controller.Controller) gin.HandlerFunc {
 			c.Set(controller.KIND, kind)
 		} else {
 			// Credentials doesn't match, we return 401 and abort handlers chain.
-			unauthorized(c)
-		}
-	}
-}
-
-func acl(con *controller.Controller, objKind int, idKey string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		user := c.GetInt(controller.USER)
-		kind := c.GetString(controller.KIND)
-		var ID int
-		if idKey != "" {
-			ID, _ =  strconv.Atoi(c.Param(idKey))
-		} else {
-			ID = controller.ALL
-		}
-		if !con.ACL(user, kind, c.Request.Method, objKind, ID){
 			unauthorized(c)
 		}
 	}

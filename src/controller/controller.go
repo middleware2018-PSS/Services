@@ -13,62 +13,9 @@ type Token struct {
 	Expire string `json:"expire"`
 }
 
-const (
-	USER = "User"
-	KIND = "Kind"
-	AdminUser = "Admin"
-	ParentUser = "Parent"
-	TeacherUser = "Teacher"
-	GET = "GET"
-	PUT = "PUT"
-	POST = "POST"
-	ALL = iota
-	CLASS
-	PARENT
-	STUDENT
-	APPOINTMENT
-
-)
 
 func NewController(r repository.Repository) *Controller {
 	return &Controller{r}
-}
-
-func (c Controller) ACL(who int, kind string, how string, what int, whatID int, params ...interface{}) bool{
-
-	switch kind {
-	case ParentUser:
-		switch what {
-		case PARENT:
-			switch how {
-			case GET:
-				return who == whatID
-			case PUT:
-				return who == whatID
-			default:
-				return false
-			}
-		case STUDENT:
-			switch how {
-			case GET:
-				return c.r.IsParent(who, whatID)
-			case PUT:
-				return c.r.IsParent(who, whatID)
-			default:
-				return false
-			}
-		case APPOINTMENT:
-			switch how {
-			case GET:
-				return c.r.ParentHasAppointment(who, whatID)
-			case PUT:
-				return c.r.ParentHasAppointment(who,whatID)
-			case POST:
-
-			}
-	}
-	}
-	return true
 }
 
 // @Summary Get a class by id
@@ -423,13 +370,11 @@ func (c *Controller) Classes(limit int, offset int) ([]interface{}, error) {
 // @Tags Auth
 // @Success 200 {object} Controller.Token
 // @Router /login [post]
-func (c *Controller) CheckUser(id string, pass string) (string, string, bool) {
+func (c *Controller) CheckUser(id string, pass string) (int, string, bool) {
 	// TODO save kind and id in context
 	return c.r.CheckUser(id, pass)
 }
-func (c *Controller) UserKind(userID string) map[string]interface{} {
-	return c.r.UserKind(userID)
-}
+
 
 // @Summary Create parent
 // @Tags Parents
