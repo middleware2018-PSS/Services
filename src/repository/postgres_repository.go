@@ -38,13 +38,13 @@ func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (inter
 	}
 }
 
-func (r *postgresRepository) exec(query string, params ...interface{}) (id int64, err error) {
+func (r *postgresRepository) exec(query string, params ...interface{}) (id int, err error) {
 	res, err := r.DB.Exec(query, params...)
 	if err != nil {
 		log.Print(err.Error())
 	}
 	if id, e := res.LastInsertId(); e != nil {
-		return id, switchErrors(err)
+		return int(id), switchErrors(err)
 	} else {
 		return 0, err
 	}

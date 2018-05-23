@@ -5,11 +5,12 @@ import (
 	"github.com/middleware2018-PSS/Services/src/models"
 )
 
-func (r *postgresRepository) CheckUser(userID string, password string) (string, bool) {
-	query := `select "user", password from back2school.accounts where "user" = $1 and password = $2`
-	var id, pass string
-	err := r.QueryRow(query, userID, password).Scan(&id, &pass)
-	return userID, err == nil
+func (r *postgresRepository) CheckUser(userID string, password string) (int, string, bool) {
+	query := `select id, kind from back2school.accounts where "user" = $1 and "password" = $2`
+	var id int
+	var kind string
+	err := r.QueryRow(query, userID, password).Scan(&id, &kind)
+	return id, kind, err == nil
 }
 
 func (r *postgresRepository) UserKind(userID string) map[string]interface{} {
@@ -20,7 +21,7 @@ func (r *postgresRepository) UserKind(userID string) map[string]interface{} {
 	return map[string]interface{}{"kind": kind, "dbID": id}
 }
 
-func (r *postgresRepository) AppointmentByID(id int64) (interface{}, error) {
+func (r *postgresRepository) AppointmentByID(id int) (interface{}, error) {
 	appointment := models.Appointment{}
 	err := r.QueryRow("SELECT id, student, teacher, time, location "+
 		"FROM back2school.appointments WHERE id = $1 ", id).Scan(
@@ -28,7 +29,7 @@ func (r *postgresRepository) AppointmentByID(id int64) (interface{}, error) {
 	return switchResult(appointment, err)
 }
 
-func (r *postgresRepository) GradeByID(id int64) (interface{}, error) {
+func (r *postgresRepository) GradeByID(id int) (interface{}, error) {
 	grade := models.Grade{}
 	err := r.QueryRow("SELECT id, student, teacher, subject, date, grade "+
 		"FROM back2school.grades WHERE id = $1 ", id).Scan(
@@ -36,7 +37,7 @@ func (r *postgresRepository) GradeByID(id int64) (interface{}, error) {
 	return switchResult(grade, err)
 }
 
-func (r *postgresRepository) ClassByID(id int64) (interface{}, error) {
+func (r *postgresRepository) ClassByID(id int) (interface{}, error) {
 	class := models.Class{}
 	err := r.QueryRow("SELECT id, year, section, info, grade FROM back2school.classes "+
 		"WHERE id = $1", id).Scan(&class.ID, &class.Year, &class.Section, &class.Info, &class.Grade)
@@ -53,7 +54,7 @@ func (r *postgresRepository) Classes(limit int, offset int) ([]interface{}, erro
 	}, limit, offset)
 }
 
-func (r *postgresRepository) StudentsByClass(id int64, limit int, offset int) (students []interface{}, err error) {
+func (r *postgresRepository) StudentsByClass(id int, limit int, offset int) (students []interface{}, err error) {
 	return r.listByParams("select distinct id, name, surname, mail, info "+
 		"from back2school.students join back2school.enrolled on student = id "+
 		"where class = $1 "+
@@ -65,7 +66,7 @@ func (r *postgresRepository) StudentsByClass(id int64, limit int, offset int) (s
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) LectureByClass(id int64, limit int, offset int) ([]interface{}, error) {
+func (r *postgresRepository) LectureByClass(id int, limit int, offset int) ([]interface{}, error) {
 	return r.listByParams(
 		"select id, class, subject, \"start\", \"end\", location, info "+
 			"from back2school.timetable natural join back2school.teaches "+
@@ -78,7 +79,7 @@ func (r *postgresRepository) LectureByClass(id int64, limit int, offset int) ([]
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) NotificationByID(id int64) (interface{}, error) {
+func (r *postgresRepository) NotificationByID(id int) (interface{}, error) {
 	n := models.Notification{}
 	err := r.QueryRow("SELECT id, receiver, message, time, receiver_kind "+
 		"FROM back2school.notification WHERE id = $1 ", id).Scan(&n.ID,
@@ -97,7 +98,7 @@ func (r *postgresRepository) Notifications(limit int, offset int) ([]interface{}
 		}, limit, offset)
 }
 
-func (r *postgresRepository) ParentByID(id int64) (interface{}, error) {
+func (r *postgresRepository) ParentByID(id int) (interface{}, error) {
 	p := models.Parent{}
 	err := r.QueryRow("SELECT id,	name, surname, mail, info "+
 		"FROM back2school.parents WHERE id = $1",
@@ -127,7 +128,7 @@ func (r *postgresRepository) Parents(limit int, offset int) ([]interface{}, erro
 		}, limit, offset)
 }
 
-func (r *postgresRepository) ChildrenByParent(id int64, limit int, offset int) (children []interface{}, err error) {
+func (r *postgresRepository) ChildrenByParent(id int, limit int, offset int) (children []interface{}, err error) {
 	return r.listByParams("SELECT distinct s.id, s.name, s.surname, s.mail, s.info "+
 		"FROM back2school.isparent join back2school.students as s on student = s.id  "+
 		"WHERE parent = $1 "+
@@ -139,7 +140,7 @@ func (r *postgresRepository) ChildrenByParent(id int64, limit int, offset int) (
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) PaymentsByParent(id int64, limit int, offset int) (payments []interface{}, err error) {
+func (r *postgresRepository) PaymentsByParent(id int, limit int, offset int) (payments []interface{}, err error) {
 	return r.listByParams("select p.id, p.amount, p.student, p.payed, p.reason, p.emitted "+
 		"from back2school.payments as p natural join back2school.isparent "+
 		"where parent = $1 "+
@@ -150,7 +151,7 @@ func (r *postgresRepository) PaymentsByParent(id int64, limit int, offset int) (
 	}, limit, offset, id)
 }
 
-func (r *postgresRepository) NotificationsByParent(id int64, limit int, offset int) (list []interface{}, err error) {
+func (r *postgresRepository) NotificationsByParent(id int, limit int, offset int) (list []interface{}, err error) {
 	return r.listByParams("select * from ( "+
 		"select n.id, n.receiver, n.message, n.receiver_kind, n.time "+
 		"from back2school.notification as n join back2school.isparent on n.receiver = student "+
@@ -168,7 +169,7 @@ func (r *postgresRepository) NotificationsByParent(id int64, limit int, offset i
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) AppointmentsByParent(id int64, limit int, offset int) (appointments []interface{}, err error) {
+func (r *postgresRepository) AppointmentsByParent(id int, limit int, offset int) (appointments []interface{}, err error) {
 	return r.listByParams("select a.id, a.student, a.teacher, a.location, a.time "+
 		"from back2school.appointments as a natural join back2school.isparent  "+
 		"where parent = $1 "+
@@ -180,7 +181,7 @@ func (r *postgresRepository) AppointmentsByParent(id int64, limit int, offset in
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) PaymentByID(id int64) (interface{}, error) {
+func (r *postgresRepository) PaymentByID(id int) (interface{}, error) {
 	payment := &models.Payment{}
 	err := r.QueryRow("SELECT id, amount, payed, emitted, reason "+
 		"FROM back2school.payments WHERE id = $1 ", id).Scan(payment.ID, payment.Amount, payment.Payed, payment.Emitted, payment.Reason)
@@ -219,7 +220,7 @@ func (r *postgresRepository) Students(limit int, offset int) (student []interfac
 	}, limit, offset)
 }
 
-func (r *postgresRepository) StudentByID(id int64) (student interface{}, err error) {
+func (r *postgresRepository) StudentByID(id int) (student interface{}, err error) {
 	s := models.Student{}
 	err = r.QueryRow("SELECT id,	name, surname, mail, info  "+
 		"FROM back2school.students WHERE id = $1", id).Scan(&s.ID,
@@ -227,7 +228,7 @@ func (r *postgresRepository) StudentByID(id int64) (student interface{}, err err
 	return switchResult(s, err)
 }
 
-func (r *postgresRepository) GradesByStudent(id int64, limit int, offset int) ([]interface{}, error) {
+func (r *postgresRepository) GradesByStudent(id int, limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("SELECT id, student, subject, date, grade, teacher "+
 		"FROM back2school.grades "+
 		"WHERE student = $1 "+
@@ -239,7 +240,7 @@ func (r *postgresRepository) GradesByStudent(id int64, limit int, offset int) ([
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) TeacherByID(id int64) (interface{}, error) {
+func (r *postgresRepository) TeacherByID(id int) (interface{}, error) {
 	teacher := models.Teacher{}
 	err := r.QueryRow("SELECT id, name, surname, mail  "+
 		"FROM back2school.teachers "+
@@ -259,7 +260,7 @@ func (r *postgresRepository) Teachers(limit int, offset int) ([]interface{}, err
 	}, limit, offset)
 }
 
-func (r *postgresRepository) AppointmentsByTeacher(id int64, limit int, offset int) (appointments []interface{}, err error) {
+func (r *postgresRepository) AppointmentsByTeacher(id int, limit int, offset int) (appointments []interface{}, err error) {
 	return r.listByParams("SELECT id, student, teacher, location, time "+
 		"FROM back2school.appointments  "+
 		"WHERE teacher = $1 "+
@@ -271,7 +272,7 @@ func (r *postgresRepository) AppointmentsByTeacher(id int64, limit int, offset i
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) NotificationsByTeacher(id int64, limit int, offset int) (notifications []interface{}, err error) {
+func (r *postgresRepository) NotificationsByTeacher(id int, limit int, offset int) (notifications []interface{}, err error) {
 	return r.listByParams("SELECT id, receiver, message, receiver_kind, time  "+
 		"FROM back2school.notification  "+
 		"WHERE (receiver = $1 and receiver_kind = 'teacher') or receiver_kind = 'general' "+
@@ -283,7 +284,7 @@ func (r *postgresRepository) NotificationsByTeacher(id int64, limit int, offset 
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) SubjectsByTeacher(id int64, limit int, offset int) (notifications []interface{}, err error) {
+func (r *postgresRepository) SubjectsByTeacher(id int, limit int, offset int) (notifications []interface{}, err error) {
 	return r.listByParams("SELECT DISTINCT subject FROM back2school.teaches where teacher = $1 order by subject",
 		func(rows *sql.Rows) (interface{}, error) {
 			subj := ""
@@ -292,7 +293,7 @@ func (r *postgresRepository) SubjectsByTeacher(id int64, limit int, offset int) 
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int64, subject string, limit int, offset int) ([]interface{}, error) {
+func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int, subject string, limit int, offset int) ([]interface{}, error) {
 	return r.listByParams("SELECT id, year, section, info, grade "+
 		"FROM back2school.teaches join back2school.classes on id = class  "+
 		"WHERE teacher = $1 and subject = $2 "+
@@ -304,7 +305,7 @@ func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int64, subject s
 		}, limit, offset, teacher, subject)
 }
 
-func (r *postgresRepository) LecturesByTeacher(id int64, limit int, offset int) (lectures []interface{}, err error) {
+func (r *postgresRepository) LecturesByTeacher(id int, limit int, offset int) (lectures []interface{}, err error) {
 	return r.listByParams("SELECT id, class, subject, location, start, \"end\", info	 "+
 		"from back2school.timetable natural join back2school.teaches as t "+
 		"where t.teacher = $1 "+
@@ -317,7 +318,7 @@ func (r *postgresRepository) LecturesByTeacher(id int64, limit int, offset int) 
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) ClassesByTeacher(id int64, limit int, offset int) ([]interface{}, error) {
+func (r *postgresRepository) ClassesByTeacher(id int, limit int, offset int) ([]interface{}, error) {
 	type Class struct {
 		models.Class
 		Subject models.Subject `json:"subject,omitempty"`
@@ -360,34 +361,34 @@ func (r *postgresRepository) UpdateAppointment(appointment models.Appointment) (
 	return r.execUpdate(query, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time, appointment.ID)
 }
 
-func (r *postgresRepository) CreateAppointment(appointment models.Appointment) (id int64, err error) {
+func (r *postgresRepository) CreateAppointment(appointment models.Appointment) (id int, err error) {
 	query := "INSERT INTO back2school.appointments " +
 		" (student, teacher, location, time) VALUES ($1, $2, $3, $4)"
 	return r.exec(query, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time)
 }
 
-func (r *postgresRepository) CreateParent(parent models.Parent) (int64, error) {
+func (r *postgresRepository) CreateParent(parent models.Parent) (int, error) {
 	query := "INSERT INTO back2school.parents " +
 		"(name, surname, mail, info) VALUES ($1, $2, $3, $4)"
 	return r.exec(query, parent.Name, parent.Surname, parent.Mail, parent.Info)
 
 }
 
-func (r *postgresRepository) CreateTeacher(teacher models.Teacher) (int64, error) {
+func (r *postgresRepository) CreateTeacher(teacher models.Teacher) (int, error) {
 	query := "INSERT INTO back2school.teachers" +
 		" (name, surname, mail, info)" +
 		" VALUES ($1, $2, $3, $4)"
 	return r.exec(query, teacher.Name, teacher.Surname, teacher.Mail, teacher.Info)
 }
 
-func (r *postgresRepository) CreateStudent(student models.Student) (int64, error) {
+func (r *postgresRepository) CreateStudent(student models.Student) (int, error) {
 	query := "INSERT INTO back2school.students" +
 		" (name, surname, mail, info) " +
 		" VALUES ($1, $2, $3, $4)"
 	return r.exec(query, student.Name, student.Surname, student.Mail, student.Info)
 }
 
-func (r *postgresRepository) CreateClass(class models.Class) (int64, error) {
+func (r *postgresRepository) CreateClass(class models.Class) (int, error) {
 	query := "INSERT INTO back2school.classes" +
 		" (year, section, info, grade) " +
 		" VALUES ($1, $2, $3, $4)"
@@ -401,7 +402,7 @@ func (r *postgresRepository) UpdateClass(class models.Class) (err error) {
 	return r.execUpdate(query, class.Year, class.Section, class.Info, class.Grade, class.ID)
 }
 
-func (r *postgresRepository) CreateNotification(notification models.Notification) (int64, error) {
+func (r *postgresRepository) CreateNotification(notification models.Notification) (int, error) {
 	query := "insert into back2school.classes " +
 		" (receiver, message, time, receiver_kind) " +
 		" VALUES ($1, $2, $3, $4) "
@@ -414,7 +415,7 @@ func (r *postgresRepository) UpdateNotification(notification models.Notification
 	return r.execUpdate(query, notification.Receiver, notification.Message, notification.Time, notification.ReceiverKind, notification.ID)
 }
 
-func (r *postgresRepository) CreateGrade(grade models.Grade) (int64, error) {
+func (r *postgresRepository) CreateGrade(grade models.Grade) (int, error) {
 	query := "insert into back2school.grades " +
 		" (student, grade, subject, date, teacher) " +
 		" VALUES ($1, $2, $3, $4, $5) "
@@ -427,7 +428,7 @@ func (r *postgresRepository) UpdateGrade(grade models.Grade) error {
 	return r.execUpdate(query, grade.Student.ID, grade.Grade, grade.Subject, grade.Date, grade.Teacher.ID, grade.ID)
 }
 
-func (r *postgresRepository) CreatePayment(payment models.Payment) (int64, error) {
+func (r *postgresRepository) CreatePayment(payment models.Payment) (int, error) {
 	query := "insert into back2school.payments " +
 		" (amount, student, payed, reason, emitted) " +
 		" VALUES ($1, $2, $3, $4, $5) "
@@ -438,4 +439,17 @@ func (r *postgresRepository) UpdatePayment(payment models.Payment) error {
 		"SET amount = $1, student = $2, payed = $3, reason = $4, emitted = $5" +
 		" where id = $6"
 	return r.execUpdate(query, payment.Amount, payment.Student.ID, payment.Payed, payment.Reason, payment.Emitted, payment.ID)
+}
+
+func (r *postgresRepository) IsParent(parent int, child int) bool {
+	query := "SELECT count(1) from back2school.isParent where parent = $1 and student = $2"
+	var n int
+	r.QueryRow(query, parent, child).Scan(&n)
+	return n == 1
+}
+
+func (r *postgresRepository) ParentHasAppointment(parent int, appointment int) bool {
+	var n int
+	r.QueryRow("SELECT count(1) from back2school.isparent natural join back2school.appointments where parent = $1 and id = $2", parent, appointment).Scan(&n)
+	return n == 1
 }
