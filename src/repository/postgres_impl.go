@@ -2,8 +2,13 @@ package repository
 
 import (
 	"database/sql"
+	_ "github.com/middleware2018-PSS/Services/src/docs"
 	"github.com/middleware2018-PSS/Services/src/models"
 )
+
+type Subjects struct {
+	Subjects []string `json:"subjects" example:"science"`
+}
 
 func (r *postgresRepository) CheckUser(userID string, password string) (int, string, bool) {
 	query := `select id, kind from back2school.accounts where "user" = $1 and "password" = $2`
@@ -13,21 +18,26 @@ func (r *postgresRepository) CheckUser(userID string, password string) (int, str
 	return id, kind, err == nil
 }
 
+// @Summary Get a appointment by id
+// @Param id path int true "Appointment ID"
+// @Tags Appointments
+// @Success 200 {object} models.Appointment
+// @Router /appointments/{id} [get]
 func (r *postgresRepository) AppointmentByID(id int, who int, whoKind string) (interface{}, error) {
 	appointment := models.Appointment{}
 	var args []interface{}
 	var query string
 	switch whoKind {
 	case ParentUser:
-		query = "SELECT id, student, teacher, time, location "+
+		query = "SELECT id, student, teacher, time, location " +
 			"FROM back2school.appointments natural join back2school.isParent WHERE id = $1 and parent = $2"
 		args = append(args, id, who)
 	case TeacherUser:
-		query = "SELECT id, student, teacher, time, location "+
+		query = "SELECT id, student, teacher, time, location " +
 			"FROM back2school.appointments WHERE id = $1 and teacher = $2"
 		args = append(args, id, who)
 	case AdminUser:
-		query = "SELECT id, student, teacher, time, location "+
+		query = "SELECT id, student, teacher, time, location " +
 			"FROM back2school.appointments WHERE id = $1 "
 		args = append(args, id)
 	default:
@@ -38,21 +48,26 @@ func (r *postgresRepository) AppointmentByID(id int, who int, whoKind string) (i
 	return switchResult(appointment, err)
 }
 
+// @Summary Get a grade by id
+// @Param id path int true "Grade ID"
+// @Tags Grades
+// @Success 200 {object} models.Grade
+// @Router /grades/{id} [get]
 func (r *postgresRepository) GradeByID(id int, who int, whoKind string) (interface{}, error) {
 	grade := models.Grade{}
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query = "SELECT id, student, teacher, subject, date, grade "+
+		query = "SELECT id, student, teacher, subject, date, grade " +
 			"FROM back2school.grades natural join back2school.isParent WHERE id = $1 and parent = $2 "
-			args = append(args, id, who)
+		args = append(args, id, who)
 	case TeacherUser:
-		query = "SELECT id, student, teacher, subject, date, grade "+
+		query = "SELECT id, student, teacher, subject, date, grade " +
 			"FROM back2school.grades WHERE id = $1 and teacher = $2"
 		args = append(args, id, who)
 	case AdminUser:
-		query = "SELECT id, student, teacher, subject, date, grade "+
+		query = "SELECT id, student, teacher, subject, date, grade " +
 			"FROM back2school.grades WHERE id = $1"
 	default:
 		return nil, ErrorNotAuthorized
@@ -62,17 +77,22 @@ func (r *postgresRepository) GradeByID(id int, who int, whoKind string) (interfa
 	return switchResult(grade, err)
 }
 
+// @Summary Get a class by id
+// @Param id path int true "Class ID"
+// @Tags Classes
+// @Success 200 {object} models.Class
+// @Router /classes/{id} [get]
 func (r *postgresRepository) ClassByID(id int, who int, whoKind string) (interface{}, error) {
 	class := models.Class{}
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser:
-		query = "SELECT id, year, section, info, grade FROM back2school.classes join back2school.teaches on class = id"+
+		query = "SELECT id, year, section, info, grade FROM back2school.classes join back2school.teaches on class = id" +
 			"WHERE id = $1 and teacher = $2"
-			args = append(args, id, who)
+		args = append(args, id, who)
 	case AdminUser:
-		query ="SELECT id, year, section, info, grade FROM back2school.classes "+
+		query = "SELECT id, year, section, info, grade FROM back2school.classes " +
 			"WHERE id = $1"
 		args = append(args, id)
 	default:
@@ -82,19 +102,25 @@ func (r *postgresRepository) ClassByID(id int, who int, whoKind string) (interfa
 	return switchResult(class, err)
 }
 
+// @Summary Get all classes
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Classes
+// @Success 200 {array} models.Class
+// @Router /classes [get]
 func (r *postgresRepository) Classes(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser:
-		query = "select id, year, section, info, grade "+
-			"from back2school.classes join back2school.teaches on class = id"+
+		query = "select id, year, section, info, grade " +
+			"from back2school.classes join back2school.teaches on class = id" +
 			"WHERE teacher = $1" +
 			"order by year desc, grade asc, section asc"
-			args = append(args, who)
+		args = append(args, who)
 	case AdminUser:
-		query ="select id, year, section, info, grade "+
-			"from back2school.classes "+
+		query = "select id, year, section, info, grade " +
+			"from back2school.classes " +
 			"order by year desc, grade asc, section asc"
 	default:
 		return nil, ErrorNotAuthorized
@@ -106,21 +132,28 @@ func (r *postgresRepository) Classes(limit int, offset int, who int, whoKind str
 	}, limit, offset, args...)
 }
 
+// @Summary Get a student by class
+// @Param id path int true "Class ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Classes
+// @Success 200 {array} models.Student
+// @Router /classes/{id}/students [get]
 func (r *postgresRepository) StudentsByClass(id int, limit int, offset int, who int, whoKind string) (students []interface{}, err error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser:
-		query = "select distinct s.id, s.name, s.surname, s.mail, s.info "+
+		query = "select distinct s.id, s.name, s.surname, s.mail, s.info " +
 			"from back2school.students as s join back2school.enrolled as e " +
-			" join back2school.teaches as t on s.id = e.student and t.class = e.class"+
-			"where s.class = $1 and t.teacher = $2"+
+			" join back2school.teaches as t on s.id = e.student and t.class = e.class" +
+			"where s.class = $1 and t.teacher = $2" +
 			"order by s.name desc, s.surname desc"
-			args = append(args, id, who)
+		args = append(args, id, who)
 	case AdminUser:
-		query ="select distinct id, name, surname, mail, info "+
-			"from back2school.students join back2school.enrolled on student = id "+
-			"where class = $1 "+
+		query = "select distinct id, name, surname, mail, info " +
+			"from back2school.students join back2school.enrolled on student = id " +
+			"where class = $1 " +
 			"order by name desc, surname desc"
 		args = append(args, id)
 	default:
@@ -135,19 +168,26 @@ func (r *postgresRepository) StudentsByClass(id int, limit int, offset int, who 
 }
 
 //TODO add entrypoint !!!
+// @Summary Get a lecture by class
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Param id path int true "Class ID"
+// @Tags Lectures
+// @Success 200 {array} models.Appointment
+// @Router /classes/{id}/lectures [get]
 func (r *postgresRepository) LectureByClass(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser:
-		query = "select id, class, subject, \"start\", \"end\", location, info "+
-			"from back2school.timetable natural join back2school.teaches "+
-			"where teacher = $1 and class = $2"+
+		query = "select id, class, subject, \"start\", \"end\", location, info " +
+			"from back2school.timetable natural join back2school.teaches " +
+			"where teacher = $1 and class = $2" +
 			"order by \"start\" desc"
-			args = append(args, who, id)
+		args = append(args, who, id)
 	case AdminUser:
-		query ="select id, class, subject, \"start\", \"end\", location, info "+
-			"from back2school.timetable"+
+		query = "select id, class, subject, \"start\", \"end\", location, info " +
+			"from back2school.timetable" +
 			"order by \"start\" desc"
 	default:
 		return nil, ErrorNotAuthorized
@@ -161,22 +201,27 @@ func (r *postgresRepository) LectureByClass(id int, limit int, offset int, who i
 		}, limit, offset, args...)
 }
 
+// @Summary Get a notification by id
+// @Param id path int true "Notification ID"
+// @Tags Notifications
+// @Success 200 {object} models.Notification
+// @Router /notifications/{id} [get]
 func (r *postgresRepository) NotificationByID(id int, who int, whoKind string) (interface{}, error) {
 	n := models.Notification{}
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser:
-		query ="SELECT id, receiver, message, time, receiver_kind "+
+		query = "SELECT id, receiver, message, time, receiver_kind " +
 			"FROM back2school.notification" +
 			"WHERE id = $1 and receiver = $2 and receiver_kind = $3"
-			args = append(args, id, who, whoKind)
+		args = append(args, id, who, whoKind)
 	case ParentUser:
-		query ="SELECT id, receiver, message, time, receiver_kind "+
+		query = "SELECT id, receiver, message, time, receiver_kind " +
 			"FROM back2school.notification WHERE id = $1 and receiver = $2 and receiver_kind = $3"
 		args = append(args, id, who, whoKind)
 	case AdminUser:
-		query ="SELECT id, receiver, message, time, receiver_kind "+
+		query = "SELECT id, receiver, message, time, receiver_kind " +
 			"FROM back2school.notification WHERE id = $1"
 		args = append(args, id)
 
@@ -188,19 +233,26 @@ func (r *postgresRepository) NotificationByID(id int, who int, whoKind string) (
 	return switchResult(n, err)
 }
 
+// List all notifications
+// @Summary Get all notifications
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Notifications
+// @Success 200 {array} models.Notification
+// @Router /notifications [get]
 func (r *postgresRepository) Notifications(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser, ParentUser:
-		query ="select id, receiver, message, time, receiver_kind "+
+		query = "select id, receiver, message, time, receiver_kind " +
 			"from back2school.notification " +
-			" where receiver = $1 and receiver_kind = $2"+
+			" where receiver = $1 and receiver_kind = $2" +
 			"order by time desc, receiver_kind desc"
 		args = append(args, who, whoKind)
 	case AdminUser:
-		query ="select id, receiver, message, time, receiver_kind "+
-			"from back2school.notification "+
+		query = "select id, receiver, message, time, receiver_kind " +
+			"from back2school.notification " +
 			"order by time desc, receiver_kind desc"
 	default:
 		return nil, ErrorNotAuthorized
@@ -213,6 +265,13 @@ func (r *postgresRepository) Notifications(limit int, offset int, who int, whoKi
 		}, limit, offset, args...)
 }
 
+// Parents
+// see/modify their personal data
+// @Summary Get a parent by id
+// @Param id path int true "Account ID"
+// @Tags Parents
+// @Success 200 {object} models.Parent
+// @Router /parents/{id} [get]
 func (r *postgresRepository) ParentByID(id int, who int, whoKind string) (interface{}, error) {
 	p := models.Parent{}
 	var query string
@@ -227,7 +286,7 @@ func (r *postgresRepository) ParentByID(id int, who int, whoKind string) (interf
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query ="SELECT id,	name, surname, mail, info "+
+		query = "SELECT id,	name, surname, mail, info " +
 			"FROM back2school.parents WHERE id = $1"
 		args = append(args, id)
 	default:
@@ -238,19 +297,25 @@ func (r *postgresRepository) ParentByID(id int, who int, whoKind string) (interf
 	return switchResult(p, err)
 }
 
+// @Summary Get all grades
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Grades
+// @Success 200 {array} models.Grade
+// @Router /grades [get]
 func (r *postgresRepository) Grades(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query ="select id, student, grade, subject, date, teacher "+
+		query = "select id, student, grade, subject, date, teacher " +
 			"from back2school.grades natural join back2school.isParent" +
-			" where parent = $1"+
+			" where parent = $1" +
 			"order by date desc, teacher asc"
 		args = append(args, who)
 	case AdminUser:
-		query ="select id, student, grade, subject, date, teacher "+
-			"from back2school.grades "+
+		query = "select id, student, grade, subject, date, teacher " +
+			"from back2school.grades " +
 			"order by date desc, teacher asc"
 	default:
 		return nil, ErrorNotAuthorized
@@ -263,6 +328,12 @@ func (r *postgresRepository) Grades(limit int, offset int, who int, whoKind stri
 		}, limit, offset, args...)
 }
 
+// @Summary Get all parents
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Parents
+// @Success 200 {array} models.Parent
+// @Router /parents [get]
 func (r *postgresRepository) Parents(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -272,8 +343,8 @@ func (r *postgresRepository) Parents(limit int, offset int, who int, whoKind str
 		return []interface{}{p}, err
 		args = append(args, who)
 	case AdminUser:
-		query ="select id, name, surname, mail, info "+
-			"from back2school.parents "+
+		query = "select id, name, surname, mail, info " +
+			"from back2school.parents " +
 			"order by name desc, surname desc"
 	default:
 		return nil, ErrorNotAuthorized
@@ -286,24 +357,32 @@ func (r *postgresRepository) Parents(limit int, offset int, who int, whoKind str
 		}, limit, offset, args...)
 }
 
+// see/modify the personal data of their registered children
+// @Summary Get children of the parent
+// @Param id path int true "Parent ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Parents
+// @Success 200 {array} models.Student
+// @Router /parents/{id}/students [get]
 func (r *postgresRepository) ChildrenByParent(id int, limit int, offset int, who int, whoKind string) (children []interface{}, err error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		if id == who{
-			query ="SELECT distinct s.id, s.name, s.surname, s.mail, s.info "+
-				"FROM back2school.isparent join back2school.students as s on student = s.id  "+
-				"WHERE parent = $1 "+
+		if id == who {
+			query = "SELECT distinct s.id, s.name, s.surname, s.mail, s.info " +
+				"FROM back2school.isparent join back2school.students as s on student = s.id  " +
+				"WHERE parent = $1 " +
 				"order by s.name desc"
 			args = append(args, who)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query ="SELECT distinct s.id, s.name, s.surname, s.mail, s.info "+
-			"FROM back2school.isparent join back2school.students as s on student = s.id  "+
-			"WHERE parent = $1 "+
+		query = "SELECT distinct s.id, s.name, s.surname, s.mail, s.info " +
+			"FROM back2school.isparent join back2school.students as s on student = s.id  " +
+			"WHERE parent = $1 " +
 			"order by s.name desc"
 		args = append(args, id)
 
@@ -318,24 +397,32 @@ func (r *postgresRepository) ChildrenByParent(id int, limit int, offset int, who
 		}, limit, offset, args...)
 }
 
+// see the monthly payments that have been made to the school in the past
+// @Summary Get payments of the parent
+// @Param id path int true "Parent ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Parents
+// @Success 200 {array} models.Payment
+// @Router /parents/{id}/payments [get]
 func (r *postgresRepository) PaymentsByParent(id int, limit int, offset int, who int, whoKind string) (payments []interface{}, err error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		if id == who{
-			query ="select p.id, p.amount, p.student, p.payed, p.reason, p.emitted "+
-				"from back2school.payments as p natural join back2school.isparent "+
-				"where parent = $1 "+
+		if id == who {
+			query = "select p.id, p.amount, p.student, p.payed, p.reason, p.emitted " +
+				"from back2school.payments as p natural join back2school.isparent " +
+				"where parent = $1 " +
 				"order by p.emitted desc"
 			args = append(args, who)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query ="select p.id, p.amount, p.student, p.payed, p.reason, p.emitted "+
-			"from back2school.payments as p natural join back2school.isparent "+
-			"where parent = $1 "+
+		query = "select p.id, p.amount, p.student, p.payed, p.reason, p.emitted " +
+			"from back2school.payments as p natural join back2school.isparent " +
+			"where parent = $1 " +
 			"order by p.emitted desc"
 		args = append(args, id)
 
@@ -349,34 +436,42 @@ func (r *postgresRepository) PaymentsByParent(id int, limit int, offset int, who
 	}, limit, offset, args...)
 }
 
+// see general/personal notifications coming from the school
+// @Summary Get notifications of the parent
+// @Param id path int true "Parent ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Parents
+// @Success 200 {array} models.Notification
+// @Router /parents/{id}/notifications [get]
 func (r *postgresRepository) NotificationsByParent(id int, limit int, offset int, who int, whoKind string) (list []interface{}, err error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		if id == who{
-			query ="select * from ( "+
-				"select n.id, n.receiver, n.message, n.receiver_kind, n.time "+
-				"from back2school.notification as n join back2school.isparent on n.receiver = student "+
-				"where parent = $1 and receiver_kind = 'student' "+
-				"union all  "+
-				"select n.id, n.receiver, n.message, n.receiver_kind, n.time "+
-				"from back2school.notification as n "+
-				"where receiver_kind = 'general' "+
+		if id == who {
+			query = "select * from ( " +
+				"select n.id, n.receiver, n.message, n.receiver_kind, n.time " +
+				"from back2school.notification as n join back2school.isparent on n.receiver = student " +
+				"where parent = $1 and receiver_kind = 'student' " +
+				"union all  " +
+				"select n.id, n.receiver, n.message, n.receiver_kind, n.time " +
+				"from back2school.notification as n " +
+				"where receiver_kind = 'general' " +
 				") as a order by time desc"
 			args = append(args, who)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query ="select * from ( "+
-			"select n.id, n.receiver, n.message, n.receiver_kind, n.time "+
-			"from back2school.notification as n join back2school.isparent on n.receiver = student "+
-			"where parent = $1 and receiver_kind = 'student' "+
-			"union all  "+
-			"select n.id, n.receiver, n.message, n.receiver_kind, n.time "+
-			"from back2school.notification as n "+
-			"where receiver_kind = 'general' "+
+		query = "select * from ( " +
+			"select n.id, n.receiver, n.message, n.receiver_kind, n.time " +
+			"from back2school.notification as n join back2school.isparent on n.receiver = student " +
+			"where parent = $1 and receiver_kind = 'student' " +
+			"union all  " +
+			"select n.id, n.receiver, n.message, n.receiver_kind, n.time " +
+			"from back2school.notification as n " +
+			"where receiver_kind = 'general' " +
 			") as a order by time desc"
 		args = append(args, id)
 
@@ -392,24 +487,34 @@ func (r *postgresRepository) NotificationsByParent(id int, limit int, offset int
 		}, limit, offset, args...)
 }
 
+// see/modify appointments that they have with their children's teachers
+// (calendar-like support for requesting appointments, err error)
+// @Summary Get appointments of the parent
+// @Param id path int true "Parent ID"
+// @Tags Parents
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Parents
+// @Success 200 {array} models.Appointment
+// @Router /parents/{id}/appointments [get]
 func (r *postgresRepository) AppointmentsByParent(id int, limit int, offset int, who int, whoKind string) (appointments []interface{}, err error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		if id == who{
-			query ="select a.id, a.student, a.teacher, a.location, a.time "+
-				"from back2school.appointments as a natural join back2school.isparent  "+
-				"where parent = $1 "+
+		if id == who {
+			query = "select a.id, a.student, a.teacher, a.location, a.time " +
+				"from back2school.appointments as a natural join back2school.isparent  " +
+				"where parent = $1 " +
 				"order by a.time desc"
 			args = append(args, who)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query ="select a.id, a.student, a.teacher, a.location, a.time "+
-			"from back2school.appointments as a natural join back2school.isparent  "+
-			"where parent = $1 "+
+		query = "select a.id, a.student, a.teacher, a.location, a.time " +
+			"from back2school.appointments as a natural join back2school.isparent  " +
+			"where parent = $1 " +
 			"order by a.time desc"
 		args = append(args, id)
 
@@ -424,18 +529,24 @@ func (r *postgresRepository) AppointmentsByParent(id int, limit int, offset int,
 		}, limit, offset, args...)
 }
 
+// Get payment by id
+// @Summary Get a payment by id
+// @Param id path int true "Payment ID"
+// @Tags Payments
+// @Success 200 {object} models.Payment
+// @Router /payments/{id} [get]
 func (r *postgresRepository) PaymentByID(id int, who int, whoKind string) (interface{}, error) {
 	payment := &models.Payment{}
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query ="SELECT id, amount, payed, emitted, reason "+
+		query = "SELECT id, amount, payed, emitted, reason " +
 			"FROM back2school.payments natural join back2school.isParent" +
 			" WHERE id = $1 and parent = $2"
 		args = append(args, id, who)
 	case AdminUser:
-		query ="SELECT id, amount, payed, emitted, reason "+
+		query = "SELECT id, amount, payed, emitted, reason " +
 			"FROM back2school.payments WHERE id = $1 "
 		args = append(args, id)
 
@@ -446,19 +557,25 @@ func (r *postgresRepository) PaymentByID(id int, who int, whoKind string) (inter
 	return switchResult(payment, err)
 }
 
+// @Summary Get all payments
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Payments
+// @Success 200 {array} models.Payment
+// @Router /payments [get]
 func (r *postgresRepository) Payments(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query ="select id, amount, student, payed, reason, emitted "+
+		query = "select id, amount, student, payed, reason, emitted " +
 			"from back2school.payments natural join back2school.isParent " +
-			" where parent = $1"+
+			" where parent = $1" +
 			"order by payed asc, emitted asc"
 		args = append(args, who)
 	case AdminUser:
-		query ="select id, amount, student, payed, reason, emitted "+
-			"from back2school.payments "+
+		query = "select id, amount, student, payed, reason, emitted " +
+			"from back2school.payments " +
 			"order by payed asc, emitted asc"
 	default:
 		return nil, ErrorNotAuthorized
@@ -471,19 +588,26 @@ func (r *postgresRepository) Payments(limit int, offset int, who int, whoKind st
 		}, limit, offset, args)
 }
 
+// @Summary Get all appointments
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Appointments
+// @Router /appointments [get]
+// @Success 200 {object} representations.List
+// @Security ApiKeyAuth
 func (r *postgresRepository) Appointments(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query ="select id, student, teacher, location, time "+
+		query = "select id, student, teacher, location, time " +
 			"from back2school.appointments natural join back2school.isParent " +
-			" where parent = $1"+
+			" where parent = $1" +
 			"order by time desc, teacher asc"
 		args = append(args, who)
 	case AdminUser:
-		query ="select id, student, teacher, location, time "+
-			"from back2school.appointments "+
+		query = "select id, student, teacher, location, time " +
+			"from back2school.appointments " +
 			"order by time desc, teacher asc"
 	default:
 		return nil, ErrorNotAuthorized
@@ -496,19 +620,32 @@ func (r *postgresRepository) Appointments(limit int, offset int, who int, whoKin
 		}, limit, offset)
 }
 
+// LectureByClass(id int, limit int, offset int) (students []interface{}, err error)
+// TODO GradeStudent(grade models.Grade) error
+// TODO
+// parents:
+// see/pay (fake payment) upcoming scheduled payments (monthly, material, trips, err error)
+// admins:
+// everything
+// @Summary Get all students
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Students
+// @Success 200 {array} models.Student
+// @Router /students [get]
 func (r *postgresRepository) Students(limit int, offset int, who int, whoKind string) (student []interface{}, err error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query ="select id, name, surname, mail, info  "+
+		query = "select id, name, surname, mail, info  " +
 			"from back2school.students join back2school.isParent on id=student " +
-			"where parent = $1"+
+			"where parent = $1" +
 			"order by name desc, surname desc"
 		args = append(args, who)
 	case AdminUser:
-		query ="select id, name, surname, mail, info  "+
-			"from back2school.students "+
+		query = "select id, name, surname, mail, info  " +
+			"from back2school.students " +
 			"order by name desc, surname desc"
 	default:
 		return nil, ErrorNotAuthorized
@@ -520,18 +657,24 @@ func (r *postgresRepository) Students(limit int, offset int, who int, whoKind st
 	}, limit, offset, args...)
 }
 
+// Get student by id
+// @Summary Get a student by id
+// @Param id path int true "Student ID"
+// @Tags Students
+// @Success 200 {object} models.Student
+// @Router /students/{id} [get]
 func (r *postgresRepository) StudentByID(id int, who int, whoKind string) (student interface{}, err error) {
 	s := models.Student{}
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query ="SELECT id,	name, surname, mail, info  "+
+		query = "SELECT id,	name, surname, mail, info  " +
 			"FROM back2school.students join back2school.isParent on student = id" +
 			"WHERE id = $1 and parent = $2"
 		args = append(args, id, who)
 	case AdminUser:
-		query ="SELECT id,	name, surname, mail, info  "+
+		query = "SELECT id,	name, surname, mail, info  " +
 			"FROM back2school.students WHERE id = $1"
 	default:
 		return nil, ErrorNotAuthorized
@@ -541,21 +684,29 @@ func (r *postgresRepository) StudentByID(id int, who int, whoKind string) (stude
 	return switchResult(s, err)
 }
 
+// see the grades obtained by their children
+// @Summary Get grades of the student
+// @Param id path int true "Student ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Students
+// @Success 200 {array} models.Grade
+// @Router /students/{id}/grades [get]
 func (r *postgresRepository) GradesByStudent(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query ="SELECT id, student, subject, date, grade, teacher "+
-			"FROM back2school.grades natural join back2school.isParent "+
-			"WHERE student = $1 and parent = $2"+
+		query = "SELECT id, student, subject, date, grade, teacher " +
+			"FROM back2school.grades natural join back2school.isParent " +
+			"WHERE student = $1 and parent = $2" +
 			"order by date desc"
 		args = append(args, id, who)
 		//TODO case ParentUser: //GradesByStudent
 	case AdminUser:
-		query ="SELECT id, student, subject, date, grade, teacher "+
-			"FROM back2school.grades "+
-			"WHERE student = $1 "+
+		query = "SELECT id, student, subject, date, grade, teacher " +
+			"FROM back2school.grades " +
+			"WHERE student = $1 " +
 			"order by date desc"
 		args = append(args, id)
 	default:
@@ -569,6 +720,13 @@ func (r *postgresRepository) GradesByStudent(id int, limit int, offset int, who 
 		}, limit, offset, args...)
 }
 
+// see/modify their personal data
+// Get teacher by id
+// @Summary Get a teacher by id
+// @Param id path int true "Teacher ID"
+// @Tags Teachers
+// @Success 200 {object} models.Teacher
+// @Router /teachers/{id} [get]
 func (r *postgresRepository) TeacherByID(id int, who int, whoKind string) (interface{}, error) {
 	teacher := models.Teacher{}
 	var query string
@@ -584,8 +742,8 @@ func (r *postgresRepository) TeacherByID(id int, who int, whoKind string) (inter
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query ="SELECT id, name, surname, mail  "+
-			"FROM back2school.teachers "+
+		query = "SELECT id, name, surname, mail  " +
+			"FROM back2school.teachers " +
 			"WHERE id = $1"
 		args = append(args, id)
 	default:
@@ -597,6 +755,13 @@ func (r *postgresRepository) TeacherByID(id int, who int, whoKind string) (inter
 
 }
 
+// List all teachers
+// @Summary Get all teachers
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers
+// @Success 200 {array} models.Teacher
+// @Router /teachers [get]
 func (r *postgresRepository) Teachers(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -605,8 +770,8 @@ func (r *postgresRepository) Teachers(limit int, offset int, who int, whoKind st
 		t, err := r.TeacherByID(who, who, whoKind)
 		return []interface{}{t}, err
 	case AdminUser:
-		query ="select id, name, surname, mail, info  "+
-			"from back2school.teachers "+
+		query = "select id, name, surname, mail, info  " +
+			"from back2school.teachers " +
 			"order by name desc, surname desc"
 	default:
 		return nil, ErrorNotAuthorized
@@ -618,6 +783,13 @@ func (r *postgresRepository) Teachers(limit int, offset int, who int, whoKind st
 	}, limit, offset, args...)
 }
 
+// @Summary Get appointments of the teacher
+// @Param id path int true "Teacher ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers
+// @Success 200 {array} models.Appointment
+// @Router /teachers/{id}/appointments [get]
 func (r *postgresRepository) AppointmentsByTeacher(id int, limit int, offset int, who int, whoKind string) (appointments []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -633,9 +805,9 @@ func (r *postgresRepository) AppointmentsByTeacher(id int, limit int, offset int
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query ="SELECT id, student, teacher, location, time "+
-			"FROM back2school.appointments  "+
-			"WHERE teacher = $1 "+
+		query = "SELECT id, student, teacher, location, time " +
+			"FROM back2school.appointments  " +
+			"WHERE teacher = $1 " +
 			"order by time desc"
 		args = append(args, id)
 
@@ -650,24 +822,31 @@ func (r *postgresRepository) AppointmentsByTeacher(id int, limit int, offset int
 		}, limit, offset, args...)
 }
 
+// @Summary Get notifications of the teacher
+// @Param id path int true "Teacher ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers
+// @Success 200 {array} models.TimeTable
+// @Router /teachers/{id}/notifications [get]
 func (r *postgresRepository) NotificationsByTeacher(id int, limit int, offset int, who int, whoKind string) (notifications []interface{}, err error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser:
 		if id == who {
-			query = "SELECT id, receiver, message, receiver_kind, time  "+
-				"FROM back2school.notification "+
-				"WHERE (receiver = $1 and receiver_kind = $2) or receiver_kind = 'general' "+
+			query = "SELECT id, receiver, message, receiver_kind, time  " +
+				"FROM back2school.notification " +
+				"WHERE (receiver = $1 and receiver_kind = $2) or receiver_kind = 'general' " +
 				"order by time desc"
 			args = append(args, who, whoKind)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query = "SELECT id, receiver, message, receiver_kind, time  "+
-			"FROM back2school.notification  "+
-			"WHERE (receiver = $1 and receiver_kind = '" + TeacherUser + "') or receiver_kind = 'general' "+
+		query = "SELECT id, receiver, message, receiver_kind, time  " +
+			"FROM back2school.notification  " +
+			"WHERE (receiver = $1 and receiver_kind = '" + TeacherUser + "') or receiver_kind = 'general' " +
 			"order by time desc"
 		args = append(args, id)
 
@@ -682,6 +861,13 @@ func (r *postgresRepository) NotificationsByTeacher(id int, limit int, offset in
 		}, limit, offset, args...)
 }
 
+// @Summary Get subject taught by the teacher
+// @Param id path int true "Teacher ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Success 200 {object} repository.Subjects
+// @Tags Teachers
+// @Router /teachers/{id}/subjects [get]
 func (r *postgresRepository) SubjectsByTeacher(id int, limit int, offset int, who int, whoKind string) (notifications []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -707,24 +893,32 @@ func (r *postgresRepository) SubjectsByTeacher(id int, limit int, offset int, wh
 		}, limit, offset, args...)
 }
 
+// @Summary Get classes in which the subject is taught by the teacher
+// @Param id path int true "Teacher ID"
+// @Param subject path int true "Subject ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Success 200 {array} models.Class
+// @Tags Teachers
+// @Router /teachers/{id}/subjects/{subject} [get]
 func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int, subject string, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser:
 		if teacher == who {
-			query = "SELECT id, year, section, info, grade "+
-				"FROM back2school.teaches join back2school.classes on id = class  "+
-				"WHERE teacher = $1 and subject = $2 "+
+			query = "SELECT id, year, section, info, grade " +
+				"FROM back2school.teaches join back2school.classes on id = class  " +
+				"WHERE teacher = $1 and subject = $2 " +
 				"order by year desc, grade asc, section desc "
 			args = append(args, who, subject)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query = "SELECT id, year, section, info, grade "+
-			"FROM back2school.teaches join back2school.classes on id = class  "+
-			"WHERE teacher = $1 and subject = $2 "+
+		query = "SELECT id, year, section, info, grade " +
+			"FROM back2school.teaches join back2school.classes on id = class  " +
+			"WHERE teacher = $1 and subject = $2 " +
 			"order by year desc, grade asc, section desc "
 		args = append(args, teacher, subject)
 	default:
@@ -738,24 +932,31 @@ func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int, subject str
 		}, limit, offset, args...)
 }
 
+// @Summary Get lectures taught by the teacher
+// @Param id path int true "Teacher ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers
+// @Success 200 {array} models.TimeTable
+// @Router /teachers/{id}/lectures [get]
 func (r *postgresRepository) LecturesByTeacher(id int, limit int, offset int, who int, whoKind string) (lectures []interface{}, err error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser:
 		if id == who {
-			query = "SELECT id, class, subject, location, start, \"end\", info	 "+
-				"from back2school.timetable natural join back2school.teaches as t "+
-				"where t.teacher = $1 "+
+			query = "SELECT id, class, subject, location, start, \"end\", info	 " +
+				"from back2school.timetable natural join back2school.teaches as t " +
+				"where t.teacher = $1 " +
 				"order by start desc"
 			args = append(args, who)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query = "SELECT id, class, subject, location, start, \"end\", info	 "+
-			"from back2school.timetable natural join back2school.teaches as t "+
-			"where t.teacher = $1 "+
+		query = "SELECT id, class, subject, location, start, \"end\", info	 " +
+			"from back2school.timetable natural join back2school.teaches as t " +
+			"where t.teacher = $1 " +
 			"order by start desc"
 		args = append(args, id)
 	default:
@@ -770,6 +971,13 @@ func (r *postgresRepository) LecturesByTeacher(id int, limit int, offset int, wh
 		}, limit, offset, args...)
 }
 
+// @Summary Get classes in which the teacher teaches
+// @Param id path int true "Teacher ID"
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Teachers
+// @Success 200 {array} models.Class
+// @Router /teachers/{id}/classes [get]
 func (r *postgresRepository) ClassesByTeacher(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	type Class struct {
 		models.Class
@@ -780,18 +988,18 @@ func (r *postgresRepository) ClassesByTeacher(id int, limit int, offset int, who
 	switch whoKind {
 	case TeacherUser:
 		if id == who {
-			query = "SELECT id, year, section, info, grade, subject "+
-				"FROM back2school.teaches join back2school.classes on id = class  "+
-				"WHERE teacher = $1 "+
+			query = "SELECT id, year, section, info, grade, subject " +
+				"FROM back2school.teaches join back2school.classes on id = class  " +
+				"WHERE teacher = $1 " +
 				"order by subject asc, year desc, grade asc, section desc "
 			args = append(args, who)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query = "SELECT id, year, section, info, grade, subject "+
-			"FROM back2school.teaches join back2school.classes on id = class  "+
-			"WHERE teacher = $1 "+
+		query = "SELECT id, year, section, info, grade, subject " +
+			"FROM back2school.teaches join back2school.classes on id = class  " +
+			"WHERE teacher = $1 " +
 			"order by subject asc, year desc, grade asc, section desc "
 		args = append(args, id)
 	default:
@@ -805,6 +1013,12 @@ func (r *postgresRepository) ClassesByTeacher(id int, limit int, offset int, who
 		}, limit, offset, args...)
 }
 
+// @Summary Update teacher's data
+// @Param id path int true "Teacher ID"
+// @Param teacher body models.Teacher true "data"
+// @Tags Teachers
+// @Success 204 {object} models.Teacher
+// @Router /teachers/{id} [put]
 func (r *postgresRepository) UpdateTeacher(teacher models.Teacher, who int, whoKind string) (err error) {
 	var query string
 	var args []interface{}
@@ -829,6 +1043,12 @@ func (r *postgresRepository) UpdateTeacher(teacher models.Teacher, who int, whoK
 	return r.execUpdate(query, args...)
 }
 
+// @Summary Update parents's data
+// @Param id path int true "Parent ID"
+// @Param parent body models.Parent true "data"
+// @Tags Parents
+// @Success 201 {object} models.Parent
+// @Router /parents/{id} [put]
 func (r *postgresRepository) UpdateParent(parent models.Parent, who int, whoKind string) (err error) {
 	var query string
 	var args []interface{}
@@ -843,7 +1063,7 @@ func (r *postgresRepository) UpdateParent(parent models.Parent, who int, whoKind
 			return ErrorNotAuthorized
 		}
 	case AdminUser:
-		query ="UPDATE back2school.parents" +
+		query = "UPDATE back2school.parents" +
 			" SET name = $1, surname = $2, mail = $3, info = $4 " +
 			"where id = $5"
 		args = append(args, parent.Name, parent.Surname, parent.Mail, parent.Info, parent.ID)
@@ -854,15 +1074,21 @@ func (r *postgresRepository) UpdateParent(parent models.Parent, who int, whoKind
 	return r.execUpdate(query, args...)
 }
 
+// @Summary Update student's data
+// @Param id path int true "Student ID"
+// @Param student body models.Student true "data"
+// @Tags Students
+// @Success 201 {object} models.Student
+// @Router /students/{id} [put]
 func (r *postgresRepository) UpdateStudent(student models.Student, who int, whoKind string) (err error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query =  "IF $1 in (select parent from back2school.isParent where student = $2) UPDATE back2school.student" +
-				" SET name = $3, surname = $4, mail = $5, info = $6 " +
-				"where id = $7"
-				args = append(args, who, student.ID, student.Name, student.Surname, student.Mail, student.Info, student.ID)
+		query = "IF $1 in (select parent from back2school.isParent where student = $2) UPDATE back2school.student" +
+			" SET name = $3, surname = $4, mail = $5, info = $6 " +
+			"where id = $7"
+		args = append(args, who, student.ID, student.Name, student.Surname, student.Mail, student.Info, student.ID)
 	case AdminUser:
 		query = "UPDATE back2school.student" +
 			" SET name = $1, surname = $2, mail = $3, info = $4 " +
@@ -874,12 +1100,18 @@ func (r *postgresRepository) UpdateStudent(student models.Student, who int, whoK
 	return r.execUpdate(query, args...)
 }
 
+// @Summary Update appointment's data
+// @Param id path int true "Appointment ID"
+// @Param appointment body models.Appointment true "data"
+// @Tags Appointments
+// @Success 201 {object} models.Appointment
+// @Router /appointments/{id} [put]
 func (r *postgresRepository) UpdateAppointment(appointment models.Appointment, who int, whoKind string) (err error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query =  "if $1 in (select parent from back2school.isParent where student = $2) UPDATE back2school.appointments " +
+		query = "if $1 in (select parent from back2school.isParent where student = $2) UPDATE back2school.appointments " +
 			"SET student = $3, teacher = $4, location = $5, time = $6 where id = $7"
 		args = append(args, who, appointment.Student.ID, appointment.Student.ID, appointment.Teacher.ID, appointment.Location, appointment.Time, appointment.ID)
 	case TeacherUser:
@@ -889,7 +1121,7 @@ func (r *postgresRepository) UpdateAppointment(appointment models.Appointment, w
 			args = append(args, appointment.Student.ID, who, appointment.Location, appointment.Time, appointment.ID)
 		}
 	case AdminUser:
-		query =  "UPDATE back2school.appointments " +
+		query = "UPDATE back2school.appointments " +
 			"SET student = $1, teacher = $2, location = $3, time = $4 where id = $5"
 		args = append(args, appointment.Student.ID, appointment.Teacher.ID, appointment.Location, appointment.Time, appointment.ID)
 	default:
@@ -898,12 +1130,18 @@ func (r *postgresRepository) UpdateAppointment(appointment models.Appointment, w
 	return r.execUpdate(query, args...)
 }
 
+// @Summary Create appointment
+// @Param id path int true "Appointment ID"
+// @Param appointment body models.Appointment true "data"
+// @Tags Appointments
+// @Router /appointments [post]
+// @Success 201 {object} models.Appointment
 func (r *postgresRepository) CreateAppointment(appointment models.Appointment, who int, whoKind string) (id int, err error) {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query =  "if $1 in (select parent from back2school.isParent where student = $2) INSERT INTO back2school.appointments " +
+		query = "if $1 in (select parent from back2school.isParent where student = $2) INSERT INTO back2school.appointments " +
 			" (student, teacher, location, time) VALUES ($3, $4, $5, $6)"
 		args = append(args, who, appointment.Student.ID, appointment.Teacher.ID, appointment.Location, appointment.Time)
 	case TeacherUser:
@@ -924,6 +1162,12 @@ func (r *postgresRepository) CreateAppointment(appointment models.Appointment, w
 	return r.exec(query, args...)
 }
 
+// @Summary Create parent
+// @Tags Parents
+// @Param parent body models.Parent true "data"
+// @Tags Parents
+// @Success 201 {object} models.Parent
+// @Router /parents [post]
 func (r *postgresRepository) CreateParent(parent models.Parent, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "INSERT INTO back2school.parents " +
@@ -934,6 +1178,11 @@ func (r *postgresRepository) CreateParent(parent models.Parent, who int, whoKind
 	}
 }
 
+// @Summary Create teacher
+// @Param teacher body models.Teacher true "data"
+// @Tags Teachers
+// @Router /teachers [post]
+// @Success 201 {object} models.Teacher
 func (r *postgresRepository) CreateTeacher(teacher models.Teacher, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "INSERT INTO back2school.teachers" +
@@ -946,6 +1195,11 @@ func (r *postgresRepository) CreateTeacher(teacher models.Teacher, who int, whoK
 
 }
 
+// @Summary Create student
+// @Param student body models.Student true "data"
+// @Tags Students
+// @Router /students [post]
+// @Success 201 {object} models.Student
 func (r *postgresRepository) CreateStudent(student models.Student, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "INSERT INTO back2school.students" +
@@ -958,6 +1212,11 @@ func (r *postgresRepository) CreateStudent(student models.Student, who int, whoK
 
 }
 
+// @Summary Create class
+// @Param class body models.Class true "data"
+// @Tags Classes
+// @Router /classes [post]
+// @Success 201 {object} models.Class
 func (r *postgresRepository) CreateClass(class models.Class, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "INSERT INTO back2school.classes" +
@@ -970,6 +1229,12 @@ func (r *postgresRepository) CreateClass(class models.Class, who int, whoKind st
 
 }
 
+// @Summary Update Class's data
+// @Param id path int true "Class ID"
+// @Param parent body models.Class true "data"
+// @Tags Classes
+// @Success 201 {object} models.Class
+// @Router /classes/{id} [put]
 func (r *postgresRepository) UpdateClass(class models.Class, who int, whoKind string) (err error) {
 	if whoKind == AdminUser {
 		query := "UPDATE back2school.classes " +
@@ -982,6 +1247,11 @@ func (r *postgresRepository) UpdateClass(class models.Class, who int, whoKind st
 
 }
 
+// @Summary Create notification
+// @Param class body models.Notification true "data"
+// @Tags Notifications
+// @Router /notifications [post]
+// @Success 201 {object} models.Notification
 func (r *postgresRepository) CreateNotification(notification models.Notification, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "insert into back2school.classes " +
@@ -993,6 +1263,13 @@ func (r *postgresRepository) CreateNotification(notification models.Notification
 	}
 
 }
+
+// @Summary Update notification
+// @Param id path int true "Notification ID"
+// @Param class body models.Notification true "data"
+// @Tags Notifications
+// @Router /notifications/{id} [put]
+// @Success 201 {object} models.Notification
 func (r *postgresRepository) UpdateNotification(notification models.Notification, who int, whoKind string) error {
 	if whoKind == AdminUser {
 		query := "UPDATE back2school.notification " +
@@ -1005,6 +1282,11 @@ func (r *postgresRepository) UpdateNotification(notification models.Notification
 
 }
 
+// @Summary Create grade
+// @Param class body models.Grade true "data"
+// @Tags Grades
+// @Router /grades [post]
+// @Success 201 {object} models.Grade
 func (r *postgresRepository) CreateGrade(grade models.Grade, who int, whoKind string) (int, error) {
 	var query string
 	var args []interface{}
@@ -1031,6 +1313,13 @@ func (r *postgresRepository) CreateGrade(grade models.Grade, who int, whoKind st
 
 	return r.exec(query, args...)
 }
+
+// @Summary Update Grade
+// @Param id path int true "Grade ID"
+// @Param class body models.Grade true "data"
+// @Tags Grades
+// @Router /grades/{id} [put]
+// @Success 201 {object} models.Grade
 func (r *postgresRepository) UpdateGrade(grade models.Grade, who int, whoKind string) error {
 	var query string
 	var args []interface{}
@@ -1055,6 +1344,11 @@ func (r *postgresRepository) UpdateGrade(grade models.Grade, who int, whoKind st
 	return r.execUpdate(query, args...)
 }
 
+// @Summary Create payment
+// @Param class body models.Payment true "data"
+// @Tags Payments
+// @Router /payments [post]
+// @Success 201 {object} models.Payment
 func (r *postgresRepository) CreatePayment(payment models.Payment, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "insert into back2school.payments " +
@@ -1065,15 +1359,22 @@ func (r *postgresRepository) CreatePayment(payment models.Payment, who int, whoK
 		return 0, ErrorNotAuthorized
 	}
 }
+
+// @Summary Update payment
+// @Param id path int true "Payment ID"
+// @Param class body models.Payment true "data"
+// @Tags Payments
+// @Router /payments/{id} [put]
+// @Success 201 {object} models.Payment
 func (r *postgresRepository) UpdatePayment(payment models.Payment, who int, whoKind string) error {
 	var query string
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser:
-			query = "if $7 in (select parent from back2school.isParent where student = $2) UPDATE back2school.grades " +
-				"SET amount = $1, student = $2, payed = $3, reason = $4, emitted = $5" +
-				" where id = $6"
-			args = append(args, payment.Amount, payment.Student.ID, payment.Payed, payment.Reason, payment.Emitted, payment.ID, who)
+		query = "if $7 in (select parent from back2school.isParent where student = $2) UPDATE back2school.grades " +
+			"SET amount = $1, student = $2, payed = $3, reason = $4, emitted = $5" +
+			" where id = $6"
+		args = append(args, payment.Amount, payment.Student.ID, payment.Payed, payment.Reason, payment.Emitted, payment.ID, who)
 
 	case AdminUser:
 		query = "UPDATE back2school.grades " +

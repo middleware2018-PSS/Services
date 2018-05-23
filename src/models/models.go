@@ -13,7 +13,7 @@ type Location = string
 // remove connections
 
 type Student struct {
-	ID      int   `json:"id" xml:"id" example:"1"`
+	ID      int     `json:"id" xml:"id" example:"1"`
 	Name    *string `json:"name" xml:"name"`
 	Surname *string `json:"surname" xml:"surname"`
 	Mail    *string `json:"mail" xml:"mail"`
@@ -21,7 +21,7 @@ type Student struct {
 }
 
 type Grade struct {
-	ID      int      `json:"id" xml:"id" example:"1"`
+	ID      int        `json:"id" xml:"id" example:"1"`
 	Student Student    `json:"student" xml:"student"`
 	Subject *string    `json:"subject" xml:"subject" example:"science"`
 	Date    *time.Time `json:"date" xml:"date"`
@@ -30,7 +30,7 @@ type Grade struct {
 }
 
 type Appointment struct {
-	ID       int      `json:"id" xml:"id" example:"1"`
+	ID       int        `json:"id" xml:"id" example:"1"`
 	Time     *time.Time `json:"time" xml:"time"`
 	Location *string    `json:"location" xml:"location" example:"Aula Magna"`
 	Student  Student    `json:"student" xml:"student"`
@@ -38,15 +38,15 @@ type Appointment struct {
 }
 
 type Notification struct {
-	ID           int      `json:"id" xml:"id" example:"1"`
-	Receiver     *int     `json:"receiver" xml:"receiver"`
+	ID           int        `json:"id" xml:"id" example:"1"`
+	Receiver     *int       `json:"receiver" xml:"receiver"`
 	Time         *time.Time `json:"time" xml:"time"`
 	Message      *string    `json:"message" xml:"message"`
 	ReceiverKind *string    `json:"receiver_kind" xml:"receiver_kind"`
 }
 
 type Parent struct {
-	ID      int   `json:"id" xml:"id" example:"1"`
+	ID      int     `json:"id" xml:"id" example:"1"`
 	Name    *string `json:"name" xml:"name"`
 	Surname *string `json:"surname" xml:"surname"`
 	Mail    *string `json:"mail" xml:"mail"`
@@ -54,7 +54,7 @@ type Parent struct {
 }
 
 type Teacher struct {
-	ID      int   `json:"id" xml:"id" example:"1"`
+	ID      int     `json:"id" xml:"id" example:"1"`
 	Name    *string `json:"name" xml:"name"`
 	Surname *string `json:"surname" xml:"surname"`
 	Mail    *string `json:"mail" xml:"mail"`
@@ -62,7 +62,7 @@ type Teacher struct {
 }
 
 type TimeTable struct {
-	ID       int      `json:"id" xml:"id" example:"1"`
+	ID       int        `json:"id" xml:"id" example:"1"`
 	Class    Class      `json:"class" xml:"class"`
 	Location *string    `json:"location" xml:"location" example:"Aula Magna"`
 	Subject  *string    `json:"subject" xml:"subject" example:"science"`
@@ -72,7 +72,7 @@ type TimeTable struct {
 }
 
 type Payment struct {
-	ID      int      `json:"id" xml:"id" example:"1"`
+	ID      int        `json:"id" xml:"id" example:"1"`
 	Amount  *int       `json:"amount" xml:"amount"`
 	Payed   *bool      `json:"payed" xml:"payed"`
 	Emitted *time.Time `json:"emitted" xml:"emitted"`
@@ -81,7 +81,7 @@ type Payment struct {
 }
 
 type Class struct {
-	ID      int   `json:"id" xml:"id" example:"1"`
+	ID      int     `json:"id" xml:"id" example:"1"`
 	Year    *int    `json:"year" xml:"year"`
 	Section *string `json:"section" xml:"section"` // as "A" in 5'A
 	Grade   *int    `json:"grade" xml:"grade"`     // as "5" in 5'A

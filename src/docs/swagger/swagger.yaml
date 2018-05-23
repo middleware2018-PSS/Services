@@ -1,29 +1,4 @@
 definitions:
-  controller.Subjects:
-    properties:
-      subjects:
-        example:
-        - science
-        items:
-          type: string
-        type: array
-    type: object
-  controller.Token:
-    properties:
-      expire:
-        type: string
-      token:
-        type: string
-    type: object
-  models.Account:
-    properties:
-      password:
-        example: Password
-        type: string
-      username:
-        example: John
-        type: string
-    type: object
   models.Appointment:
     properties:
       id:
@@ -164,6 +139,15 @@ definitions:
       subject:
         example: science
         type: string
+    type: object
+  repository.Subjects:
+    properties:
+      subjects:
+        example:
+        - science
+        items:
+          type: string
+        type: array
     type: object
   representations.List:
     properties:
@@ -353,6 +337,32 @@ paths:
       summary: Update Class's data
       tags:
       - Classes
+  /classes/{id}/lectures:
+    get:
+      parameters:
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Appointment'
+            type: array
+      summary: Get a lecture by class
+      tags:
+      - Lectures
   /classes/{id}/students:
     get:
       parameters:
@@ -458,25 +468,6 @@ paths:
       summary: Update Grade
       tags:
       - Grades
-  /login:
-    post:
-      parameters:
-      - description: Add account
-        in: body
-        name: account
-        required: true
-        schema:
-          $ref: '#/definitions/models.Account'
-          type: object
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controller.Token'
-            type: object
-      summary: Get a login token
-      tags:
-      - Auth
   /notifications:
     get:
       parameters:
@@ -862,15 +853,7 @@ paths:
   /students/{id}:
     get:
       parameters:
-      - description: number of elements to return
-        in: query
-        name: limit
-        type: integer
-      - description: offset in the list of elements to return
-        in: query
-        name: offset
-        type: integer
-      - description: Class ID
+      - description: Student ID
         in: path
         name: id
         required: true
@@ -879,10 +862,9 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.Appointment'
-            type: array
-      summary: Get a lecture by class
+            $ref: '#/definitions/models.Student'
+            type: object
+      summary: Get a student by id
       tags:
       - Students
     put:
@@ -1137,7 +1119,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/controller.Subjects'
+            $ref: '#/definitions/repository.Subjects'
             type: object
       summary: Get subject taught by the teacher
       tags:

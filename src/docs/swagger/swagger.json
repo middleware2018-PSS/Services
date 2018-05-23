@@ -263,6 +263,46 @@
                 }
             }
         },
+        "/classes/{id}/lectures": {
+            "get": {
+                "tags": [
+                    "Lectures"
+                ],
+                "summary": "Get a lecture by class",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "number of elements to return",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "offset in the list of elements to return",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Appointment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/classes/{id}/students": {
             "get": {
                 "tags": [
@@ -418,35 +458,6 @@
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.Grade"
-                        }
-                    }
-                }
-            }
-        },
-        "/login": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Get a login token",
-                "parameters": [
-                    {
-                        "description": "Add account",
-                        "name": "account",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.Account"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/controller.Token"
                         }
                     }
                 }
@@ -1039,23 +1050,11 @@
                 "tags": [
                     "Students"
                 ],
-                "summary": "Get a lecture by class",
+                "summary": "Get a student by id",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "number of elements to return",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "offset in the list of elements to return",
-                        "name": "offset",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Class ID",
+                        "description": "Student ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1065,10 +1064,8 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Appointment"
-                            }
+                            "type": "object",
+                            "$ref": "#/definitions/models.Student"
                         }
                     }
                 }
@@ -1460,7 +1457,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/controller.Subjects"
+                            "$ref": "#/definitions/repository.Subjects"
                         }
                     }
                 }
@@ -1515,44 +1512,6 @@
         }
     },
     "definitions": {
-        "controller.Subjects": {
-            "type": "object",
-            "properties": {
-                "subjects": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "science"
-                    ]
-                }
-            }
-        },
-        "controller.Token": {
-            "type": "object",
-            "properties": {
-                "expire": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Account": {
-            "type": "object",
-            "properties": {
-                "password": {
-                    "type": "string",
-                    "example": "Password"
-                },
-                "username": {
-                    "type": "string",
-                    "example": "John"
-                }
-            }
-        },
         "models.Appointment": {
             "type": "object",
             "properties": {
@@ -1757,6 +1716,20 @@
                 "subject": {
                     "type": "string",
                     "example": "science"
+                }
+            }
+        },
+        "repository.Subjects": {
+            "type": "object",
+            "properties": {
+                "subjects": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "science"
+                    ]
                 }
             }
         },

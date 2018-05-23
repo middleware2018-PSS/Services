@@ -2,11 +2,8 @@ package main
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"fmt"
-	"log"
-	"net/http"
-	"strconv"
-	"strings"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	_ "github.com/middleware2018-PSS/Services/src/docs"
@@ -16,12 +13,15 @@ import (
 	"github.com/pkg/errors"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
-	"encoding/base64"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
 )
 
 var (
 	LimitError = errors.New("Limit Must Be Greater Than Zero.")
-	REALM = ""
+	REALM      = ""
 )
 
 // @title Back2School API
@@ -60,11 +60,11 @@ func main() {
 	g := gin.Default()
 	//g.POST("/login", authMiddleware.LoginHandler)
 
-	api := g.Group("", checkBasicUserPassword(con))//, authMiddleware.MiddlewareFunc())
+	api := g.Group("", checkBasicUserPassword(con)) //, authMiddleware.MiddlewareFunc())
 
 	//api.GET("/refresh_token", authMiddleware.RefreshHandler)
 
-	api.POST("/parents", /*authAdmin(authMiddleware.Realm),*/ func(c *gin.Context) {
+	api.POST("/parents" /*authAdmin(authMiddleware.Realm),*/, func(c *gin.Context) {
 		var p models.Parent
 		if err := c.ShouldBind(&p); err == nil {
 			who, whoKind := idKind(c)
@@ -75,12 +75,12 @@ func main() {
 		}
 	})
 
-	parent := api.Group("/parents/:id")//, authAdminOrParent(authMiddleware.Realm))
+	parent := api.Group("/parents/:id") //, authAdminOrParent(authMiddleware.Realm))
 	{
 		parent.GET("", byID("id", con.ParentByID))
 		// TODO add admin auth on Post
 
-		parent.PUT("" ,func(c *gin.Context) {
+		parent.PUT("", func(c *gin.Context) {
 			// not possible to refactor (at the best of my knowledge)
 			var p models.Parent
 			if err := c.ShouldBind(&p); err == nil {
@@ -153,7 +153,7 @@ func main() {
 		teachers.GET("/classes", byIDWithOffsetAndLimit("id", con.ClassesByTeacher))
 	}
 
-	api.GET("/appointments", /*authAdmin(authMiddleware.Realm),*/ getOffsetLimit(con.Appointments))
+	api.GET("/appointments" /*authAdmin(authMiddleware.Realm),*/, getOffsetLimit(con.Appointments))
 	api.GET("/appointments/:appointment", byID("appointment", con.AppointmentByID))
 	api.PUT("/appointments/:appointment", func(c *gin.Context) {
 		var a models.Appointment
@@ -211,7 +211,7 @@ func main() {
 		var s models.Notification
 		if err := c.ShouldBind(&s); err == nil {
 			who, whoKind := idKind(c)
-			if id, err := con.CreateNotification(s,who, whoKind); err != nil {
+			if id, err := con.CreateNotification(s, who, whoKind); err != nil {
 				s.ID = id
 				c.JSON(http.StatusCreated, s)
 			}
@@ -303,7 +303,7 @@ func offsetLimit(c *gin.Context) (int, int) {
 	return offset, limit
 }
 
-func idKind(c *gin.Context) (int, string){
+func idKind(c *gin.Context) (int, string) {
 	who := c.MustGet(repository.USER).(int)
 	kind := c.MustGet(repository.KIND).(string)
 	return who, kind
@@ -375,7 +375,7 @@ func next(uri string, offset int, limit int, input []interface{}) string {
 func checkBasicUserPassword(con repository.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := strings.Fields(c.GetHeader("Authorization"))
-		if len(auth) == 0{
+		if len(auth) == 0 {
 			unauthorized(c)
 			return
 		}
@@ -393,7 +393,7 @@ func checkBasicUserPassword(con repository.Repository) gin.HandlerFunc {
 
 func unauthorized(c *gin.Context) {
 	c.Header("WWW-Authenticate", REALM)
-	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error":"unauthorized access"})
+	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized access"})
 }
 
 func negotiate(data interface{}) gin.Negotiate {
