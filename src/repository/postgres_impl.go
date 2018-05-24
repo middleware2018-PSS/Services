@@ -168,12 +168,12 @@ func (r *postgresRepository) StudentsByClass(id int, limit int, offset int, who 
 }
 
 //TODO add entrypoint !!!
-// @Summary Get a lecture by class
+// @Summary Get lectures by class
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Param id path int true "Class ID"
 // @Tags Lectures
-// @Success 200 {array} models.Appointment
+// @Success 200 {array} models.TimeTable
 // @Router /classes/{id}/lectures [get]
 func (r *postgresRepository) LectureByClass(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
@@ -323,7 +323,7 @@ func (r *postgresRepository) Grades(limit int, offset int, who int, whoKind stri
 	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			g := models.Grade{}
-			err := rows.Scan(&g.ID, &g.Student.ID, &g.Grade, &g.Subject, &g.Date, &g.Teacher)
+			err := rows.Scan(&g.ID, &g.Student.ID, &g.Grade, &g.Subject, &g.Date, &g.Teacher.ID)
 			return g, err
 		}, limit, offset, args...)
 }
@@ -524,7 +524,7 @@ func (r *postgresRepository) AppointmentsByParent(id int, limit int, offset int,
 	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			appointment := models.Appointment{}
-			err := rows.Scan(&appointment.ID, &appointment.Student, &appointment.Teacher, &appointment.Location, &appointment.Time)
+			err := rows.Scan(&appointment.ID, &appointment.Student.ID, &appointment.Teacher.ID, &appointment.Location, &appointment.Time)
 			return appointment, err
 		}, limit, offset, args...)
 }
@@ -1385,4 +1385,78 @@ func (r *postgresRepository) UpdatePayment(payment models.Payment, who int, whoK
 		return ErrorNotAuthorized
 	}
 	return r.execUpdate(query, args...)
+}
+
+// @Summary Get all lectures
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Lectures
+// @Success 200 {array} models.TimeTable
+// @Router /lectures [get]
+func (r *postgresRepository) Lectures(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
+	var query string
+	var args []interface{}
+	switch whoKind {
+	case ParentUser:
+		query = "select id, class, subject, \"start\", \"end\", location, info " +
+			"from back2school.timetable natural join back2school.enrolled natural join back2school.isParent " +
+			"where parent = $1" +
+			"order by \"start\" desc"
+		args = append(args, who)
+	case TeacherUser:
+		query = "select id, class, subject, \"start\", \"end\", location, info " +
+			"from back2school.timetable natural join back2school.teaches " +
+			"where teacher = $1" +
+			"order by \"start\" desc"
+		args = append(args, who)
+	case AdminUser:
+		query =  "select id, class, subject, \"start\", \"end\", location, info " +
+			"from back2school.timetable " +
+			"order by \"start\" desc"
+	default:
+		return nil, ErrorNotAuthorized
+	}
+	return r.listByParams(query, func(rows *sql.Rows) (interface{}, error) {
+		lecture := models.TimeTable{}
+		err := rows.Scan(&lecture.ID, &lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
+		return lecture, err
+	}, limit, offset, args...)
+}
+
+
+// @Summary Get a lecture by id
+// @Param id path int true "Lecture ID"
+// @Tags Grades
+// @Success 200 {object} models.TimeTable
+// @Router /lectures/{id} [get]
+func (r *postgresRepository) LectureByID(id int, who int, whoKind string) (interface{}, error) {
+	grade := models.Grade{}
+	var query string
+	var args []interface{}
+	switch whoKind {
+	case ParentUser:
+		query = "select id, class, subject, \"start\", \"end\", location, info " +
+			"from back2school.timetable natural join back2school.enrolled natural join back2school.isParent " +
+			"where id = $1 and parent = $2" +
+			"order by \"start\" desc"
+		args = append(args, id, who)
+	case TeacherUser:
+		query = "select id, class, subject, \"start\", \"end\", location, info " +
+			"from back2school.timetable natural join back2school.teaches " +
+			"where id = $1 and teacher = $2" +
+			"order by \"start\" desc"
+		args = append(args, id, who)
+	case AdminUser:
+		query = "select id, class, subject, \"start\", \"end\", location, info " +
+			"from back2school.timetable " +
+			"where id = $1" +
+			"order by \"start\" desc"
+		args = append(args, id)
+
+	default:
+		return nil, ErrorNotAuthorized
+	}
+	err := r.QueryRow(query, id, who).Scan(
+		&grade.ID, &grade.Student.ID, &grade.Teacher.ID, &grade.Subject, &grade.Date, &grade.Grade)
+	return switchResult(grade, err)
 }

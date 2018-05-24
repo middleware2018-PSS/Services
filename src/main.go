@@ -24,6 +24,8 @@ var (
 	REALM      = ""
 )
 
+const HAL  = "application/hal+json"
+
 // @title Back2School API
 // @version 1.0
 // @description These are a School management system's API .
@@ -166,6 +168,8 @@ func main() {
 			}
 		}
 	})
+	api.GET("/lectures", getOffsetLimit(con.Lectures))
+	api.GET("/lectures/:id", byID("id", con.LectureByID))
 
 	api.GET("/parents", getOffsetLimit(con.Parents))
 	api.GET("/grades", getOffsetLimit(con.Grades))
@@ -290,7 +294,7 @@ func byID(key string, f func(int, int, string) (interface{}, error)) func(c *gin
 		id, err := strconv.Atoi(c.Param(key))
 		who, whoKind := idKind(c)
 		res, err := f(id, who, whoKind)
-		res, _ = representations.ToRepresentation(res, c)
+		res, _ = representations.ToRepresentation(res, c, checkHAL(c))
 		handleErr(err, res, c)
 	}
 
@@ -317,7 +321,7 @@ func getOffsetLimit(f func(int, int, int, string) ([]interface{}, error)) func(c
 		if limit > 0 {
 			res, err := f(limit, offset, who, whoKind)
 			for i, el := range res {
-				res[i], _ = representations.ToRepresentation(el, c)
+				res[i], _ = representations.ToRepresentation(el, c, checkHAL(c))
 			}
 			handleErr(err, res, c)
 		} else {
@@ -336,7 +340,7 @@ func byIDWithOffsetAndLimit(id string, f func(int, int, int, int, string) ([]int
 		res, err := f(id, limit, offset, who, whoKind)
 		for i, el := range res {
 			//TODO handle err
-			res[i], _ = representations.ToRepresentation(el, c)
+			res[i], _ = representations.ToRepresentation(el, c, checkHAL(c))
 		}
 		result := representations.List{
 			Self:     c.Request.RequestURI,
@@ -416,4 +420,9 @@ func handleErr(err error, res interface{}, c *gin.Context) {
 	} else {
 		c.JSON(http.StatusNoContent, nil)
 	}
+}
+
+func checkHAL(c *gin.Context) bool{
+	return 	strings.Contains(c.GetHeader("Accept"), HAL)
+
 }

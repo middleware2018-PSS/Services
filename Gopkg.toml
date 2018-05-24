@@ -52,3 +52,7 @@
 [[constraint]]
   name = "github.com/swaggo/swag"
   version = "1.1.1"
+
+[[constraint]]
+  name = "github.com/nvellon/hal"
+  branch = "master"

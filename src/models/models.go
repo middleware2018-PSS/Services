@@ -2,6 +2,7 @@ package models
 
 import (
 	"time"
+	"github.com/nvellon/hal"
 )
 
 type ID = int
@@ -13,7 +14,7 @@ type Location = string
 // remove connections
 
 type Student struct {
-	ID      int     `json:"id" xml:"id" example:"1"`
+	ID      int     `json:"-" xml:"id" example:"1"`
 	Name    *string `json:"name" xml:"name"`
 	Surname *string `json:"surname" xml:"surname"`
 	Mail    *string `json:"mail" xml:"mail"`
@@ -21,7 +22,7 @@ type Student struct {
 }
 
 type Grade struct {
-	ID      int        `json:"id" xml:"id" example:"1"`
+	ID      int        `json:"-" xml:"id" example:"1"`
 	Student Student    `json:"student" xml:"student"`
 	Subject *string    `json:"subject" xml:"subject" example:"science"`
 	Date    *time.Time `json:"date" xml:"date"`
@@ -30,7 +31,7 @@ type Grade struct {
 }
 
 type Appointment struct {
-	ID       int        `json:"id" xml:"id" example:"1"`
+	ID       int        `json:"-" xml:"id" example:"1"`
 	Time     *time.Time `json:"time" xml:"time"`
 	Location *string    `json:"location" xml:"location" example:"Aula Magna"`
 	Student  Student    `json:"student" xml:"student"`
@@ -38,7 +39,7 @@ type Appointment struct {
 }
 
 type Notification struct {
-	ID           int        `json:"id" xml:"id" example:"1"`
+	ID           int        `json:"-" xml:"id" example:"1"`
 	Receiver     *int       `json:"receiver" xml:"receiver"`
 	Time         *time.Time `json:"time" xml:"time"`
 	Message      *string    `json:"message" xml:"message"`
@@ -46,7 +47,7 @@ type Notification struct {
 }
 
 type Parent struct {
-	ID      int     `json:"id" xml:"id" example:"1"`
+	ID      int     `json:"-" xml:"id" example:"1"`
 	Name    *string `json:"name" xml:"name"`
 	Surname *string `json:"surname" xml:"surname"`
 	Mail    *string `json:"mail" xml:"mail"`
@@ -54,7 +55,7 @@ type Parent struct {
 }
 
 type Teacher struct {
-	ID      int     `json:"id" xml:"id" example:"1"`
+	ID      int     `json:"-" xml:"id" example:"1"`
 	Name    *string `json:"name" xml:"name"`
 	Surname *string `json:"surname" xml:"surname"`
 	Mail    *string `json:"mail" xml:"mail"`
@@ -62,7 +63,7 @@ type Teacher struct {
 }
 
 type TimeTable struct {
-	ID       int        `json:"id" xml:"id" example:"1"`
+	ID       int        `json:"-" xml:"id" example:"1"`
 	Class    Class      `json:"class" xml:"class"`
 	Location *string    `json:"location" xml:"location" example:"Aula Magna"`
 	Subject  *string    `json:"subject" xml:"subject" example:"science"`
@@ -71,8 +72,9 @@ type TimeTable struct {
 	Info     *string    `json:"info" xml:"info"`
 }
 
+
 type Payment struct {
-	ID      int        `json:"id" xml:"id" example:"1"`
+	ID      int        `json:"-" xml:"id" example:"1"`
 	Amount  *int       `json:"amount" xml:"amount"`
 	Payed   *bool      `json:"payed" xml:"payed"`
 	Emitted *time.Time `json:"emitted" xml:"emitted"`
@@ -81,7 +83,7 @@ type Payment struct {
 }
 
 type Class struct {
-	ID      int     `json:"id" xml:"id" example:"1"`
+	ID      int     `json:"-" xml:"id" example:"1"`
 	Year    *int    `json:"year" xml:"year"`
 	Section *string `json:"section" xml:"section"` // as "A" in 5'A
 	Grade   *int    `json:"grade" xml:"grade"`     // as "5" in 5'A
@@ -91,4 +93,29 @@ type Class struct {
 type Account struct {
 	Username string `form:"username" json:"username" binding:"required" example:"John"`
 	Password string `form:"password" json:"password" binding:"required" example:"Password"`
+}
+
+func (t TimeTable) GetMap() hal.Entry{
+	return hal.Entry{
+		"location" : t.Location,
+		"subject" : t.Subject,
+		"start" : t.Start,
+		"end" : t.End,
+		"info" : t.Info,
+	}
+}
+
+func (t Appointment) GetMap() hal.Entry{
+	return hal.Entry{
+		"time" : t.Time,
+		"location" : t.Location,
+	}
+}
+
+func (t Grade) GetMap() hal.Entry{
+	return hal.Entry{
+		"grade" : t.Grade,
+		"subject" : t.Subject,
+		"date" : t.Date,
+		}
 }

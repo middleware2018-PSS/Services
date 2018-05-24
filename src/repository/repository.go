@@ -11,16 +11,6 @@ const (
 	AdminUser   = "Admin"
 	ParentUser  = "Parent"
 	TeacherUser = "Teacher"
-	GET         = "GET"
-	PUT         = "PUT"
-	POST        = "POST"
-	ALL         = iota
-	CLASS
-	PARENT
-	TEACHER
-	ADM
-	STUDENT
-	APPOINTMENT
 )
 
 var (
@@ -89,7 +79,7 @@ type Repository interface {
 	// see/pay (fake payment) upcoming scheduled payments (monthly, material, trips, err error)
 	// admins:
 	// everything
-
+	Lectures(limit int, offset int, who int, whoKind string) ([]interface{}, error)
 	Students(limit int, offset int, who int, whoKind string) ([]interface{}, error)
 	Teachers(limit int, offset int, who int, whoKind string) ([]interface{}, error)
 	Parents(limit int, offset int, who int, whoKind string) ([]interface{}, error)
