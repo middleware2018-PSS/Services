@@ -105,9 +105,9 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/nvellon/hal"
+  name = "github.com/phisco/hal"
   packages = ["."]
-  revision = "30599563a375f1ab0dff0dc2f5612e3afd2ceed8"
+  revision = "9f02c233fa231d8850e4a7ad6925df16d22e64b8"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -190,6 +190,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "0420477ad55b55c2c2f4e05fb83479396fc214cab5ba32f202780deaa7aea9f0"
+  inputs-digest = "5855f635b5285ba2350d510894b80f4e738c4053bedc305cd9ac8b7adcac105a"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -41,18 +41,18 @@
   go-tests = true
   unused-packages = true
 
-[[constraint]]
-  name = "github.com/appleboy/gin-jwt"
-  version = "2.3.1"
+#[[constraint]]
+#  name = "github.com/appleboy/gin-jwt"
+#  version = "2.3.1"
 
 [[constraint]]
   branch = "master"
   name = "github.com/swaggo/gin-swagger"
 
 [[constraint]]
-  name = "github.com/swaggo/swag"
-  version = "1.1.1"
+  branch = "master"
+  name = "github.com/phisco/hal"
 
 [[constraint]]
-  name = "github.com/nvellon/hal"
-  branch = "master"
+  name = "github.com/swaggo/swag"
+  version = "1.1.1"

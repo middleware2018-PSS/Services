@@ -9,7 +9,7 @@ import (
 	_ "github.com/middleware2018-PSS/Services/src/docs"
 	"github.com/middleware2018-PSS/Services/src/models"
 	"github.com/middleware2018-PSS/Services/src/repository"
-	"github.com/middleware2018-PSS/Services/src/representations"
+	"github.com/phisco/hal"
 	"github.com/pkg/errors"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
@@ -24,7 +24,7 @@ var (
 	REALM      = ""
 )
 
-const HAL  = "application/hal+json"
+const HAL = "application/hal+json"
 
 // @title Back2School API
 // @version 1.0
@@ -288,13 +288,15 @@ func main() {
 	g.Run(":5000")
 }
 
+// UTIL FUNCTIONS
+
 func byID(key string, f func(int, int, string) (interface{}, error)) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// TODO: check err
 		id, err := strconv.Atoi(c.Param(key))
 		who, whoKind := idKind(c)
 		res, err := f(id, who, whoKind)
-		res, _ = representations.ToRepresentation(res, c, checkHAL(c))
+		res, _ = ToRepresentation(res, c, checkHAL(c))
 		handleErr(err, res, c)
 	}
 
@@ -320,15 +322,33 @@ func getOffsetLimit(f func(int, int, int, string) ([]interface{}, error)) func(c
 		who, whoKind := idKind(c)
 		if limit > 0 {
 			res, err := f(limit, offset, who, whoKind)
-			for i, el := range res {
-				res[i], _ = representations.ToRepresentation(el, c, checkHAL(c))
+			if err == nil {
+				h := checkHAL(c)
+				for i, el := range res {
+					res[i], _ = ToRepresentation(el, c, h)
+				}
+				if h {
+					halList(c, &res, err, next(c.Request.RequestURI, offset, limit, res), prev(c.Request.RequestURI, offset, limit))
+				} else {
+					handleErr(err, &res, c)
+				}
 			}
-			handleErr(err, res, c)
 		} else {
 			handleErr(LimitError, nil, c)
 		}
 
 	}
+}
+
+func halList(c *gin.Context, res *[]interface{}, err error, next string, prev string) {
+	halRes := hal.NewResource(models.List{Previous: prev, Next: next}, c.Request.RequestURI)
+	uri := strings.Split(c.Request.RequestURI, "/")
+	embeddedLink := uri[len(uri)-1]
+	for _, el := range *res {
+		el.(*hal.Resource).Links = hal.LinkRelations{"self": el.(*hal.Resource).Links["self"]}
+		halRes.Embed(hal.Relation(embeddedLink), el.(*hal.Resource))
+	}
+	handleErr(err, halRes, c)
 }
 
 func byIDWithOffsetAndLimit(id string, f func(int, int, int, int, string) ([]interface{}, error)) func(c *gin.Context) {
@@ -338,17 +358,22 @@ func byIDWithOffsetAndLimit(id string, f func(int, int, int, int, string) ([]int
 		who, whoKind := idKind(c)
 		offset, limit := offsetLimit(c)
 		res, err := f(id, limit, offset, who, whoKind)
+		h := checkHAL(c)
 		for i, el := range res {
 			//TODO handle err
-			res[i], _ = representations.ToRepresentation(el, c, checkHAL(c))
+			res[i], _ = ToRepresentation(el, c, h)
 		}
-		result := representations.List{
-			Self:     c.Request.RequestURI,
-			Data:     res,
-			Next:     next(c.Request.RequestURI, offset, limit, res),
-			Previous: prev(c.Request.RequestURI, offset, limit),
+		if !h {
+			result := models.List{
+				Self:     c.Request.RequestURI,
+				Data:     res,
+				Next:     next(c.Request.RequestURI, offset, limit, res),
+				Previous: prev(c.Request.RequestURI, offset, limit),
+			}
+			handleErr(err, result, c)
+		} else {
+			halList(c, &res, err, next(c.Request.RequestURI, offset, limit, res), prev(c.Request.RequestURI, offset, limit))
 		}
-		handleErr(err, result, c)
 	}
 }
 
@@ -400,10 +425,14 @@ func unauthorized(c *gin.Context) {
 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized access"})
 }
 
-func negotiate(data interface{}) gin.Negotiate {
-	return gin.Negotiate{
-		Offered: []string{gin.MIMEJSON, gin.MIMEXML},
-		Data:    data,
+func negotiate(data interface{}, c *gin.Context, status int) {
+	if !checkHAL(c) {
+		c.Negotiate(status, gin.Negotiate{
+			Offered: []string{gin.MIMEJSON, gin.MIMEXML},
+			Data:    data,
+		})
+	} else {
+		c.JSON(status, data)
 	}
 }
 
@@ -411,18 +440,32 @@ func handleErr(err error, res interface{}, c *gin.Context) {
 	if res != nil {
 		switch err {
 		case nil:
-			c.Negotiate(http.StatusOK, negotiate(res))
+			negotiate(res, c, http.StatusOK)
 		case repository.ErrNoResult:
-			c.Negotiate(http.StatusNotFound, negotiate(gin.H{"error": err.Error()}))
+			negotiate(gin.H{"error": err.Error()}, c, http.StatusNotFound)
 		default:
-			c.Negotiate(http.StatusBadRequest, negotiate(gin.H{"error": err.Error()}))
+			negotiate(gin.H{"error": err.Error()}, c, http.StatusBadRequest)
 		}
 	} else {
 		c.JSON(http.StatusNoContent, nil)
 	}
 }
 
-func checkHAL(c *gin.Context) bool{
-	return 	strings.Contains(c.GetHeader("Accept"), HAL)
+func checkHAL(c *gin.Context) bool {
+	return strings.HasPrefix(c.GetHeader("Accept"), HAL)
 
+}
+
+func ToRepresentation(res interface{}, c *gin.Context, halF bool) (interface{}, error) {
+	if r, ok := res.(models.Repr); ok {
+		return r.GetRepresentation(halF)
+	} else {
+		return &struct {
+			Self string      `json:"self",xml:"self"`
+			Data interface{} `json:"data",xml:"data"`
+		}{
+			c.Request.RequestURI,
+			res,
+		}, nil
+	}
 }

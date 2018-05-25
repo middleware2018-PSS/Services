@@ -1410,7 +1410,7 @@ func (r *postgresRepository) Lectures(limit int, offset int, who int, whoKind st
 			"order by \"start\" desc"
 		args = append(args, who)
 	case AdminUser:
-		query =  "select id, class, subject, \"start\", \"end\", location, info " +
+		query = "select id, class, subject, \"start\", \"end\", location, info " +
 			"from back2school.timetable " +
 			"order by \"start\" desc"
 	default:
@@ -1422,7 +1422,6 @@ func (r *postgresRepository) Lectures(limit int, offset int, who int, whoKind st
 		return lecture, err
 	}, limit, offset, args...)
 }
-
 
 // @Summary Get a lecture by id
 // @Param id path int true "Lecture ID"
