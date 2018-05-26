@@ -46,25 +46,9 @@ func main() {
 	defer db.Close()
 	con := repository.NewPostgresRepository(db)
 
-	//con := controller.NewController(r)
-
-	/*authMiddleware := jwt.GinJWTMiddleware{
-		Realm:      "test",
-		Key:        []byte("password"),
-		Timeout:    time.Hour,
-		MaxRefresh: time.Hour,
-		Authenticator: func(userID string, password string, c *gin.Context) (string, bool) {
-			return con.CheckUser(userID, password)
-		},
-		PayloadFunc: con.UserKind,
-	}*/
-
 	g := gin.Default()
-	//g.POST("/login", authMiddleware.LoginHandler)
 
 	api := g.Group("", checkBasicUserPassword(con)) //, authMiddleware.MiddlewareFunc())
-
-	//api.GET("/refresh_token", authMiddleware.RefreshHandler)
 
 	api.POST("/parents" /*authAdmin(authMiddleware.Realm),*/, func(c *gin.Context) {
 		var p models.Parent
@@ -209,7 +193,6 @@ func main() {
 	})
 	api.GET("/students/:id", byID("id", con.StudentByID))
 	api.GET("/students/:id/grades", byIDWithOffsetAndLimit("id", con.GradesByStudent))
-
 	api.GET("/notifications", getOffsetLimit(con.Notifications))
 	api.POST("/notifications", func(c *gin.Context) {
 		var s models.Notification
@@ -258,7 +241,6 @@ func main() {
 	})
 
 	api.GET("/teachers", getOffsetLimit(con.Teachers))
-
 	api.GET("/classes", getOffsetLimit(con.Classes))
 	api.GET("/classes/:id", byID("id", con.ClassByID))
 	api.PUT("/classes/:id", func(c *gin.Context) {
@@ -332,6 +314,8 @@ func getOffsetLimit(f func(int, int, int, string) ([]interface{}, error)) func(c
 				} else {
 					handleErr(err, &res, c)
 				}
+			} else {
+				handleErr(repository.ErrNoResult, nil, c)
 			}
 		} else {
 			handleErr(LimitError, nil, c)
