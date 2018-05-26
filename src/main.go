@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"fmt"
+	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	_ "github.com/middleware2018-PSS/Services/src/docs"
@@ -17,12 +18,18 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
 	LimitError = errors.New("Limit Must Be Greater Than Zero.")
 	REALM      = ""
 )
+
+type JwtData struct {
+	Id   int
+	Role string
+}
 
 const HAL = "application/hal+json"
 
@@ -46,11 +53,36 @@ func main() {
 	defer db.Close()
 	con := repository.NewPostgresRepository(db)
 
+	authMiddleware := jwt.GinJWTMiddleware{
+		Realm:      "test",
+		Key:        []byte("password"),
+		Timeout:    time.Hour,
+		MaxRefresh: time.Hour,
+		Authenticator: func(userID string, password string, c *gin.Context) (interface{}, bool) {
+			id, kind, ok := con.CheckUser(userID, password)
+			return JwtData{id, kind}, ok
+		},
+		PayloadFunc: func(data interface{}) map[string]interface{} {
+			return map[string]interface{}{
+				repository.USER:   data.(JwtData).Id,
+				repository.KIND: data.(JwtData).Role,
+			}
+		},
+	}
+
 	g := gin.Default()
 
-	api := g.Group("", checkBasicUserPassword(con)) //, authMiddleware.MiddlewareFunc())
+	g.POST("/login", authMiddleware.LoginHandler)
 
-	api.POST("/parents" /*authAdmin(authMiddleware.Realm),*/, func(c *gin.Context) {
+	api := g.Group("", authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
+		claims := jwt.ExtractClaims(c)
+		c.Set(repository.USER, claims[repository.USER])
+		c.Set(repository.KIND, claims[repository.KIND])
+	}) // checkBasicUserPassword(con))
+
+	api.GET("/refresh_token", authMiddleware.RefreshHandler)
+
+	api.POST("/parents", func(c *gin.Context) {
 		var p models.Parent
 		if err := c.ShouldBind(&p); err == nil {
 			who, whoKind := idKind(c)
@@ -292,7 +324,7 @@ func offsetLimit(c *gin.Context) (int, int) {
 }
 
 func idKind(c *gin.Context) (int, string) {
-	who := c.MustGet(repository.USER).(int)
+	who := int(c.MustGet(repository.USER).(float64))
 	kind := c.MustGet(repository.KIND).(string)
 	return who, kind
 }
