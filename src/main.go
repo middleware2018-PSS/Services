@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/base64"
 	"fmt"
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
@@ -68,14 +67,14 @@ func main() {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 
-	db, err := sql.Open("postgres", "user="+viper.GetString("DBuser")+
-		" dbname="+viper.GetString("DB")+" sslmode=disable")
+	db, err := sql.Open("postgres", viper.GetString("DBparams"))
 
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
-	con := repository.NewPostgresRepository(db)
+	var con repository.Repository
+	con = repository.NewPostgresRepository(db)
 
 	authMiddleware := jwt.GinJWTMiddleware{
 		Realm:      viper.GetString("realm"),
@@ -449,25 +448,6 @@ func next(uri string, offset int, limit int, input []interface{}) string {
 		uri = uri[:n]
 	}
 	return strings.Join([]string{uri, fmt.Sprintf("?offset=%d&limit=%d", offset+limit, limit)}, "")
-}
-
-func checkBasicUserPassword(con repository.Repository) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		auth := strings.Fields(c.GetHeader("Authorization"))
-		if len(auth) == 0 {
-			unauthorized(c)
-			return
-		}
-		decoded, _ := base64.StdEncoding.DecodeString(auth[1])
-		cred := strings.Split(string(decoded), ":")
-		if user, kind, ok := con.CheckUser(cred[0], cred[1]); ok {
-			c.Set(repository.USER, user)
-			c.Set(repository.KIND, kind)
-		} else {
-			// Credentials doesn't match, we return 401 and abort handlers chain.
-			unauthorized(c)
-		}
-	}
 }
 
 func unauthorized(c *gin.Context) {

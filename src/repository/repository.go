@@ -102,6 +102,6 @@ type Repository interface {
 	CreatePayment(models.Payment, int, string) (int, error)
 	UpdatePayment(models.Payment, int, string) error
 
-	CreateAccount(username string, password string, id int, kind string) error
-
+	CreateAccount(username string, password string, id int, kind string, cost int) error
+	LectureByID(id int, who int, whoKind string) (interface{}, error)
 }
