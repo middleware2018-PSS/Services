@@ -19,19 +19,31 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"github.com/spf13/viper"
 )
 
 var (
 	LimitError = errors.New("Limit Must Be Greater Than Zero.")
-	REALM      = ""
 )
 
-type JwtData struct {
+type (
+	JwtData struct {
 	Id   int
 	Role string
-}
+	}
 
-const HAL = "application/hal+json"
+	User struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Role string `json:"role"`
+		ID int `json:"id"`
+	}
+)
+
+const (
+	HAL = "application/hal+json"
+	COST = 10
+)
 
 // @title Back2School API
 // @version 1.0
@@ -46,7 +58,19 @@ const HAL = "application/hal+json"
 
 // @host localhost:5000
 func main() {
-	db, err := sql.Open("postgres", "user=postgres dbname=postgres sslmode=disable")
+	/*p, _ := bcrypt.GenerateFromPassword([]byte("password"), 4)
+	fmt.Printf("%s", p)*/
+	viper.SetConfigName("config")
+	viper.AddConfigPath("$HOME/go/src/github.com/middleware2018-PSS/Services/config")
+
+	err := viper.ReadInConfig()
+	if err != nil{
+		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	}
+
+	db, err := sql.Open("postgres", "user="+viper.GetString("DBuser")+
+		" dbname="+viper.GetString("DB")+" sslmode=disable")
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,8 +78,10 @@ func main() {
 	con := repository.NewPostgresRepository(db)
 
 	authMiddleware := jwt.GinJWTMiddleware{
-		Realm:      "test",
-		Key:        []byte("password"),
+		Realm:      viper.GetString("realm"),
+		SigningAlgorithm: "RS256",
+		PrivKeyFile: viper.GetString("PrivateKeyFile"),
+		PubKeyFile: viper.GetString("PublicKeyFile"),
 		Timeout:    time.Hour,
 		MaxRefresh: time.Hour,
 		Authenticator: func(userID string, password string, c *gin.Context) (interface{}, bool) {
@@ -79,7 +105,17 @@ func main() {
 		c.Set(repository.USER, claims[repository.USER])
 		c.Set(repository.KIND, claims[repository.KIND])
 	}) // checkBasicUserPassword(con))
+	api.POST("/accounts", func(c *gin.Context) {
+		var user User
+		if err := c.Bind(&user); err == nil{
+			if err := con.CreateAccount(user.Username, user.Password, user.ID, user.Role, COST); err != nil{
+				c.AbortWithStatus(http.StatusNotAcceptable)
+			} else {
+				c.AbortWithStatus(http.StatusCreated)
+			}
+		}
 
+	})
 	api.GET("/refresh_token", authMiddleware.RefreshHandler)
 
 	api.POST("/parents", func(c *gin.Context) {
@@ -96,8 +132,6 @@ func main() {
 	parent := api.Group("/parents/:id") //, authAdminOrParent(authMiddleware.Realm))
 	{
 		parent.GET("", byID("id", con.ParentByID))
-		// TODO add admin auth on Post
-
 		parent.PUT("", func(c *gin.Context) {
 			// not possible to refactor (at the best of my knowledge)
 			var p models.Parent
@@ -437,7 +471,7 @@ func checkBasicUserPassword(con repository.Repository) gin.HandlerFunc {
 }
 
 func unauthorized(c *gin.Context) {
-	c.Header("WWW-Authenticate", REALM)
+	c.Header("WWW-Authenticate", viper.GetString("Realm"))
 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized access"})
 }
 

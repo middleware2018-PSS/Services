@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	_ "github.com/middleware2018-PSS/Services/src/docs"
 	"github.com/middleware2018-PSS/Services/src/models"
+	"golang.org/x/crypto/bcrypt"
+	"log"
 )
 
 type Subjects struct {
@@ -11,12 +13,26 @@ type Subjects struct {
 }
 
 func (r *postgresRepository) CheckUser(userID string, password string) (int, string, bool) {
-	query := `select id, kind from back2school.accounts where "user" = $1 and "password" = $2`
+	query := `select id, kind, password from back2school.accounts where "user" = $1`
 	var id int
 	var kind string
-	err := r.QueryRow(query, userID, password).Scan(&id, &kind)
-	return id, kind, err == nil
+	var saltedPass []byte
+	err := r.QueryRow(query, userID).Scan(&id, &kind, &saltedPass)
+	return id, kind, err == nil && bcrypt.CompareHashAndPassword(saltedPass, []byte(password)) == nil
 }
+
+func (r* postgresRepository) CreateAccount(username string, password string, id int, kind string, cost int) error {
+	query :=`INSERT INTO back2school.accounts ("user", "password", id, kind) VALUES ($1, $2, $3, $4)`
+	cryptedPass, err := bcrypt.GenerateFromPassword([]byte(password), cost)
+	if err != nil{
+		return err
+	}
+	_, err = r.Exec(query, username, cryptedPass, id, kind)
+	if err != nil{
+		log.Printf("%v", err.Error())
+	}
+	return err
+	}
 
 // @Summary Get a appointment by id
 // @Param id path int true "Appointment ID"

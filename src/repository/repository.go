@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	USER        = "User"
-	KIND        = "Kind"
+	USER        = "userID"
+	KIND        = "kind"
 	AdminUser   = "Admin"
 	ParentUser  = "Parent"
 	TeacherUser = "Teacher"
@@ -101,4 +101,7 @@ type Repository interface {
 	UpdateGrade(models.Grade, int, string) error
 	CreatePayment(models.Payment, int, string) (int, error)
 	UpdatePayment(models.Payment, int, string) error
+
+	CreateAccount(username string, password string, id int, kind string) error
+
 }
