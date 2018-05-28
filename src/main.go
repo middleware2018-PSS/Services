@@ -51,7 +51,7 @@ func main() {
 	/*p, _ := bcrypt.GenerateFromPassword([]byte("password"), 4)
 	fmt.Printf("%s", p)*/
 	viper.SetConfigName("config")
-	viper.AddConfigPath("$HOME/go/src/github.com/middleware2018-PSS/Services/config")
+	viper.AddConfigPath("config")
 
 	err := viper.ReadInConfig()
 	if err != nil {
