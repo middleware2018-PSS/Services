@@ -171,7 +171,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
   title: Back2School API
-  version: "1.0"
+  version: 1.0byID
 paths:
   /accounts:
     post:
@@ -184,6 +184,17 @@ paths:
           $ref: '#/definitions/models.User'
           type: object
       summary: Create an account
+      tags:
+      - Accounts
+  /accounts/{id}:
+    delete:
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Delete Account
       tags:
       - Accounts
   /appointments:
@@ -232,6 +243,16 @@ paths:
       tags:
       - Appointments
   /appointments/{id}:
+    delete:
+      parameters:
+      - description: Appointment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Delete Appointment
+      tags:
+      - Appointments
     get:
       parameters:
       - description: Appointment ID
@@ -311,6 +332,16 @@ paths:
       tags:
       - Classes
   /classes/{id}:
+    delete:
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Delete Class
+      tags:
+      - Classes
     get:
       parameters:
       - description: Class ID
@@ -375,7 +406,7 @@ paths:
             type: array
       summary: Get lectures by class
       tags:
-      - Lectures
+      - Classes
   /classes/{id}/students:
     get:
       parameters:
@@ -442,6 +473,16 @@ paths:
       tags:
       - Grades
   /grades/{id}:
+    delete:
+      parameters:
+      - description: Grade ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Delete Grade
+      tags:
+      - Grades
     get:
       parameters:
       - description: Grade ID
@@ -502,7 +543,35 @@ paths:
       summary: Get all lectures
       tags:
       - Lectures
+    post:
+      parameters:
+      - description: data
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.TimeTable'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Payment'
+            type: object
+      summary: Create lecture
+      tags:
+      - Lectures
   /lectures/{id}:
+    delete:
+      parameters:
+      - description: Lecture ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Delete Lecture
+      tags:
+      - Lectures
     get:
       parameters:
       - description: Lecture ID
@@ -518,7 +587,30 @@ paths:
             type: object
       summary: Get a lecture by id
       tags:
-      - Grades
+      - Lectures
+    put:
+      parameters:
+      - description: Lecture ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.TimeTable'
+          type: object
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.TimeTable'
+            type: object
+      summary: Update lecture
+      tags:
+      - Lectures
   /login:
     post:
       parameters:
@@ -578,6 +670,16 @@ paths:
       tags:
       - Notifications
   /notifications/{id}:
+    delete:
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Delete Notification
+      tags:
+      - Notifications
     get:
       parameters:
       - description: Notification ID
@@ -658,6 +760,16 @@ paths:
       - Parents
       - Parents
   /parents/{id}:
+    delete:
+      parameters:
+      - description: Parent ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Delete Parent
+      tags:
+      - Parents
     get:
       parameters:
       - description: Account ID
@@ -842,6 +954,16 @@ paths:
       tags:
       - Payments
   /payments/{id}:
+    delete:
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Delete Payment
+      tags:
+      - Payments
     get:
       parameters:
       - description: Payment ID
@@ -921,6 +1043,16 @@ paths:
       tags:
       - Students
   /students/{id}:
+    delete:
+      parameters:
+      - description: Student ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Delete Student
+      tags:
+      - Students
     get:
       parameters:
       - description: Student ID
@@ -1026,6 +1158,16 @@ paths:
       tags:
       - Teachers
   /teachers/{id}:
+    delete:
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      summary: Delete Teacher
+      tags:
+      - Teachers
     get:
       parameters:
       - description: Teacher ID
@@ -1228,6 +1370,6 @@ paths:
 securityDefinitions:
   ApiKeyAuth:
     in: header
-    name: 'Authorization: Bearer'
+    name: Authorization
     type: apiKey
 swagger: "2.0"

@@ -190,3 +190,19 @@ func (r *postgresRepository) CreatePayment(payment models.Payment, who int, whoK
 		return 0, ErrorNotAuthorized
 	}
 }
+
+// @Summary Create lecture
+// @Param class body models.TimeTable true "data"
+// @Tags Lectures
+// @Router /lectures [post]
+// @Success 201 {object} models.Payment
+func (r *postgresRepository) CreateLecture(lecture models.TimeTable, who int, whoKind string) (int, error) {
+	if whoKind == AdminUser {
+		query := "insert into back2school.timetable " +
+			" (class, subject, location, start, end, info) " +
+			" VALUES ($1, $2, $3, $4, $5, $6) "
+		return r.exec(query, lecture.Class, lecture.Subject, lecture.Location, lecture.Start, lecture.End, lecture.Info)
+	} else {
+		return 0, ErrorNotAuthorized
+	}
+}

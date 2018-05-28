@@ -182,7 +182,7 @@ func (r *postgresRepository) StudentByID(id int, who int, whoKind string) (stude
 
 // @Summary Get a lecture by id
 // @Param id path int true "Lecture ID"
-// @Tags Grades
+// @Tags Lectures
 // @Success 200 {object} models.TimeTable
 // @Router /lectures/{id} [get]
 func (r *postgresRepository) LectureByID(id int, who int, whoKind string) (interface{}, error) {

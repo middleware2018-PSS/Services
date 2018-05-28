@@ -112,4 +112,8 @@ type Repository interface {
 	DeletePayment(id int, who int, whoKind string) (interface{}, error)
 	DeleteClass(id int, who int, whoKind string) (interface{}, error)
 	DeleteAccount(username string, whoKind string) (interface{}, error)
+	DeleteGrade(id int, who int, whoKind string) (interface{}, error)
+	DeleteLecture(id int, who int, whoKind string) (interface{}, error)
+	UpdateLecture(models.TimeTable, int, string) error
+	CreateLecture(lecture models.TimeTable, who int, whoKind string) (int, error)
 }

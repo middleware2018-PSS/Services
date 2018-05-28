@@ -222,10 +222,33 @@ func main() {
 
 	api.GET("/lectures", getOffsetLimit(con.Lectures))
 	api.GET("/lectures/:id", byID("id", con.LectureByID))
+	api.POST("/lectures", func(c *gin.Context) {
+		var s models.TimeTable
+		if err := c.ShouldBind(&s); err == nil {
+			who, whoKind := idKind(c)
+			if id, err := con.CreateLecture(s, who, whoKind); err != nil {
+				s.ID = id
+				c.JSON(http.StatusCreated, s)
+			}
+		}
+	})
+	api.PUT("/lectures/:id", func(c *gin.Context) {
+		var a models.TimeTable
+		if err := c.ShouldBind(&a); err == nil {
+			id, _ := strconv.Atoi(c.Param("id"))
+			a.ID = id
+			who, whoKind := idKind(c)
+			if err := con.UpdateLecture(a, who, whoKind); err == nil {
+				c.JSON(http.StatusCreated, a)
+			}
+		}
+	})
+	api.DELETE("/lectures/:id", byID("id", con.DeleteLecture))
 
 	api.GET("/parents", getOffsetLimit(con.Parents))
 	api.GET("/grades", getOffsetLimit(con.Grades))
 	api.GET("/grades/:id", byID("id", con.GradeByID))
+	api.DELETE("/grades/:id", byID("id", con.DeleteGrade))
 	api.PUT("/grades/:id", func(c *gin.Context) {
 		var a models.Grade
 		if err := c.ShouldBind(&a); err == nil {

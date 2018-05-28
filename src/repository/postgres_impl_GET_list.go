@@ -80,7 +80,7 @@ func (r *postgresRepository) StudentsByClass(id int, limit int, offset int, who 
 // @Param limit query int false "number of elements to return"
 // @Param offset query int false "offset in the list of elements to return"
 // @Param id path int true "Class ID"
-// @Tags Lectures
+// @Tags Classes
 // @Success 200 {array} models.TimeTable
 // @Router /classes/{id}/lectures [get]
 func (r *postgresRepository) LectureByClass(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {

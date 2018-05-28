@@ -195,7 +195,7 @@ func (r *postgresRepository) UpdatePayment(payment models.Payment, who int, whoK
 	var query string
 	var args []interface{}
 	switch whoKind {
-	case TeacherUser:
+	case ParentUser:
 		query = "if $7 in (select parent from back2school.isParent where student = $2) UPDATE back2school.grades " +
 			"SET amount = $1, student = $2, payed = $3, reason = $4, emitted = $5 " +
 			" where id = $6 "
@@ -206,6 +206,32 @@ func (r *postgresRepository) UpdatePayment(payment models.Payment, who int, whoK
 			"SET amount = $1, student = $2, payed = $3, reason = $4, emitted = $5 " +
 			" where id = $6 "
 		args = append(args, payment.Amount, payment.Student.ID, payment.Payed, payment.Reason, payment.Emitted, payment.ID)
+	default:
+		return ErrorNotAuthorized
+	}
+	return r.execUpdate(query, args...)
+}
+
+// @Summary Update lecture
+// @Param id path int true "Lecture ID"
+// @Param class body models.TimeTable true "data"
+// @Tags Lectures
+// @Router /lectures/{id} [put]
+// @Success 201 {object} models.TimeTable
+func (r *postgresRepository) UpdateLecture(lecture models.TimeTable, who int, whoKind string) error {
+	var query string
+	var args []interface{}
+	switch whoKind {
+	case TeacherUser:
+		query = "if $1 in (select teacher from back2school.teaches natural join timetable where id = $2) UPDATE back2school.timetable " +
+			"SET location = $3, start = $4, end = $5, info = $6 " +
+			" where id = $2"
+		args = append(args, who, lecture.ID, lecture.Location, lecture.Start, lecture.End, lecture.Info)
+	case AdminUser:
+		query = "UPDATE back2school.timetable " +
+			"SET location = $3, start = $4, end = $5, info = $6 " +
+			" where id = $2"
+		args = append(args, who, lecture.ID, lecture.Location, lecture.Start, lecture.End, lecture.Info)
 	default:
 		return ErrorNotAuthorized
 	}

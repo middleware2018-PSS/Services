@@ -9,7 +9,7 @@
             "name": "Apache 2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
-        "version": "1.0"
+        "version": "1.0byID"
     },
     "host": "localhost:5000",
     "paths": {
@@ -29,6 +29,23 @@
                             "type": "object",
                             "$ref": "#/definitions/models.User"
                         }
+                    }
+                ]
+            }
+        },
+        "/accounts/{id}": {
+            "delete": {
+                "tags": [
+                    "Accounts"
+                ],
+                "summary": "Delete Account",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ]
             }
@@ -161,6 +178,21 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Delete Appointment",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Appointment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ]
             }
         },
         "/classes": {
@@ -281,12 +313,27 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Classes"
+                ],
+                "summary": "Delete Class",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ]
             }
         },
         "/classes/{id}/lectures": {
             "get": {
                 "tags": [
-                    "Lectures"
+                    "Classes"
                 ],
                 "summary": "Get lectures by class",
                 "parameters": [
@@ -481,6 +528,21 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Grades"
+                ],
+                "summary": "Delete Grade",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Grade ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ]
             }
         },
         "/lectures": {
@@ -514,12 +576,39 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "tags": [
+                    "Lectures"
+                ],
+                "summary": "Create lecture",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.TimeTable"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Payment"
+                        }
+                    }
+                }
             }
         },
         "/lectures/{id}": {
             "get": {
                 "tags": [
-                    "Grades"
+                    "Lectures"
                 ],
                 "summary": "Get a lecture by id",
                 "parameters": [
@@ -540,6 +629,55 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "tags": [
+                    "Lectures"
+                ],
+                "summary": "Update lecture",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Lecture ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "data",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.TimeTable"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.TimeTable"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Lectures"
+                ],
+                "summary": "Delete Lecture",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Lecture ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ]
             }
         },
         "/login": {
@@ -689,6 +827,21 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Delete Notification",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Notification ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ]
             }
         },
         "/parents": {
@@ -810,6 +963,21 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Parents"
+                ],
+                "summary": "Delete Parent",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Parent ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ]
             }
         },
         "/parents/{id}/appointments": {
@@ -1091,6 +1259,21 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Delete Payment",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Payment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ]
             }
         },
         "/students": {
@@ -1211,6 +1394,21 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Delete Student",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Student ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ]
             }
         },
         "/students/{id}/grades": {
@@ -1371,6 +1569,21 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Teachers"
+                ],
+                "summary": "Delete Teacher",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Teacher ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ]
             }
         },
         "/teachers/{id}/appointments": {
@@ -1871,7 +2084,7 @@
     "securityDefinitions": {
         "ApiKeyAuth": {
             "type": "apiKey",
-            "name": "Authorization: Bearer",
+            "name": "Authorization",
             "in": "header"
         }
     }
