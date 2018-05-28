@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type postgresRepository struct {
@@ -14,6 +15,16 @@ func NewPostgresRepository(DB *sql.DB) *postgresRepository {
 	//TODO prepare all statement at startup
 	return &postgresRepository{DB}
 }
+
+func (r *postgresRepository) CheckUser(userID string, password string) (int, string, bool) {
+	query := `select id, kind, password from back2school.accounts where "user" = $1`
+	var id int
+	var kind string
+	var saltedPass []byte
+	err := r.QueryRow(query, userID).Scan(&id, &kind, &saltedPass)
+	return id, kind, err == nil && bcrypt.CompareHashAndPassword(saltedPass, []byte(password)) == nil
+}
+
 
 func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (interface{}, error), limit int, offset int, params ...interface{}) (list []interface{}, err error) {
 	query = query + fmt.Sprintf(" limit $%d offset $%d", len(params)+1, len(params)+2)
