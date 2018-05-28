@@ -32,7 +32,6 @@ func (r *postgresRepository) AppointmentByID(id int, who int, whoKind string) (i
 	return switchResult(appointment, err)
 }
 
-
 // @Summary Get a grade by id
 // @Param id path int true "Grade ID"
 // @Tags Grades
@@ -88,7 +87,6 @@ func (r *postgresRepository) ClassByID(id int, who int, whoKind string) (interfa
 	return switchResult(class, err)
 }
 
-
 // @Summary Get a notification by id
 // @Param id path int true "Notification ID"
 // @Tags Notifications
@@ -121,7 +119,6 @@ func (r *postgresRepository) NotificationByID(id int, who int, whoKind string) (
 	return switchResult(n, err)
 }
 
-
 // Parents
 // see/modify their personal data
 // @Summary Get a parent by id
@@ -153,7 +150,6 @@ func (r *postgresRepository) ParentByID(id int, who int, whoKind string) (interf
 		args...).Scan(&p.ID, &p.Name, &p.Surname, &p.Mail, &p.Info)
 	return switchResult(p, err)
 }
-
 
 // Get student by id
 // @Summary Get a student by id

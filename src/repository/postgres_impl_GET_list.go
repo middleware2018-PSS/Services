@@ -109,7 +109,6 @@ func (r *postgresRepository) LectureByClass(id int, limit int, offset int, who i
 		}, limit, offset, args...)
 }
 
-
 // List all notifications
 // @Summary Get all notifications
 // @Param limit query int false "number of elements to return"
@@ -501,7 +500,6 @@ func (r *postgresRepository) Students(limit int, offset int, who int, whoKind st
 		return student, err
 	}, limit, offset, args...)
 }
-
 
 // see the grades obtained by their children
 // @Summary Get grades of the student

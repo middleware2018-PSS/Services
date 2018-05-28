@@ -38,15 +38,14 @@ const (
 )
 
 // @title Back2School API
-// @version 1.0
+// @version 1.0byID
 // @description These are a School management system's API .
 // @termsOfService http://swagger.io/terms/
-
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
-// @name Authorization: Bearer
+// @name Authorization
 // @host localhost:5000
 func main() {
 	/*p, _ := bcrypt.GenerateFromPassword([]byte("password"), 4)
@@ -99,13 +98,21 @@ func main() {
 	api.POST("/accounts", func(c *gin.Context) {
 		var user models.User
 		if err := c.Bind(&user); err == nil {
-			if err := con.CreateAccount(user.Username, user.Password, user.ID, user.Role, COST); err != nil {
+			_, whokind := idKind(c)
+			if err := con.CreateAccount(user.Username, user.Password, user.ID, user.Role, COST, whokind); err != nil {
 				c.AbortWithStatus(http.StatusNotAcceptable)
 			} else {
 				c.AbortWithStatus(http.StatusCreated)
 			}
 		}
 
+	})
+	api.DELETE("/accounts/{id}", func(c *gin.Context) {
+		user := c.Param("id")
+		_, whoKind := idKind(c)
+		res, err := con.DeleteAccount(user, whoKind)
+		res, _ = ToRepresentation(res, c, checkHAL(c))
+		handleErr(err, res, c)
 	})
 	api.GET("/refresh_token", authMiddleware.RefreshHandler)
 
@@ -135,6 +142,7 @@ func main() {
 				}
 			}
 		})
+		parent.DELETE("", byID("id", con.DeleteParent))
 		parent.GET("/students", byIDWithOffsetAndLimit("id", con.ChildrenByParent))
 		parent.GET("/appointments", byIDWithOffsetAndLimit("id", con.AppointmentsByParent))
 		parent.POST("/appointments", func(c *gin.Context) {
@@ -165,7 +173,7 @@ func main() {
 			}
 		}
 	})
-
+	api.GET("/teachers", getOffsetLimit(con.Teachers))
 	teachers := api.Group("/teachers/:id") //, authAdminOrTeacher(authMiddleware.Realm))
 	{
 		teachers.GET("", byID("id", con.TeacherByID))
@@ -180,6 +188,7 @@ func main() {
 				}
 			}
 		})
+		teachers.DELETE("", byID("id", con.DeleteTeacher))
 		teachers.GET("/lectures", byIDWithOffsetAndLimit("id", con.LecturesByTeacher))
 		teachers.GET("/appointments", byIDWithOffsetAndLimit("id", con.AppointmentsByTeacher))
 		teachers.GET("/notifications", byIDWithOffsetAndLimit("id", con.NotificationsByTeacher))
@@ -209,6 +218,8 @@ func main() {
 			}
 		}
 	})
+	api.DELETE("/appointments/:appointment", byID("appointment", con.DeleteAppointment))
+
 	api.GET("/lectures", getOffsetLimit(con.Lectures))
 	api.GET("/lectures/:id", byID("id", con.LectureByID))
 
@@ -238,6 +249,7 @@ func main() {
 			}
 		}
 	})
+	api.DELETE("/students/:id", byID("id", con.DeleteStudent))
 	api.POST("/students", func(c *gin.Context) {
 		var s models.Student
 		if err := c.ShouldBind(&s); err == nil {
@@ -262,6 +274,7 @@ func main() {
 		}
 	})
 	api.GET("/notifications/:id", byID("id", con.NotificationByID))
+	api.DELETE("/notifications/:id", byID("id", con.DeleteNotification))
 	api.PUT("/notifications/:id", func(c *gin.Context) {
 		var a models.Notification
 		if err := c.ShouldBind(&a); err == nil {
@@ -296,8 +309,8 @@ func main() {
 			}
 		}
 	})
+	api.DELETE("/payments/:id", byID("id", con.DeletePayment))
 
-	api.GET("/teachers", getOffsetLimit(con.Teachers))
 	api.GET("/classes", getOffsetLimit(con.Classes))
 	api.GET("/classes/:id", byID("id", con.ClassByID))
 	api.PUT("/classes/:id", func(c *gin.Context) {
@@ -311,6 +324,8 @@ func main() {
 			}
 		}
 	})
+	api.DELETE("/classes/:id", byID("id", con.DeleteClass))
+
 	api.GET("/classes/:id/students", byIDWithOffsetAndLimit("id", con.StudentsByClass))
 	api.POST("/classes", func(c *gin.Context) {
 		var s models.Class

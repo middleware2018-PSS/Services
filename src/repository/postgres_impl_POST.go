@@ -1,28 +1,31 @@
 package repository
 
 import (
+	"github.com/middleware2018-PSS/Services/src/models"
 	"golang.org/x/crypto/bcrypt"
 	"log"
-	"github.com/middleware2018-PSS/Services/src/models"
 )
 
 // @Summary Create an account
 // @Param Account body models.User true "data"
 // @Tags Accounts
 // @Router /accounts [post]
-func (r *postgresRepository) CreateAccount(username string, password string, id int, kind string, cost int) error {
-	query := `INSERT INTO back2school.accounts ("user", "password", id, kind) VALUES ($1, $2, $3, $4)`
-	cryptedPass, err := bcrypt.GenerateFromPassword([]byte(password), cost)
-	if err != nil {
+func (r *postgresRepository) CreateAccount(username string, password string, id int, kind string, cost int, whoKind string) error {
+	if whoKind == AdminUser {
+		query := `INSERT INTO back2school.accounts ("user", "password", id, kind) VALUES ($1, $2, $3, $4)`
+		cryptedPass, err := bcrypt.GenerateFromPassword([]byte(password), cost)
+		if err != nil {
+			return err
+		}
+		_, err = r.Exec(query, username, cryptedPass, id, kind)
+		if err != nil {
+			log.Printf("%v", err.Error())
+		}
 		return err
+	} else {
+		return ErrorNotAuthorized
 	}
-	_, err = r.Exec(query, username, cryptedPass, id, kind)
-	if err != nil {
-		log.Printf("%v", err.Error())
-	}
-	return err
 }
-
 
 // @Summary Create appointment
 // @Param id path int true "Appointment ID"
@@ -55,8 +58,6 @@ func (r *postgresRepository) CreateAppointment(appointment models.Appointment, w
 	}
 	return r.exec(query, args...)
 }
-
-
 
 // @Summary Create parent
 // @Tags Parents
@@ -142,7 +143,6 @@ func (r *postgresRepository) CreateNotification(notification models.Notification
 
 }
 
-
 // @Summary Create grade
 // @Param class body models.Grade true "data"
 // @Tags Grades
@@ -174,7 +174,6 @@ func (r *postgresRepository) CreateGrade(grade models.Grade, who int, whoKind st
 
 	return r.exec(query, args...)
 }
-
 
 // @Summary Create payment
 // @Param class body models.Payment true "data"

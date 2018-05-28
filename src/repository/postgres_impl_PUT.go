@@ -119,7 +119,6 @@ func (r *postgresRepository) UpdateAppointment(appointment models.Appointment, w
 	return r.execUpdate(query, args...)
 }
 
-
 // @Summary Update Class's data
 // @Param id path int true "Class ID"
 // @Param parent body models.Class true "data"
@@ -137,7 +136,6 @@ func (r *postgresRepository) UpdateClass(class models.Class, who int, whoKind st
 	}
 
 }
-
 
 // @Summary Update notification
 // @Param id path int true "Notification ID"

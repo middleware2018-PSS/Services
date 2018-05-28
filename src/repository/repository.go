@@ -102,6 +102,14 @@ type Repository interface {
 	CreatePayment(models.Payment, int, string) (int, error)
 	UpdatePayment(models.Payment, int, string) error
 
-	CreateAccount(username string, password string, id int, kind string, cost int) error
+	CreateAccount(username string, password string, id int, kind string, cost int, whoKind string) error
 	LectureByID(id int, who int, whoKind string) (interface{}, error)
+	DeleteParent(id int, who int, whoKind string) (interface{}, error)
+	DeleteTeacher(id int, who int, whoKind string) (interface{}, error)
+	DeleteAppointment(id int, who int, whoKind string) (interface{}, error)
+	DeleteStudent(id int, who int, whoKind string) (interface{}, error)
+	DeleteNotification(id int, who int, whoKind string) (interface{}, error)
+	DeletePayment(id int, who int, whoKind string) (interface{}, error)
+	DeleteClass(id int, who int, whoKind string) (interface{}, error)
+	DeleteAccount(username string, whoKind string) (interface{}, error)
 }

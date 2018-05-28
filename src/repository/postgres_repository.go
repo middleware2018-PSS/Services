@@ -3,8 +3,8 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 )
 
 type postgresRepository struct {
@@ -24,7 +24,6 @@ func (r *postgresRepository) CheckUser(userID string, password string) (int, str
 	err := r.QueryRow(query, userID).Scan(&id, &kind, &saltedPass)
 	return id, kind, err == nil && bcrypt.CompareHashAndPassword(saltedPass, []byte(password)) == nil
 }
-
 
 func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (interface{}, error), limit int, offset int, params ...interface{}) (list []interface{}, err error) {
 	query = query + fmt.Sprintf(" limit $%d offset $%d", len(params)+1, len(params)+2)
