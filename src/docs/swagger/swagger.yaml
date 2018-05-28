@@ -1,6 +1,12 @@
 definitions:
   models.Account:
     properties:
+      id:
+        example: 1
+        type: integer
+      kind:
+        example: Parent
+        type: string
       password:
         example: Password
         type: string
@@ -50,7 +56,7 @@ definitions:
     properties:
       data:
         items:
-          type: '&{%!s(token.Pos=5631) %!s(*ast.FieldList=&{5640 [] 5641}) %!s(bool=false)}'
+          type: '&{%!s(token.Pos=5638) %!s(*ast.FieldList=&{5647 [] 5648}) %!s(bool=false)}'
         type: array
       next:
         type: string
@@ -183,6 +189,28 @@ info:
   version: 1.0byID
 paths:
   /accounts:
+    get:
+      parameters:
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Login'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get all accounts
+      tags:
+      - Accounts
     post:
       parameters:
       - description: data
@@ -192,6 +220,8 @@ paths:
         schema:
           $ref: '#/definitions/models.User'
           type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create an account
       tags:
       - Accounts
@@ -204,6 +234,8 @@ paths:
         schema:
           $ref: '#/definitions/models.Account'
           type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update Account
       tags:
       - Accounts
@@ -215,6 +247,8 @@ paths:
         name: id
         required: true
         type: integer
+      security:
+      - ApiKeyAuth: []
       summary: Delete Account
       tags:
       - Accounts
@@ -260,6 +294,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Appointment'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create appointment
       tags:
       - Appointments
@@ -271,6 +307,8 @@ paths:
         name: id
         required: true
         type: integer
+      security:
+      - ApiKeyAuth: []
       summary: Delete Appointment
       tags:
       - Appointments
@@ -287,6 +325,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Appointment'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get a appointment by id
       tags:
       - Appointments
@@ -310,6 +350,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Appointment'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update appointment's data
       tags:
       - Appointments
@@ -331,6 +373,8 @@ paths:
             items:
               $ref: '#/definitions/models.Class'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get all classes
       tags:
       - Classes
@@ -349,6 +393,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Class'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create class
       tags:
       - Classes
@@ -360,6 +406,8 @@ paths:
         name: id
         required: true
         type: integer
+      security:
+      - ApiKeyAuth: []
       summary: Delete Class
       tags:
       - Classes
@@ -376,6 +424,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Class'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get a class by id
       tags:
       - Classes
@@ -399,6 +449,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Class'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update Class's data
       tags:
       - Classes
@@ -425,6 +477,8 @@ paths:
             items:
               $ref: '#/definitions/models.TimeTable'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get lectures by class
       tags:
       - Classes
@@ -451,6 +505,8 @@ paths:
             items:
               $ref: '#/definitions/models.Student'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get a student by class
       tags:
       - Classes
@@ -472,6 +528,8 @@ paths:
             items:
               $ref: '#/definitions/models.Grade'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get all grades
       tags:
       - Grades
@@ -490,6 +548,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Grade'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create grade
       tags:
       - Grades
@@ -501,6 +561,8 @@ paths:
         name: id
         required: true
         type: integer
+      security:
+      - ApiKeyAuth: []
       summary: Delete Grade
       tags:
       - Grades
@@ -517,6 +579,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Grade'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get a grade by id
       tags:
       - Grades
@@ -540,6 +604,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Grade'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update Grade
       tags:
       - Grades
@@ -561,6 +627,8 @@ paths:
             items:
               $ref: '#/definitions/models.TimeTable'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get all lectures
       tags:
       - Lectures
@@ -579,6 +647,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Payment'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create lecture
       tags:
       - Lectures
@@ -590,6 +660,8 @@ paths:
         name: id
         required: true
         type: integer
+      security:
+      - ApiKeyAuth: []
       summary: Delete Lecture
       tags:
       - Lectures
@@ -606,6 +678,8 @@ paths:
           schema:
             $ref: '#/definitions/models.TimeTable'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get a lecture by id
       tags:
       - Lectures
@@ -629,6 +703,8 @@ paths:
           schema:
             $ref: '#/definitions/models.TimeTable'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update lecture
       tags:
       - Lectures
@@ -669,6 +745,8 @@ paths:
             items:
               $ref: '#/definitions/models.Notification'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get all notifications
       tags:
       - Notifications
@@ -687,6 +765,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Notification'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create notification
       tags:
       - Notifications
@@ -698,6 +778,8 @@ paths:
         name: id
         required: true
         type: integer
+      security:
+      - ApiKeyAuth: []
       summary: Delete Notification
       tags:
       - Notifications
@@ -714,6 +796,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Notification'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get a notification by id
       tags:
       - Notifications
@@ -737,6 +821,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Notification'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update notification
       tags:
       - Notifications
@@ -758,6 +844,8 @@ paths:
             items:
               $ref: '#/definitions/models.Parent'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get all parents
       tags:
       - Parents
@@ -776,6 +864,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Parent'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create parent
       tags:
       - Parents
@@ -788,6 +878,8 @@ paths:
         name: id
         required: true
         type: integer
+      security:
+      - ApiKeyAuth: []
       summary: Delete Parent
       tags:
       - Parents
@@ -804,6 +896,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Parent'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get a parent by id
       tags:
       - Parents
@@ -827,6 +921,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Parent'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update parents's data
       tags:
       - Parents
@@ -853,6 +949,8 @@ paths:
             items:
               $ref: '#/definitions/models.Appointment'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get appointments of the parent
       tags:
       - Parents
@@ -880,6 +978,8 @@ paths:
             items:
               $ref: '#/definitions/models.Notification'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get notifications of the parent
       tags:
       - Parents
@@ -906,6 +1006,8 @@ paths:
             items:
               $ref: '#/definitions/models.Payment'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get payments of the parent
       tags:
       - Parents
@@ -932,6 +1034,8 @@ paths:
             items:
               $ref: '#/definitions/models.Student'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get children of the parent
       tags:
       - Parents
@@ -953,6 +1057,8 @@ paths:
             items:
               $ref: '#/definitions/models.Payment'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get all payments
       tags:
       - Payments
@@ -971,6 +1077,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Payment'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create payment
       tags:
       - Payments
@@ -982,6 +1090,8 @@ paths:
         name: id
         required: true
         type: integer
+      security:
+      - ApiKeyAuth: []
       summary: Delete Payment
       tags:
       - Payments
@@ -998,6 +1108,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Payment'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get a payment by id
       tags:
       - Payments
@@ -1021,6 +1133,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Payment'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update payment
       tags:
       - Payments
@@ -1042,6 +1156,8 @@ paths:
             items:
               $ref: '#/definitions/models.Student'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get all students
       tags:
       - Students
@@ -1060,6 +1176,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Student'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create student
       tags:
       - Students
@@ -1071,6 +1189,8 @@ paths:
         name: id
         required: true
         type: integer
+      security:
+      - ApiKeyAuth: []
       summary: Delete Student
       tags:
       - Students
@@ -1087,6 +1207,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Student'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get a student by id
       tags:
       - Students
@@ -1110,6 +1232,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Student'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update student's data
       tags:
       - Students
@@ -1136,6 +1260,8 @@ paths:
             items:
               $ref: '#/definitions/models.Grade'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get grades of the student
       tags:
       - Students
@@ -1157,6 +1283,8 @@ paths:
             items:
               $ref: '#/definitions/models.Teacher'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get all teachers
       tags:
       - Teachers
@@ -1175,6 +1303,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Teacher'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create teacher
       tags:
       - Teachers
@@ -1186,6 +1316,8 @@ paths:
         name: id
         required: true
         type: integer
+      security:
+      - ApiKeyAuth: []
       summary: Delete Teacher
       tags:
       - Teachers
@@ -1202,6 +1334,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Teacher'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get a teacher by id
       tags:
       - Teachers
@@ -1225,6 +1359,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Teacher'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update teacher's data
       tags:
       - Teachers
@@ -1251,6 +1387,8 @@ paths:
             items:
               $ref: '#/definitions/models.Appointment'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get appointments of the teacher
       tags:
       - Teachers
@@ -1277,6 +1415,8 @@ paths:
             items:
               $ref: '#/definitions/models.Class'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get classes in which the teacher teaches
       tags:
       - Teachers
@@ -1303,6 +1443,8 @@ paths:
             items:
               $ref: '#/definitions/models.TimeTable'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get lectures taught by the teacher
       tags:
       - Teachers
@@ -1329,6 +1471,8 @@ paths:
             items:
               $ref: '#/definitions/models.TimeTable'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get notifications of the teacher
       tags:
       - Teachers
@@ -1354,6 +1498,8 @@ paths:
           schema:
             $ref: '#/definitions/repository.Subjects'
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get subject taught by the teacher
       tags:
       - Teachers
@@ -1385,6 +1531,8 @@ paths:
             items:
               $ref: '#/definitions/models.Class'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: Get classes in which the subject is taught by the teacher
       tags:
       - Teachers

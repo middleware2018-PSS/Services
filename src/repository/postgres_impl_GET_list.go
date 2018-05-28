@@ -16,6 +16,7 @@ type Subjects struct {
 // @Tags Classes
 // @Success 200 {array} models.Class
 // @Router /classes [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) Classes(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -47,6 +48,7 @@ func (r *postgresRepository) Classes(limit int, offset int, who int, whoKind str
 // @Tags Classes
 // @Success 200 {array} models.Student
 // @Router /classes/{id}/students [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) StudentsByClass(id int, limit int, offset int, who int, whoKind string) (students []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -83,6 +85,7 @@ func (r *postgresRepository) StudentsByClass(id int, limit int, offset int, who 
 // @Tags Classes
 // @Success 200 {array} models.TimeTable
 // @Router /classes/{id}/lectures [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) LectureByClass(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -116,6 +119,7 @@ func (r *postgresRepository) LectureByClass(id int, limit int, offset int, who i
 // @Tags Notifications
 // @Success 200 {array} models.Notification
 // @Router /notifications [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) Notifications(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -147,6 +151,7 @@ func (r *postgresRepository) Notifications(limit int, offset int, who int, whoKi
 // @Tags Grades
 // @Success 200 {array} models.Grade
 // @Router /grades [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) Grades(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -178,6 +183,7 @@ func (r *postgresRepository) Grades(limit int, offset int, who int, whoKind stri
 // @Tags Parents
 // @Success 200 {array} models.Parent
 // @Router /parents [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) Parents(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -209,6 +215,7 @@ func (r *postgresRepository) Parents(limit int, offset int, who int, whoKind str
 // @Tags Parents
 // @Success 200 {array} models.Student
 // @Router /parents/{id}/students [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) ChildrenByParent(id int, limit int, offset int, who int, whoKind string) (children []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -249,6 +256,7 @@ func (r *postgresRepository) ChildrenByParent(id int, limit int, offset int, who
 // @Tags Parents
 // @Success 200 {array} models.Payment
 // @Router /parents/{id}/payments [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) PaymentsByParent(id int, limit int, offset int, who int, whoKind string) (payments []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -288,6 +296,7 @@ func (r *postgresRepository) PaymentsByParent(id int, limit int, offset int, who
 // @Tags Parents
 // @Success 200 {array} models.Notification
 // @Router /parents/{id}/notifications [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) NotificationsByParent(id int, limit int, offset int, who int, whoKind string) (list []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -341,6 +350,7 @@ func (r *postgresRepository) NotificationsByParent(id int, limit int, offset int
 // @Tags Parents
 // @Success 200 {array} models.Appointment
 // @Router /parents/{id}/appointments [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) AppointmentsByParent(id int, limit int, offset int, who int, whoKind string) (appointments []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -379,6 +389,7 @@ func (r *postgresRepository) AppointmentsByParent(id int, limit int, offset int,
 // @Tags Payments
 // @Success 200 {object} models.Payment
 // @Router /payments/{id} [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) PaymentByID(id int, who int, whoKind string) (interface{}, error) {
 	payment := &models.Payment{}
 	var query string
@@ -407,6 +418,7 @@ func (r *postgresRepository) PaymentByID(id int, who int, whoKind string) (inter
 // @Tags Payments
 // @Success 200 {array} models.Payment
 // @Router /payments [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) Payments(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -477,6 +489,7 @@ func (r *postgresRepository) Appointments(limit int, offset int, who int, whoKin
 // @Tags Students
 // @Success 200 {array} models.Student
 // @Router /students [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) Students(limit int, offset int, who int, whoKind string) (student []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -509,6 +522,7 @@ func (r *postgresRepository) Students(limit int, offset int, who int, whoKind st
 // @Tags Students
 // @Success 200 {array} models.Grade
 // @Router /students/{id}/grades [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) GradesByStudent(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -544,6 +558,7 @@ func (r *postgresRepository) GradesByStudent(id int, limit int, offset int, who 
 // @Tags Teachers
 // @Success 200 {object} models.Teacher
 // @Router /teachers/{id} [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) TeacherByID(id int, who int, whoKind string) (interface{}, error) {
 	teacher := models.Teacher{}
 	var query string
@@ -579,6 +594,7 @@ func (r *postgresRepository) TeacherByID(id int, who int, whoKind string) (inter
 // @Tags Teachers
 // @Success 200 {array} models.Teacher
 // @Router /teachers [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) Teachers(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -607,6 +623,7 @@ func (r *postgresRepository) Teachers(limit int, offset int, who int, whoKind st
 // @Tags Teachers
 // @Success 200 {array} models.Appointment
 // @Router /teachers/{id}/appointments [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) AppointmentsByTeacher(id int, limit int, offset int, who int, whoKind string) (appointments []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -646,6 +663,7 @@ func (r *postgresRepository) AppointmentsByTeacher(id int, limit int, offset int
 // @Tags Teachers
 // @Success 200 {array} models.TimeTable
 // @Router /teachers/{id}/notifications [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) NotificationsByTeacher(id int, limit int, offset int, who int, whoKind string) (notifications []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -685,6 +703,7 @@ func (r *postgresRepository) NotificationsByTeacher(id int, limit int, offset in
 // @Success 200 {object} repository.Subjects
 // @Tags Teachers
 // @Router /teachers/{id}/subjects [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) SubjectsByTeacher(id int, limit int, offset int, who int, whoKind string) (notifications []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -718,6 +737,7 @@ func (r *postgresRepository) SubjectsByTeacher(id int, limit int, offset int, wh
 // @Success 200 {array} models.Class
 // @Tags Teachers
 // @Router /teachers/{id}/subjects/{subject} [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int, subject string, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -756,6 +776,7 @@ func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int, subject str
 // @Tags Teachers
 // @Success 200 {array} models.TimeTable
 // @Router /teachers/{id}/lectures [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) LecturesByTeacher(id int, limit int, offset int, who int, whoKind string) (lectures []interface{}, err error) {
 	var query string
 	var args []interface{}
@@ -795,6 +816,7 @@ func (r *postgresRepository) LecturesByTeacher(id int, limit int, offset int, wh
 // @Tags Teachers
 // @Success 200 {array} models.Class
 // @Router /teachers/{id}/classes [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) ClassesByTeacher(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	type Class struct {
 		models.Class
@@ -836,6 +858,7 @@ func (r *postgresRepository) ClassesByTeacher(id int, limit int, offset int, who
 // @Tags Lectures
 // @Success 200 {array} models.TimeTable
 // @Router /lectures [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) Lectures(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string
 	var args []interface{}
@@ -864,4 +887,24 @@ func (r *postgresRepository) Lectures(limit int, offset int, who int, whoKind st
 		err := rows.Scan(&lecture.ID, &lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
 		return lecture, err
 	}, limit, offset, args...)
+}
+
+// @Summary Get all accounts
+// @Param limit query int false "number of elements to return"
+// @Param offset query int false "offset in the list of elements to return"
+// @Tags Accounts
+// @Success 200 {array} models.Login
+// @Router /accounts [get]
+// @Security ApiKeyAuth
+func (r *postgresRepository) Accounts(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
+	if whoKind == AdminUser {
+		query := `select "user", kind, id from back2school.accounts`
+		return r.listByParams(query, func(rows *sql.Rows) (interface{}, error) {
+			account := models.Account{}
+			err := rows.Scan(&account.Username, &account.Kind, &account.ID)
+			return account, err
+		}, limit, offset)
+	} else {
+		return nil, ErrorNotAuthorized
+	}
 }

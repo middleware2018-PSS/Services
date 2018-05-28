@@ -25,7 +25,7 @@ type (
 
 	// remove connections
 	Parent struct {
-		ID      int     `json:"-,omitempty" xml:"id" example:"1"`
+		ID      int     `json:"-" xml:"id" example:"1"`
 		Name    *string `json:"name,omitempty" xml:"name"`
 		Surname *string `json:"surname,omitempty" xml:"surname"`
 		Mail    *string `json:"mail,omitempty" xml:"mail"`
@@ -33,7 +33,7 @@ type (
 	}
 
 	Teacher struct {
-		ID      int     `json:"-,omitempty" xml:"id" example:"1"`
+		ID      int     `json:"-" xml:"id" example:"1"`
 		Name    *string `json:"name,omitempty" xml:"name"`
 		Surname *string `json:"surname,omitempty" xml:"surname"`
 		Mail    *string `json:"mail,omitempty" xml:"mail"`
@@ -41,7 +41,7 @@ type (
 	}
 
 	Student struct {
-		ID      int     `json:"-,omitempty" xml:"id" example:"1"`
+		ID      int     `json:"-" xml:"id" example:"1"`
 		Name    *string `json:"name,omitempty" xml:"name"`
 		Surname *string `json:"surname,omitempty" xml:"surname"`
 		Mail    *string `json:"mail,omitempty" xml:"mail"`
@@ -49,7 +49,7 @@ type (
 	}
 
 	Class struct {
-		ID      int     `json:"-,omitempty" xml:"id" example:"1"`
+		ID      int     `json:"-" xml:"id" example:"1"`
 		Year    *int    `json:"year,omitempty" xml:"year"`
 		Section *string `json:"section,omitempty" xml:"section"` // as "A" in 5'A
 		Grade   *int    `json:"grade,omitempty" xml:"grade"`     // as "5" in 5'A
@@ -57,7 +57,7 @@ type (
 	}
 
 	Notification struct {
-		ID           int        `json:"-,omitempty" xml:"id" example:"1"`
+		ID           int        `json:"-" xml:"id" example:"1"`
 		Receiver     *int       `json:"receiver,omitempty" xml:"receiver"`
 		Time         *time.Time `json:"time,omitempty" xml:"time"`
 		Message      *string    `json:"message,omitempty" xml:"message"`
@@ -65,7 +65,7 @@ type (
 	}
 
 	Appointment struct {
-		ID       int        `json:"-,omitempty" xml:"id" example:"1"`
+		ID       int        `json:"-" xml:"id" example:"1"`
 		Time     *time.Time `json:"time,omitempty" xml:"time"`
 		Location *string    `json:"location,omitempty" xml:"location" example:"Aula Magna"`
 		Student  Student    `json:"student,omitempty" xml:"student"`
@@ -73,7 +73,7 @@ type (
 	}
 
 	Payment struct {
-		ID      int        `json:"-,omitempty" xml:"id" example:"1"`
+		ID      int        `json:"-" xml:"id" example:"1"`
 		Amount  *int       `json:"amount,omitempty" xml:"amount"`
 		Payed   *bool      `json:"payed,omitempty" xml:"payed"`
 		Emitted *time.Time `json:"emitted,omitempty" xml:"emitted"`
@@ -82,7 +82,7 @@ type (
 	}
 
 	Grade struct {
-		ID      int        `json:"-,omitempty" xml:"id" example:"1"`
+		ID      int        `json:"-" xml:"id" example:"1"`
 		Student Student    `json:"student,omitempty" xml:"student"`
 		Subject *string    `json:"subject,omitempty" xml:"subject" example:"science"`
 		Date    *time.Time `json:"date,omitempty" xml:"date"`
@@ -91,7 +91,7 @@ type (
 	}
 
 	TimeTable struct {
-		ID       int        `json:"-,omitempty" xml:"id" example:"1"`
+		ID       int        `json:"-" xml:"id" example:"1"`
 		Class    Class      `json:"class,omitempty" xml:"class"`
 		Location *string    `json:"location,omitempty" xml:"location" example:"Aula Magna"`
 		Subject  *string    `json:"subject,omitempty" xml:"subject" example:"science"`
@@ -103,6 +103,8 @@ type (
 	Account struct {
 		Username string `form:"username" json:"username,omitempty" binding:"required" example:"John"`
 		Password string `form:"password" json:"password,omitempty" binding:"required" example:"Password"`
+		Kind string `json:"kind" binding:"required" example:"Parent"`
+		ID int `json:"id" example:"1"`
 	}
 )
 
@@ -314,6 +316,7 @@ func (r Payment) GetRepresentation(halF bool) (interface{}, error) {
 		return h, nil
 	}
 }
+
 func (r Grade) GetRepresentation(halF bool) (interface{}, error) {
 	self := "/grades/" + fmt.Sprintf("%d", r.ID)
 	s, _ := r.Student.GetRepresentation(false)
@@ -334,6 +337,7 @@ func (r Grade) GetRepresentation(halF bool) (interface{}, error) {
 		return h, nil
 	}
 }
+
 func (r TimeTable) GetRepresentation(halF bool) (interface{}, error) {
 	self := "/lectures/" + fmt.Sprintf("%d", r.ID)
 	class, _ := r.Class.GetRepresentation(false)

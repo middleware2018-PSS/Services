@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 10.3 (Debian 10.3-1.pgdg90+1)
--- Dumped by pg_dump version 10.3
+-- Dumped by pg_dump version 10.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -565,9 +565,10 @@ ALTER TABLE ONLY back2school.timetable ALTER COLUMN id SET DEFAULT nextval('back
 --
 
 COPY back2school.accounts ("user", password, kind, id) FROM stdin;
-pippo	pluto	Parent	3
-a	p	Admin	2
-admin	password	Admin	1
+a	$2a$04$3gNENZCutU4.6JtklLNB7OmEvxn5Tr6KSSo8zXKbqojifwlJscEF6	Admin	2
+pippo	$2a$04$3gNENZCutU4.6JtklLNB7OmEvxn5Tr6KSSo8zXKbqojifwlJscEF6	Parent	3
+admin	$2a$04$3gNENZCutU4.6JtklLNB7OmEvxn5Tr6KSSo8zXKbqojifwlJscEF6	Admin	1
+philippe	$2a$10$kulRkFpy6hE.Z9i3uxbQN.6PUw4qpMGMmAd7d7I1fX2tDVm1O3Hu.	Admin	3
 \.
 
 
@@ -774,6 +775,14 @@ SELECT pg_catalog.setval('back2school.timetable_id_seq', 2, true);
 
 
 --
+-- Name: accounts accounts_kind_id_pk; Type: CONSTRAINT; Schema: back2school; Owner: postgres
+--
+
+ALTER TABLE ONLY back2school.accounts
+    ADD CONSTRAINT accounts_kind_id_pk UNIQUE (kind, id);
+
+
+--
 -- Name: accounts accounts_user_pk; Type: CONSTRAINT; Schema: back2school; Owner: postgres
 --
 
@@ -891,13 +900,6 @@ ALTER TABLE ONLY back2school.teaches
 
 ALTER TABLE ONLY back2school.timetable
     ADD CONSTRAINT timetable_id_pk PRIMARY KEY (id);
-
-
---
--- Name: accounts_password_uindex; Type: INDEX; Schema: back2school; Owner: postgres
---
-
-CREATE UNIQUE INDEX accounts_password_uindex ON back2school.accounts USING btree (password);
 
 
 --

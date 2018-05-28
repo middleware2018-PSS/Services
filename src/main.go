@@ -94,7 +94,8 @@ func main() {
 		claims := jwt.ExtractClaims(c)
 		c.Set(repository.USER, claims[repository.USER])
 		c.Set(repository.KIND, claims[repository.KIND])
-	}) // checkBasicUserPassword(con))
+	})
+	api.GET("/accounts", getOffsetLimit(con.Accounts))
 	api.POST("/accounts", func(c *gin.Context) {
 		var user models.User
 		if err := c.Bind(&user); err == nil {

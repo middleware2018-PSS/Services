@@ -14,7 +14,48 @@
     "host": "localhost:5000",
     "paths": {
         "/accounts": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "Accounts"
+                ],
+                "summary": "Get all accounts",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "number of elements to return",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "offset in the list of elements to return",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Login"
+                            }
+                        }
+                    }
+                }
+            },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Accounts"
                 ],
@@ -33,6 +74,11 @@
                 ]
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Accounts"
                 ],
@@ -53,6 +99,11 @@
         },
         "/accounts/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Accounts"
                 ],
@@ -104,6 +155,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Appointments"
                 ],
@@ -140,6 +196,11 @@
         },
         "/appointments/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Appointments"
                 ],
@@ -164,6 +225,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Appointments"
                 ],
@@ -198,6 +264,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Appointments"
                 ],
@@ -215,6 +286,11 @@
         },
         "/classes": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Classes"
                 ],
@@ -246,6 +322,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Classes"
                 ],
@@ -275,6 +356,11 @@
         },
         "/classes/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Classes"
                 ],
@@ -299,6 +385,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Classes"
                 ],
@@ -333,6 +424,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Classes"
                 ],
@@ -350,6 +446,11 @@
         },
         "/classes/{id}/lectures": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Classes"
                 ],
@@ -390,6 +491,11 @@
         },
         "/classes/{id}/students": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Classes"
                 ],
@@ -430,6 +536,11 @@
         },
         "/grades": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Grades"
                 ],
@@ -461,6 +572,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Grades"
                 ],
@@ -490,6 +606,11 @@
         },
         "/grades/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Grades"
                 ],
@@ -514,6 +635,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Grades"
                 ],
@@ -548,6 +674,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Grades"
                 ],
@@ -565,6 +696,11 @@
         },
         "/lectures": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Lectures"
                 ],
@@ -596,6 +732,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Lectures"
                 ],
@@ -625,6 +766,11 @@
         },
         "/lectures/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Lectures"
                 ],
@@ -649,6 +795,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Lectures"
                 ],
@@ -683,6 +834,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Lectures"
                 ],
@@ -729,6 +885,11 @@
         },
         "/notifications": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Notifications"
                 ],
@@ -760,6 +921,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Notifications"
                 ],
@@ -789,6 +955,11 @@
         },
         "/notifications/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Notifications"
                 ],
@@ -813,6 +984,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Notifications"
                 ],
@@ -847,6 +1023,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Notifications"
                 ],
@@ -864,6 +1045,11 @@
         },
         "/parents": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Parents"
                 ],
@@ -895,6 +1081,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Parents",
                     "Parents"
@@ -925,6 +1116,11 @@
         },
         "/parents/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Parents"
                 ],
@@ -949,6 +1145,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Parents"
                 ],
@@ -983,6 +1184,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Parents"
                 ],
@@ -1000,6 +1206,11 @@
         },
         "/parents/{id}/appointments": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Parents",
                     "Parents"
@@ -1041,6 +1252,11 @@
         },
         "/parents/{id}/notifications": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Parents"
                 ],
@@ -1081,6 +1297,11 @@
         },
         "/parents/{id}/payments": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Parents"
                 ],
@@ -1121,6 +1342,11 @@
         },
         "/parents/{id}/students": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Parents"
                 ],
@@ -1161,6 +1387,11 @@
         },
         "/payments": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Payments"
                 ],
@@ -1192,6 +1423,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Payments"
                 ],
@@ -1221,6 +1457,11 @@
         },
         "/payments/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Payments"
                 ],
@@ -1245,6 +1486,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Payments"
                 ],
@@ -1279,6 +1525,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Payments"
                 ],
@@ -1296,6 +1547,11 @@
         },
         "/students": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Students"
                 ],
@@ -1327,6 +1583,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Students"
                 ],
@@ -1356,6 +1617,11 @@
         },
         "/students/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Students"
                 ],
@@ -1380,6 +1646,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Students"
                 ],
@@ -1414,6 +1685,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Students"
                 ],
@@ -1431,6 +1707,11 @@
         },
         "/students/{id}/grades": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Students"
                 ],
@@ -1471,6 +1752,11 @@
         },
         "/teachers": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Teachers"
                 ],
@@ -1502,6 +1788,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Teachers"
                 ],
@@ -1531,6 +1822,11 @@
         },
         "/teachers/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Teachers"
                 ],
@@ -1555,6 +1851,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Teachers"
                 ],
@@ -1589,6 +1890,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Teachers"
                 ],
@@ -1606,6 +1912,11 @@
         },
         "/teachers/{id}/appointments": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Teachers"
                 ],
@@ -1646,6 +1957,11 @@
         },
         "/teachers/{id}/classes": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Teachers"
                 ],
@@ -1686,6 +2002,11 @@
         },
         "/teachers/{id}/lectures": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Teachers"
                 ],
@@ -1726,6 +2047,11 @@
         },
         "/teachers/{id}/notifications": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Teachers"
                 ],
@@ -1766,6 +2092,11 @@
         },
         "/teachers/{id}/subjects": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Teachers"
                 ],
@@ -1804,6 +2135,11 @@
         },
         "/teachers/{id}/subjects/{subject}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "tags": [
                     "Teachers"
                 ],
@@ -1854,6 +2190,14 @@
         "models.Account": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "kind": {
+                    "type": "string",
+                    "example": "Parent"
+                },
                 "password": {
                     "type": "string",
                     "example": "Password"
@@ -1926,7 +2270,7 @@
                 "data": {
                     "type": "array",
                     "items": {
-                        "type": "\u0026{%!s(token.Pos=5631) %!s(*ast.FieldList=\u0026{5640 [] 5641}) %!s(bool=false)}"
+                        "type": "\u0026{%!s(token.Pos=5638) %!s(*ast.FieldList=\u0026{5647 [] 5648}) %!s(bool=false)}"
                     }
                 },
                 "next": {

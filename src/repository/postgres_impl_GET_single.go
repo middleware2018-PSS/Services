@@ -7,6 +7,7 @@ import "github.com/middleware2018-PSS/Services/src/models"
 // @Tags Appointments
 // @Success 200 {object} models.Appointment
 // @Router /appointments/{id} [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) AppointmentByID(id int, who int, whoKind string) (interface{}, error) {
 	appointment := models.Appointment{}
 	var args []interface{}
@@ -37,6 +38,7 @@ func (r *postgresRepository) AppointmentByID(id int, who int, whoKind string) (i
 // @Tags Grades
 // @Success 200 {object} models.Grade
 // @Router /grades/{id} [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) GradeByID(id int, who int, whoKind string) (interface{}, error) {
 	grade := models.Grade{}
 	var query string
@@ -67,6 +69,7 @@ func (r *postgresRepository) GradeByID(id int, who int, whoKind string) (interfa
 // @Tags Classes
 // @Success 200 {object} models.Class
 // @Router /classes/{id} [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) ClassByID(id int, who int, whoKind string) (interface{}, error) {
 	class := models.Class{}
 	var query string
@@ -92,6 +95,7 @@ func (r *postgresRepository) ClassByID(id int, who int, whoKind string) (interfa
 // @Tags Notifications
 // @Success 200 {object} models.Notification
 // @Router /notifications/{id} [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) NotificationByID(id int, who int, whoKind string) (interface{}, error) {
 	n := models.Notification{}
 	var query string
@@ -126,6 +130,7 @@ func (r *postgresRepository) NotificationByID(id int, who int, whoKind string) (
 // @Tags Parents
 // @Success 200 {object} models.Parent
 // @Router /parents/{id} [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) ParentByID(id int, who int, whoKind string) (interface{}, error) {
 	p := models.Parent{}
 	var query string
@@ -157,6 +162,7 @@ func (r *postgresRepository) ParentByID(id int, who int, whoKind string) (interf
 // @Tags Students
 // @Success 200 {object} models.Student
 // @Router /students/{id} [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) StudentByID(id int, who int, whoKind string) (student interface{}, err error) {
 	s := models.Student{}
 	var query string
@@ -185,6 +191,7 @@ func (r *postgresRepository) StudentByID(id int, who int, whoKind string) (stude
 // @Tags Lectures
 // @Success 200 {object} models.TimeTable
 // @Router /lectures/{id} [get]
+// @Security ApiKeyAuth
 func (r *postgresRepository) LectureByID(id int, who int, whoKind string) (interface{}, error) {
 	grade := models.Grade{}
 	var query string

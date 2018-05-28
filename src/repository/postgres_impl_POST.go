@@ -10,6 +10,7 @@ import (
 // @Param Account body models.User true "data"
 // @Tags Accounts
 // @Router /accounts [post]
+// @Security ApiKeyAuth
 func (r *postgresRepository) CreateAccount(username string, password string, id int, kind string, cost int, whoKind string) error {
 	if whoKind == AdminUser {
 		query := `INSERT INTO back2school.accounts ("user", "password", id, kind) VALUES ($1, $2, $3, $4)`
@@ -33,6 +34,7 @@ func (r *postgresRepository) CreateAccount(username string, password string, id 
 // @Tags Appointments
 // @Router /appointments [post]
 // @Success 201 {object} models.Appointment
+// @Security ApiKeyAuth
 func (r *postgresRepository) CreateAppointment(appointment models.Appointment, who int, whoKind string) (id int, err error) {
 	var query string
 	var args []interface{}
@@ -65,6 +67,7 @@ func (r *postgresRepository) CreateAppointment(appointment models.Appointment, w
 // @Tags Parents
 // @Success 201 {object} models.Parent
 // @Router /parents [post]
+// @Security ApiKeyAuth
 func (r *postgresRepository) CreateParent(parent models.Parent, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "INSERT INTO back2school.parents " +
@@ -80,6 +83,7 @@ func (r *postgresRepository) CreateParent(parent models.Parent, who int, whoKind
 // @Tags Teachers
 // @Router /teachers [post]
 // @Success 201 {object} models.Teacher
+// @Security ApiKeyAuth
 func (r *postgresRepository) CreateTeacher(teacher models.Teacher, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "INSERT INTO back2school.teachers " +
@@ -97,6 +101,7 @@ func (r *postgresRepository) CreateTeacher(teacher models.Teacher, who int, whoK
 // @Tags Students
 // @Router /students [post]
 // @Success 201 {object} models.Student
+// @Security ApiKeyAuth
 func (r *postgresRepository) CreateStudent(student models.Student, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "INSERT INTO back2school.students " +
@@ -114,6 +119,7 @@ func (r *postgresRepository) CreateStudent(student models.Student, who int, whoK
 // @Tags Classes
 // @Router /classes [post]
 // @Success 201 {object} models.Class
+// @Security ApiKeyAuth
 func (r *postgresRepository) CreateClass(class models.Class, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "INSERT INTO back2school.classes " +
@@ -131,6 +137,7 @@ func (r *postgresRepository) CreateClass(class models.Class, who int, whoKind st
 // @Tags Notifications
 // @Router /notifications [post]
 // @Success 201 {object} models.Notification
+// @Security ApiKeyAuth
 func (r *postgresRepository) CreateNotification(notification models.Notification, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "insert into back2school.classes " +
@@ -148,6 +155,7 @@ func (r *postgresRepository) CreateNotification(notification models.Notification
 // @Tags Grades
 // @Router /grades [post]
 // @Success 201 {object} models.Grade
+// @Security ApiKeyAuth
 func (r *postgresRepository) CreateGrade(grade models.Grade, who int, whoKind string) (int, error) {
 	var query string
 	var args []interface{}
@@ -180,6 +188,7 @@ func (r *postgresRepository) CreateGrade(grade models.Grade, who int, whoKind st
 // @Tags Payments
 // @Router /payments [post]
 // @Success 201 {object} models.Payment
+// @Security ApiKeyAuth
 func (r *postgresRepository) CreatePayment(payment models.Payment, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "insert into back2school.payments " +
@@ -196,6 +205,7 @@ func (r *postgresRepository) CreatePayment(payment models.Payment, who int, whoK
 // @Tags Lectures
 // @Router /lectures [post]
 // @Success 201 {object} models.Payment
+// @Security ApiKeyAuth
 func (r *postgresRepository) CreateLecture(lecture models.TimeTable, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "insert into back2school.timetable " +

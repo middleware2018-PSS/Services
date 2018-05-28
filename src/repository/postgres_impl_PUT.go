@@ -11,6 +11,7 @@ import (
 // @Tags Teachers
 // @Success 204 {object} models.Teacher
 // @Router /teachers/{id} [put]
+// @Security ApiKeyAuth
 func (r *postgresRepository) UpdateTeacher(teacher models.Teacher, who int, whoKind string) (err error) {
 	var query string
 	var args []interface{}
@@ -41,6 +42,7 @@ func (r *postgresRepository) UpdateTeacher(teacher models.Teacher, who int, whoK
 // @Tags Parents
 // @Success 201 {object} models.Parent
 // @Router /parents/{id} [put]
+// @Security ApiKeyAuth
 func (r *postgresRepository) UpdateParent(parent models.Parent, who int, whoKind string) (err error) {
 	var query string
 	var args []interface{}
@@ -72,6 +74,7 @@ func (r *postgresRepository) UpdateParent(parent models.Parent, who int, whoKind
 // @Tags Students
 // @Success 201 {object} models.Student
 // @Router /students/{id} [put]
+// @Security ApiKeyAuth
 func (r *postgresRepository) UpdateStudent(student models.Student, who int, whoKind string) (err error) {
 	var query string
 	var args []interface{}
@@ -98,6 +101,7 @@ func (r *postgresRepository) UpdateStudent(student models.Student, who int, whoK
 // @Tags Appointments
 // @Success 201 {object} models.Appointment
 // @Router /appointments/{id} [put]
+// @Security ApiKeyAuth
 func (r *postgresRepository) UpdateAppointment(appointment models.Appointment, who int, whoKind string) (err error) {
 	var query string
 	var args []interface{}
@@ -128,6 +132,7 @@ func (r *postgresRepository) UpdateAppointment(appointment models.Appointment, w
 // @Tags Classes
 // @Success 201 {object} models.Class
 // @Router /classes/{id} [put]
+// @Security ApiKeyAuth
 func (r *postgresRepository) UpdateClass(class models.Class, who int, whoKind string) (err error) {
 	if whoKind == AdminUser {
 		query := "UPDATE back2school.classes " +
@@ -146,6 +151,7 @@ func (r *postgresRepository) UpdateClass(class models.Class, who int, whoKind st
 // @Tags Notifications
 // @Router /notifications/{id} [put]
 // @Success 201 {object} models.Notification
+// @Security ApiKeyAuth
 func (r *postgresRepository) UpdateNotification(notification models.Notification, who int, whoKind string) error {
 	if whoKind == AdminUser {
 		query := "UPDATE back2school.notification " +
@@ -164,6 +170,7 @@ func (r *postgresRepository) UpdateNotification(notification models.Notification
 // @Tags Grades
 // @Router /grades/{id} [put]
 // @Success 201 {object} models.Grade
+// @Security ApiKeyAuth
 func (r *postgresRepository) UpdateGrade(grade models.Grade, who int, whoKind string) error {
 	var query string
 	var args []interface{}
@@ -194,6 +201,7 @@ func (r *postgresRepository) UpdateGrade(grade models.Grade, who int, whoKind st
 // @Tags Payments
 // @Router /payments/{id} [put]
 // @Success 201 {object} models.Payment
+// @Security ApiKeyAuth
 func (r *postgresRepository) UpdatePayment(payment models.Payment, who int, whoKind string) error {
 	var query string
 	var args []interface{}
@@ -221,6 +229,7 @@ func (r *postgresRepository) UpdatePayment(payment models.Payment, who int, whoK
 // @Tags Lectures
 // @Router /lectures/{id} [put]
 // @Success 201 {object} models.TimeTable
+// @Security ApiKeyAuth
 func (r *postgresRepository) UpdateLecture(lecture models.TimeTable, who int, whoKind string) error {
 	var query string
 	var args []interface{}
@@ -245,6 +254,7 @@ func (r *postgresRepository) UpdateLecture(lecture models.TimeTable, who int, wh
 // @Param class body models.Account true "data"
 // @Tags Accounts
 // @Router /accounts [put]
+// @Security ApiKeyAuth
 func (r *postgresRepository) UpdateAccount(account models.Account, who int, whoKind string, cost int) error {
 	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), cost)
 	query := `UPDATE back2school.accounts SET "user" = $1, "password" = $2 where id = $3 and kind = $4" `

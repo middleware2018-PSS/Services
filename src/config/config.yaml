@@ -1,6 +1,6 @@
 DBuser : postgres
 DB : postgres
 Realm : test
-PrivateKeyFile : /home/phisco/go/src/github.com/middleware2018-PSS/Services/config/back2school.rsa
-PublicKeyFile : /home/phisco/go/src/github.com/middleware2018-PSS/Services/config/back2school.rsa.pub
+PrivateKeyFile : /home/phisco/go/src/github.com/middleware2018-PSS/Services/src/config/back2school.rsa
+PublicKeyFile : /home/phisco/go/src/github.com/middleware2018-PSS/Services/src/config/back2school.rsa.pub
 DBparams : "user=postgres dbname=postgres sslmode=disable"
