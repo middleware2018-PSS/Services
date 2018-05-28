@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/appleboy/gin-jwt"
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	_ "github.com/middleware2018-PSS/Services/src/docs"
@@ -11,6 +11,7 @@ import (
 	"github.com/middleware2018-PSS/Services/src/repository"
 	"github.com/phisco/hal"
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"log"
@@ -18,7 +19,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -27,20 +27,13 @@ var (
 
 type (
 	JwtData struct {
-	Id   int
-	Role string
-	}
-
-	User struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-		Role string `json:"role"`
-		ID int `json:"id"`
+		Id   int
+		Role string
 	}
 )
 
 const (
-	HAL = "application/hal+json"
+	HAL  = "application/hal+json"
 	COST = 10
 )
 
@@ -53,8 +46,7 @@ const (
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
-// @name Authorization
-
+// @name Authorization: Bearer
 // @host localhost:5000
 func main() {
 	/*p, _ := bcrypt.GenerateFromPassword([]byte("password"), 4)
@@ -63,7 +55,7 @@ func main() {
 	viper.AddConfigPath("$HOME/go/src/github.com/middleware2018-PSS/Services/config")
 
 	err := viper.ReadInConfig()
-	if err != nil{
+	if err != nil {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 
@@ -77,19 +69,19 @@ func main() {
 	con = repository.NewPostgresRepository(db)
 
 	authMiddleware := jwt.GinJWTMiddleware{
-		Realm:      viper.GetString("realm"),
+		Realm:            viper.GetString("realm"),
 		SigningAlgorithm: "RS256",
-		PrivKeyFile: viper.GetString("PrivateKeyFile"),
-		PubKeyFile: viper.GetString("PublicKeyFile"),
-		Timeout:    time.Hour,
-		MaxRefresh: time.Hour,
+		PrivKeyFile:      viper.GetString("PrivateKeyFile"),
+		PubKeyFile:       viper.GetString("PublicKeyFile"),
+		Timeout:          time.Hour,
+		MaxRefresh:       time.Hour,
 		Authenticator: func(userID string, password string, c *gin.Context) (interface{}, bool) {
 			id, kind, ok := con.CheckUser(userID, password)
 			return JwtData{id, kind}, ok
 		},
 		PayloadFunc: func(data interface{}) map[string]interface{} {
 			return map[string]interface{}{
-				repository.USER:   data.(JwtData).Id,
+				repository.USER: data.(JwtData).Id,
 				repository.KIND: data.(JwtData).Role,
 			}
 		},
@@ -97,7 +89,7 @@ func main() {
 
 	g := gin.Default()
 
-	g.POST("/login", authMiddleware.LoginHandler)
+	g.POST("/login", LoginHandler(&authMiddleware))
 
 	api := g.Group("", authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
 		claims := jwt.ExtractClaims(c)
@@ -105,9 +97,9 @@ func main() {
 		c.Set(repository.KIND, claims[repository.KIND])
 	}) // checkBasicUserPassword(con))
 	api.POST("/accounts", func(c *gin.Context) {
-		var user User
-		if err := c.Bind(&user); err == nil{
-			if err := con.CreateAccount(user.Username, user.Password, user.ID, user.Role, COST); err != nil{
+		var user models.User
+		if err := c.Bind(&user); err == nil {
+			if err := con.CreateAccount(user.Username, user.Password, user.ID, user.Role, COST); err != nil {
 				c.AbortWithStatus(http.StatusNotAcceptable)
 			} else {
 				c.AbortWithStatus(http.StatusCreated)
@@ -498,4 +490,13 @@ func ToRepresentation(res interface{}, c *gin.Context, halF bool) (interface{}, 
 			res,
 		}, nil
 	}
+}
+
+// @Summary Authenticate
+// @Param Account body models.Login true "data"
+// @Tags Accounts
+// @Success 200 {object} models.Token
+// @Router /login [post]
+func LoginHandler(authMiddleware *jwt.GinJWTMiddleware) func(*gin.Context) {
+	return authMiddleware.LoginHandler
 }

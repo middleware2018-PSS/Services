@@ -2,3 +2,7 @@ todo.txt
 vendor
 
 \.vscode/
+
+*.rsa
+
+*.pub

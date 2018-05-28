@@ -13,6 +13,26 @@
     },
     "host": "localhost:5000",
     "paths": {
+        "/accounts": {
+            "post": {
+                "tags": [
+                    "Accounts"
+                ],
+                "summary": "Create an account",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "Account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ]
+            }
+        },
         "/appointments": {
             "get": {
                 "security": [
@@ -43,7 +63,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/representations.List"
+                            "$ref": "#/definitions/models.List"
                         }
                     }
                 }
@@ -268,7 +288,7 @@
                 "tags": [
                     "Lectures"
                 ],
-                "summary": "Get a lecture by class",
+                "summary": "Get lectures by class",
                 "parameters": [
                     {
                         "type": "integer",
@@ -296,7 +316,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Appointment"
+                                "$ref": "#/definitions/models.TimeTable"
                             }
                         }
                     }
@@ -458,6 +478,94 @@
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.Grade"
+                        }
+                    }
+                }
+            }
+        },
+        "/lectures": {
+            "get": {
+                "tags": [
+                    "Lectures"
+                ],
+                "summary": "Get all lectures",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "number of elements to return",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "offset in the list of elements to return",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TimeTable"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/lectures/{id}": {
+            "get": {
+                "tags": [
+                    "Grades"
+                ],
+                "summary": "Get a lecture by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Lecture ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.TimeTable"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Accounts"
+                ],
+                "summary": "Authenticate",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "Account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Login"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Token"
                         }
                     }
                 }
@@ -1515,10 +1623,6 @@
         "models.Appointment": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "location": {
                     "type": "string",
                     "example": "Aula Magna"
@@ -1537,10 +1641,6 @@
             "properties": {
                 "grade": {
                     "type": "integer"
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 1
                 },
                 "info": {
                     "type": "string"
@@ -1562,10 +1662,6 @@
                 "grade": {
                     "type": "integer"
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "student": {
                     "type": "object",
                     "$ref": "#/definitions/models.Student"
@@ -1580,13 +1676,40 @@
                 }
             }
         },
+        "models.List": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "\u0026{%!s(token.Pos=5631) %!s(*ast.FieldList=\u0026{5640 [] 5641}) %!s(bool=false)}"
+                    }
+                },
+                "next": {
+                    "type": "string"
+                },
+                "previous": {
+                    "type": "string"
+                },
+                "self": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Login": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Notification": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "message": {
                     "type": "string"
                 },
@@ -1604,10 +1727,6 @@
         "models.Parent": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "info": {
                     "type": "string"
                 },
@@ -1631,10 +1750,6 @@
                 "emitted": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "payed": {
                     "type": "boolean"
                 },
@@ -1650,10 +1765,6 @@
         "models.Student": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "info": {
                     "type": "string"
                 },
@@ -1671,10 +1782,6 @@
         "models.Teacher": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "info": {
                     "type": "string"
                 },
@@ -1699,10 +1806,6 @@
                 "end": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "info": {
                     "type": "string"
                 },
@@ -1719,6 +1822,37 @@
                 }
             }
         },
+        "models.Token": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "expire": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "repository.Subjects": {
             "type": "object",
             "properties": {
@@ -1732,32 +1866,12 @@
                     ]
                 }
             }
-        },
-        "representations.List": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "\u0026{%!s(token.Pos=1100) %!s(*ast.FieldList=\u0026{1109 [] 1110}) %!s(bool=false)}"
-                    }
-                },
-                "next": {
-                    "type": "string"
-                },
-                "previous": {
-                    "type": "string"
-                },
-                "self": {
-                    "type": "string"
-                }
-            }
         }
     },
     "securityDefinitions": {
         "ApiKeyAuth": {
             "type": "apiKey",
-            "name": "Authorization",
+            "name": "Authorization: Bearer",
             "in": "header"
         }
     }

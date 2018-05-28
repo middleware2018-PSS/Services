@@ -12,6 +12,16 @@ type (
 	Subject = string
 
 	Location = string
+	Token    struct {
+		Code   int       `json:"code"`
+		Token  string    `json:"token"`
+		Expire time.Time `json:"expire"`
+	}
+
+	Login struct {
+		Username string `form:"username" json:"username" binding:"required"`
+		Password string `form:"password" json:"password" binding:"required"`
+	}
 
 	// remove connections
 	Parent struct {
@@ -133,6 +143,13 @@ func (r List) GetMap() hal.Entry {
 }
 
 type (
+	User struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Role     string `json:"role"`
+		ID       int    `json:"id"`
+	}
+
 	StudentRepr struct {
 		SelfAndData
 		Grades string `json:"grades",xml:"grades"`

@@ -21,18 +21,22 @@ func (r *postgresRepository) CheckUser(userID string, password string) (int, str
 	return id, kind, err == nil && bcrypt.CompareHashAndPassword(saltedPass, []byte(password)) == nil
 }
 
-func (r* postgresRepository) CreateAccount(username string, password string, id int, kind string, cost int) error {
-	query :=`INSERT INTO back2school.accounts ("user", "password", id, kind) VALUES ($1, $2, $3, $4)`
+// @Summary Create an account
+// @Param Account body models.User true "data"
+// @Tags Accounts
+// @Router /accounts [post]
+func (r *postgresRepository) CreateAccount(username string, password string, id int, kind string, cost int) error {
+	query := `INSERT INTO back2school.accounts ("user", "password", id, kind) VALUES ($1, $2, $3, $4)`
 	cryptedPass, err := bcrypt.GenerateFromPassword([]byte(password), cost)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	_, err = r.Exec(query, username, cryptedPass, id, kind)
-	if err != nil{
+	if err != nil {
 		log.Printf("%v", err.Error())
 	}
 	return err
-	}
+}
 
 // @Summary Get a appointment by id
 // @Param id path int true "Appointment ID"
@@ -610,7 +614,7 @@ func (r *postgresRepository) Payments(limit int, offset int, who int, whoKind st
 // @Param offset query int false "offset in the list of elements to return"
 // @Tags Appointments
 // @Router /appointments [get]
-// @Success 200 {object} representations.List
+// @Success 200 {object} models.List
 // @Security ApiKeyAuth
 func (r *postgresRepository) Appointments(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	var query string

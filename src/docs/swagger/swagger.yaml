@@ -1,9 +1,6 @@
 definitions:
   models.Appointment:
     properties:
-      id:
-        example: 1
-        type: integer
       location:
         example: Aula Magna
         type: string
@@ -16,9 +13,6 @@ definitions:
   models.Class:
     properties:
       grade:
-        type: integer
-      id:
-        example: 1
         type: integer
       info:
         type: string
@@ -33,9 +27,6 @@ definitions:
         type: string
       grade:
         type: integer
-      id:
-        example: 1
-        type: integer
       student:
         $ref: '#/definitions/models.Student'
         type: object
@@ -46,11 +37,28 @@ definitions:
         $ref: '#/definitions/models.Teacher'
         type: object
     type: object
+  models.List:
+    properties:
+      data:
+        items:
+          type: '&{%!s(token.Pos=5631) %!s(*ast.FieldList=&{5640 [] 5641}) %!s(bool=false)}'
+        type: array
+      next:
+        type: string
+      previous:
+        type: string
+      self:
+        type: string
+    type: object
+  models.Login:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   models.Notification:
     properties:
-      id:
-        example: 1
-        type: integer
       message:
         type: string
       receiver:
@@ -62,9 +70,6 @@ definitions:
     type: object
   models.Parent:
     properties:
-      id:
-        example: 1
-        type: integer
       info:
         type: string
       mail:
@@ -80,9 +85,6 @@ definitions:
         type: integer
       emitted:
         type: string
-      id:
-        example: 1
-        type: integer
       payed:
         type: boolean
       reason:
@@ -93,9 +95,6 @@ definitions:
     type: object
   models.Student:
     properties:
-      id:
-        example: 1
-        type: integer
       info:
         type: string
       mail:
@@ -107,9 +106,6 @@ definitions:
     type: object
   models.Teacher:
     properties:
-      id:
-        example: 1
-        type: integer
       info:
         type: string
       mail:
@@ -126,9 +122,6 @@ definitions:
         type: object
       end:
         type: string
-      id:
-        example: 1
-        type: integer
       info:
         type: string
       location:
@@ -140,6 +133,26 @@ definitions:
         example: science
         type: string
     type: object
+  models.Token:
+    properties:
+      code:
+        type: integer
+      expire:
+        type: string
+      token:
+        type: string
+    type: object
+  models.User:
+    properties:
+      id:
+        type: integer
+      password:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
   repository.Subjects:
     properties:
       subjects:
@@ -148,19 +161,6 @@ definitions:
         items:
           type: string
         type: array
-    type: object
-  representations.List:
-    properties:
-      data:
-        items:
-          type: '&{%!s(token.Pos=1100) %!s(*ast.FieldList=&{1109 [] 1110}) %!s(bool=false)}'
-        type: array
-      next:
-        type: string
-      previous:
-        type: string
-      self:
-        type: string
     type: object
 host: localhost:5000
 info:
@@ -173,6 +173,19 @@ info:
   title: Back2School API
   version: "1.0"
 paths:
+  /accounts:
+    post:
+      parameters:
+      - description: data
+        in: body
+        name: Account
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+          type: object
+      summary: Create an account
+      tags:
+      - Accounts
   /appointments:
     get:
       parameters:
@@ -188,7 +201,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/representations.List'
+            $ref: '#/definitions/models.List'
             type: object
       security:
       - ApiKeyAuth: []
@@ -358,9 +371,9 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Appointment'
+              $ref: '#/definitions/models.TimeTable'
             type: array
-      summary: Get a lecture by class
+      summary: Get lectures by class
       tags:
       - Lectures
   /classes/{id}/students:
@@ -468,6 +481,63 @@ paths:
       summary: Update Grade
       tags:
       - Grades
+  /lectures:
+    get:
+      parameters:
+      - description: number of elements to return
+        in: query
+        name: limit
+        type: integer
+      - description: offset in the list of elements to return
+        in: query
+        name: offset
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TimeTable'
+            type: array
+      summary: Get all lectures
+      tags:
+      - Lectures
+  /lectures/{id}:
+    get:
+      parameters:
+      - description: Lecture ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TimeTable'
+            type: object
+      summary: Get a lecture by id
+      tags:
+      - Grades
+  /login:
+    post:
+      parameters:
+      - description: data
+        in: body
+        name: Account
+        required: true
+        schema:
+          $ref: '#/definitions/models.Login'
+          type: object
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Token'
+            type: object
+      summary: Authenticate
+      tags:
+      - Accounts
   /notifications:
     get:
       parameters:
@@ -1158,6 +1228,6 @@ paths:
 securityDefinitions:
   ApiKeyAuth:
     in: header
-    name: Authorization
+    name: 'Authorization: Bearer'
     type: apiKey
 swagger: "2.0"
