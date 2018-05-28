@@ -29,7 +29,7 @@ func (r *postgresRepository) AppointmentByID(id int, who int, whoKind string) (i
 		return nil, ErrorNotAuthorized
 	}
 	err := r.QueryRow(query, args...).Scan(
-		&appointment.ID, &appointment.Student.ID, &appointment.Teacher.ID, &appointment.Time, &appointment.Location)
+		&appointment.ID, &appointment.Student, &appointment.Teacher, &appointment.Time, &appointment.Location)
 	return switchResult(appointment, err)
 }
 
@@ -60,7 +60,7 @@ func (r *postgresRepository) GradeByID(id int, who int, whoKind string) (interfa
 		return nil, ErrorNotAuthorized
 	}
 	err := r.QueryRow(query, id, who).Scan(
-		&grade.ID, &grade.Student.ID, &grade.Teacher.ID, &grade.Subject, &grade.Date, &grade.Grade)
+		&grade.ID, &grade.Student, &grade.Teacher, &grade.Subject, &grade.Date, &grade.Grade)
 	return switchResult(grade, err)
 }
 
@@ -220,6 +220,6 @@ func (r *postgresRepository) LectureByID(id int, who int, whoKind string) (inter
 		return nil, ErrorNotAuthorized
 	}
 	err := r.QueryRow(query, id, who).Scan(
-		&grade.ID, &grade.Student.ID, &grade.Teacher.ID, &grade.Subject, &grade.Date, &grade.Grade)
+		&grade.ID, &grade.Student, &grade.Teacher, &grade.Subject, &grade.Date, &grade.Grade)
 	return switchResult(grade, err)
 }

@@ -107,7 +107,7 @@ func (r *postgresRepository) LectureByClass(id int, limit int, offset int, who i
 		query,
 		func(rows *sql.Rows) (interface{}, error) {
 			lecture := models.TimeTable{}
-			err := rows.Scan(&lecture.ID, &lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
+			err := rows.Scan(&lecture.ID, lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
 			return lecture, err
 		}, limit, offset, args...)
 }
@@ -172,7 +172,7 @@ func (r *postgresRepository) Grades(limit int, offset int, who int, whoKind stri
 	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			g := models.Grade{}
-			err := rows.Scan(&g.ID, &g.Student.ID, &g.Grade, &g.Subject, &g.Date, &g.Teacher.ID)
+			err := rows.Scan(&g.ID, g.Student, &g.Grade, &g.Subject, &g.Date, g.Teacher)
 			return g, err
 		}, limit, offset, args...)
 }
@@ -283,7 +283,7 @@ func (r *postgresRepository) PaymentsByParent(id int, limit int, offset int, who
 	}
 	return r.listByParams(query, func(rows *sql.Rows) (interface{}, error) {
 		payment := models.Payment{}
-		err := rows.Scan(&payment.ID, &payment.Amount, &payment.Student.ID, &payment.Payed, &payment.Reason, &payment.Emitted)
+		err := rows.Scan(&payment.ID, &payment.Amount, payment.Student, &payment.Payed, &payment.Reason, &payment.Emitted)
 		return payment, err
 	}, limit, offset, args...)
 }
@@ -378,7 +378,7 @@ func (r *postgresRepository) AppointmentsByParent(id int, limit int, offset int,
 	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			appointment := models.Appointment{}
-			err := rows.Scan(&appointment.ID, &appointment.Student.ID, &appointment.Teacher.ID, &appointment.Location, &appointment.Time)
+			err := rows.Scan(&appointment.ID, appointment.Student, appointment.Teacher, &appointment.Location, &appointment.Time)
 			return appointment, err
 		}, limit, offset, args...)
 }
@@ -439,7 +439,7 @@ func (r *postgresRepository) Payments(limit int, offset int, who int, whoKind st
 	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			payment := models.Payment{}
-			err := rows.Scan(&payment.ID, &payment.Amount, &payment.Student.ID, &payment.Payed, &payment.Reason, &payment.Emitted)
+			err := rows.Scan(&payment.ID, &payment.Amount, payment.Student, &payment.Payed, &payment.Reason, &payment.Emitted)
 			return payment, err
 		}, limit, offset, args...)
 }
@@ -471,7 +471,7 @@ func (r *postgresRepository) Appointments(limit int, offset int, who int, whoKin
 	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			appointment := models.Appointment{}
-			err := rows.Scan(&appointment.ID, &appointment.Student.ID, &appointment.Teacher.ID, &appointment.Location, &appointment.Time)
+			err := rows.Scan(&appointment.ID, &appointment.Student, &appointment.Teacher, &appointment.Location, &appointment.Time)
 			return appointment, err
 		}, limit, offset, args...)
 }
@@ -546,7 +546,7 @@ func (r *postgresRepository) GradesByStudent(id int, limit int, offset int, who 
 	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			grade := models.Grade{}
-			err := rows.Scan(&grade.ID, &grade.Student.ID, &grade.Subject, &grade.Date, &grade.Grade, &grade.Teacher.ID)
+			err := rows.Scan(&grade.ID, grade.Student, &grade.Subject, &grade.Date, &grade.Grade, grade.Teacher)
 			return grade, err
 		}, limit, offset, args...)
 }
@@ -651,7 +651,7 @@ func (r *postgresRepository) AppointmentsByTeacher(id int, limit int, offset int
 	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			app := models.Appointment{}
-			err := rows.Scan(&app.ID, &app.Student.ID, &app.Teacher.ID, &app.Location, &app.Time)
+			err := rows.Scan(&app.ID, app.Student, app.Teacher, &app.Location, &app.Time)
 			return app, err
 		}, limit, offset, args...)
 }
@@ -803,7 +803,7 @@ func (r *postgresRepository) LecturesByTeacher(id int, limit int, offset int, wh
 	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			lecture := models.TimeTable{}
-			err := rows.Scan(&lecture.ID, &lecture.Class.ID, &lecture.Subject, &lecture.Location, &lecture.Start, &lecture.End, &lecture.Info)
+			err := rows.Scan(&lecture.ID, lecture.Class, &lecture.Subject, &lecture.Location, &lecture.Start, &lecture.End, &lecture.Info)
 			return lecture, err
 
 		}, limit, offset, args...)
@@ -884,7 +884,7 @@ func (r *postgresRepository) Lectures(limit int, offset int, who int, whoKind st
 	}
 	return r.listByParams(query, func(rows *sql.Rows) (interface{}, error) {
 		lecture := models.TimeTable{}
-		err := rows.Scan(&lecture.ID, &lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
+		err := rows.Scan(&lecture.ID, lecture.Class, &lecture.Subject, &lecture.Start, &lecture.End, &lecture.Location, &lecture.Info)
 		return lecture, err
 	}, limit, offset, args...)
 }

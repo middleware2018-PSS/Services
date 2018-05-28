@@ -109,17 +109,17 @@ func (r *postgresRepository) UpdateAppointment(appointment models.Appointment, w
 	case ParentUser:
 		query = "if $1 in (select parent from back2school.isParent where student = $2) UPDATE back2school.appointments " +
 			"SET student = $3, teacher = $4, location = $5, time = $6 where id = $7 "
-		args = append(args, who, appointment.Student.ID, appointment.Student.ID, appointment.Teacher.ID, appointment.Location, appointment.Time, appointment.ID)
+		args = append(args, who, appointment.Student, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time, appointment.ID)
 	case TeacherUser:
-		if appointment.Teacher.ID == who {
+		if *appointment.Teacher == who {
 			query = "UPDATE back2school.appointments " +
 				"SET student = $1, teacher = $2, location = $3, time = $4 where id = $5 "
-			args = append(args, appointment.Student.ID, who, appointment.Location, appointment.Time, appointment.ID)
+			args = append(args, appointment.Student, who, appointment.Location, appointment.Time, appointment.ID)
 		}
 	case AdminUser:
 		query = "UPDATE back2school.appointments " +
 			"SET student = $1, teacher = $2, location = $3, time = $4 where id = $5 "
-		args = append(args, appointment.Student.ID, appointment.Teacher.ID, appointment.Location, appointment.Time, appointment.ID)
+		args = append(args, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time, appointment.ID)
 	default:
 		return ErrorNotAuthorized
 	}
@@ -176,11 +176,11 @@ func (r *postgresRepository) UpdateGrade(grade models.Grade, who int, whoKind st
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser:
-		if grade.Teacher.ID == who {
+		if *grade.Teacher == who {
 			query = "UPDATE back2school.grades " +
 				"SET student = $1, grade = $2, subject = $3, date = $4, teacher = $5) " +
 				" where id = $6 "
-			args = append(args, grade.Student.ID, grade.Grade, grade.Subject, grade.Date, grade.Teacher.ID, grade.ID)
+			args = append(args, grade.Student, grade.Grade, grade.Subject, grade.Date, grade.Teacher, grade.ID)
 		} else {
 			return ErrorNotAuthorized
 		}
@@ -188,7 +188,7 @@ func (r *postgresRepository) UpdateGrade(grade models.Grade, who int, whoKind st
 		query = "UPDATE back2school.grades " +
 			"SET student = $1, grade = $2, subject = $3, date = $4, teacher = $5) " +
 			" where id = $6 "
-		args = append(args, grade.Student.ID, grade.Grade, grade.Subject, grade.Date, grade.Teacher.ID)
+		args = append(args, grade.Student, grade.Grade, grade.Subject, grade.Date, grade.Teacher)
 	default:
 		return ErrorNotAuthorized
 	}
@@ -210,13 +210,13 @@ func (r *postgresRepository) UpdatePayment(payment models.Payment, who int, whoK
 		query = "if $7 in (select parent from back2school.isParent where student = $2) UPDATE back2school.grades " +
 			"SET amount = $1, student = $2, payed = $3, reason = $4, emitted = $5 " +
 			" where id = $6 "
-		args = append(args, payment.Amount, payment.Student.ID, payment.Payed, payment.Reason, payment.Emitted, payment.ID, who)
+		args = append(args, payment.Amount, payment.Student, payment.Payed, payment.Reason, payment.Emitted, payment.ID, who)
 
 	case AdminUser:
 		query = "UPDATE back2school.grades " +
 			"SET amount = $1, student = $2, payed = $3, reason = $4, emitted = $5 " +
 			" where id = $6 "
-		args = append(args, payment.Amount, payment.Student.ID, payment.Payed, payment.Reason, payment.Emitted, payment.ID)
+		args = append(args, payment.Amount, payment.Student, payment.Payed, payment.Reason, payment.Emitted, payment.ID)
 	default:
 		return ErrorNotAuthorized
 	}

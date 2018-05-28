@@ -118,5 +118,4 @@ type Repository interface {
 	CreateLecture(lecture models.TimeTable, who int, whoKind string) (int, error)
 	UpdateAccount(account models.Account, who int, whoKind string, cost int) error
 	Accounts(limit int, offset int, who int, whoKind string) ([]interface{}, error)
-
 }

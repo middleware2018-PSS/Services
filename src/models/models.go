@@ -12,7 +12,8 @@ type (
 	Subject = string
 
 	Location = string
-	Token    struct {
+
+	Token struct {
 		Code   int       `json:"code"`
 		Token  string    `json:"token"`
 		Expire time.Time `json:"expire"`
@@ -68,8 +69,8 @@ type (
 		ID       int        `json:"-" xml:"id" example:"1"`
 		Time     *time.Time `json:"time,omitempty" xml:"time"`
 		Location *string    `json:"location,omitempty" xml:"location" example:"Aula Magna"`
-		Student  Student    `json:"student,omitempty" xml:"student"`
-		Teacher  Teacher    `json:"student,omitempty" xml:"teacher"`
+		Student  *int       `json:"studentID,omitempty" xml:"student"`
+		Teacher  *int       `json:"teacherID,omitempty" xml:"teacher"`
 	}
 
 	Payment struct {
@@ -78,21 +79,21 @@ type (
 		Payed   *bool      `json:"payed,omitempty" xml:"payed"`
 		Emitted *time.Time `json:"emitted,omitempty" xml:"emitted"`
 		Reason  *string    `json:"reason,omitempty" xml:"reason"`
-		Student Student    `json:"student,omitempty" xml:"student"`
+		Student *int       `json:"studentID,omitempty" xml:"student"`
 	}
 
 	Grade struct {
 		ID      int        `json:"-" xml:"id" example:"1"`
-		Student Student    `json:"student,omitempty" xml:"student"`
+		Student *int       `json:"studentID,omitempty" xml:"student"`
 		Subject *string    `json:"subject,omitempty" xml:"subject" example:"science"`
 		Date    *time.Time `json:"date,omitempty" xml:"date"`
 		Grade   *int       `json:"grade,omitempty" xml:"grade"`
-		Teacher Teacher    `json:"teacher,omitempty" xml:"teacher"`
+		Teacher *int       `json:"teacherID,omitempty" xml:"teacher"`
 	}
 
 	TimeTable struct {
 		ID       int        `json:"-" xml:"id" example:"1"`
-		Class    Class      `json:"class,omitempty" xml:"class"`
+		Class    *int       `json:"classID,omitempty" xml:"class"`
 		Location *string    `json:"location,omitempty" xml:"location" example:"Aula Magna"`
 		Subject  *string    `json:"subject,omitempty" xml:"subject" example:"science"`
 		Start    *time.Time `json:"start,omitempty" xml:"start"`
@@ -103,48 +104,10 @@ type (
 	Account struct {
 		Username string `form:"username" json:"username,omitempty" binding:"required" example:"John"`
 		Password string `form:"password" json:"password,omitempty" binding:"required" example:"Password"`
-		Kind string `json:"kind" binding:"required" example:"Parent"`
-		ID int `json:"id" example:"1"`
+		Kind     string `json:"kind" binding:"required" example:"Parent"`
+		ID       int    `json:"id" example:"1"`
 	}
-)
 
-func (r TimeTable) GetMap() hal.Entry {
-	return hal.Entry{
-		"location": r.Location,
-		"subject":  r.Subject,
-		"start":    r.Start,
-		"end":      r.End,
-		"info":     r.Info,
-	}
-}
-
-func (r Appointment) GetMap() hal.Entry {
-	return hal.Entry{
-		"time":     r.Time,
-		"location": r.Location,
-	}
-}
-
-func (r Grade) GetMap() hal.Entry {
-	return hal.Entry{
-		"grade":   r.Grade,
-		"subject": r.Subject,
-		"date":    r.Date,
-	}
-}
-
-func (r List) GetMap() hal.Entry {
-	hen := hal.Entry{}
-	if r.Previous != "" {
-		hen["prev"] = r.Previous
-	}
-	if r.Next != "" {
-		hen["next"] = r.Next
-	}
-	return hen
-}
-
-type (
 	User struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -152,41 +115,9 @@ type (
 		ID       int    `json:"id"`
 	}
 
-	StudentRepr struct {
-		SelfAndData
-		Grades string `json:"grades",xml:"grades"`
-	}
-
-	ParentRepr struct {
-		SelfAndData
-		Children      string `json:"children",xml:"children"`
-		Appointments  string `json:"appointments",xml:"appointments"`
-		Payments      string `json:"payments",xml:"payments"`
-		Notifications string `json:"notifications",xml:"notifications"`
-	}
-
-	TeacherRepr struct {
-		SelfAndData
-		Lectures      string `json:"lectures",xml:"lectures"`
-		Appointments  string `json:"appointments",xml:"appointments"`
-		Notifications string `json:"notifications",xml:"notifications"`
-		Subjects      string `json:"subjects",xml:"subjects"`
-		Classes       string `json:"classes",xml:"classes"`
-	}
-
-	SelfAndData struct {
-		Self string      `json:"self",xml:"self"`
-		Data interface{} `json:"data",xml:"data"`
-	}
-
-	ClassRepr struct {
-		SelfAndData
-		Students string `json:"students",xml:"students"`
-	}
-
 	List struct {
 		Self     string        `json:"self",xml:"self"`
-		Data     []interface{} `json:"data",xml:"data"`
+		Data     []interface{} `json:"data,omitempty",xml:"data"`
 		Next     string        `json:"next,omitempty",xml:"next"`
 		Previous string        `json:"previous,omitempty",xml:"previous"`
 	}
@@ -194,20 +125,21 @@ type (
 	Repr interface {
 		GetRepresentation(bool) (interface{}, error)
 	}
+
+	Selfable interface {
+		GetSelfLink() string
+	}
 )
 
+func (r Parent) GetSelfLink() string {
+	return "/parents/" + fmt.Sprintf("%d", r.ID)
+}
+
 func (r Parent) GetRepresentation(halF bool) (interface{}, error) {
-	self := "/parents/" + fmt.Sprintf("%d", r.ID)
 	if !halF {
-		return &ParentRepr{
-			SelfAndData{self,
-				r},
-			self + "/students",
-			self + "/appointments",
-			self + "/payments",
-			self + "/notifications",
-		}, nil
+		return r, nil
 	} else {
+		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		h.AddNewLink("children", self+"/students")
 		h.AddNewLink("appointments", self+"/appointments")
@@ -217,19 +149,15 @@ func (r Parent) GetRepresentation(halF bool) (interface{}, error) {
 	}
 }
 
+func (r Teacher) GetSelfLink() string {
+	return "/teachers/" + fmt.Sprintf("%d", r.ID)
+}
+
 func (r Teacher) GetRepresentation(halF bool) (interface{}, error) {
-	self := "/teachers/" + fmt.Sprintf("%d", r.ID)
 	if !halF {
-		return &TeacherRepr{
-			SelfAndData{self,
-				r},
-			self + "/lectures",
-			self + "/appointments",
-			self + "/notifications",
-			self + "/subjects",
-			self + "/classes",
-		}, nil
+		return r, nil
 	} else {
+		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		h.AddNewLink("lectures", self+"/lectures")
 		h.AddNewLink("appointments", self+"/appointments")
@@ -239,119 +167,106 @@ func (r Teacher) GetRepresentation(halF bool) (interface{}, error) {
 		return h, nil
 	}
 }
-
+func (r Student) GetSelfLink() string {
+	return "/students/" + fmt.Sprintf("%d", r.ID)
+}
 func (r Student) GetRepresentation(halF bool) (interface{}, error) {
-	self := "/students/" + fmt.Sprintf("%d", r.ID)
 	if !halF {
-		return &StudentRepr{
-			SelfAndData{self,
-				r},
-			self + "/grades",
-		}, nil
+		return r, nil
 	} else {
+		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		h.AddNewLink("grades", self+"/grades")
 		return h, nil
 	}
 }
+
+func (r Class) GetSelfLink() string {
+	return "/classes/" + fmt.Sprintf("%d", r.ID)
+}
 func (r Class) GetRepresentation(halF bool) (interface{}, error) {
-	self := "/classes/" + fmt.Sprintf("%d", r.ID)
 	if !halF {
-		return &ClassRepr{
-			SelfAndData{self,
-				r},
-			self + "/students",
-		}, nil
+		return r, nil
 	} else {
+		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		h.AddNewLink("students", self+"/students")
 		return h, nil
 	}
 }
 
+func (r Notification) GetSelfLink() string {
+	return "/notifications/" + fmt.Sprintf("%d", r.ID)
+}
+
 func (r Notification) GetRepresentation(halF bool) (interface{}, error) {
-	self := "/notifications/" + fmt.Sprintf("%d", r.ID)
 	if !halF {
-		return &SelfAndData{
-			self,
-			r,
-		}, nil
+		return r, nil
 	} else {
+		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		return h, nil
 	}
 }
+
+func (r Appointment) GetSelfLink() string {
+	return "/appointments/" + fmt.Sprintf("%d", r.ID)
+}
+
 func (r Appointment) GetRepresentation(halF bool) (interface{}, error) {
-	self := "/appointments/" + fmt.Sprintf("%d", r.ID)
-	s, _ := r.Student.GetRepresentation(false)
-	t, _ := r.Teacher.GetRepresentation(false)
 	if !halF {
-		return &SelfAndData{
-			self,
-			struct {
-				Appointment
-				Student *StudentRepr `json:"student",xml:"student"`
-				Teacher *TeacherRepr `json:"teacher",xml:"teacher"`
-			}{r, s.(*StudentRepr), t.(*TeacherRepr)}}, nil
+		return r, nil
 	} else {
+		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
-		h.AddNewLink("student", s.(*StudentRepr).Self)
-		h.AddNewLink("teacher", t.(*TeacherRepr).Self)
+		h.AddNewLink("student", Student{ID: *r.Student}.GetSelfLink())
+		h.AddNewLink("teacher", Teacher{ID: *r.Teacher}.GetSelfLink())
 		return h, nil
 	}
 }
+
+func (r Payment) GetSelfLink() string {
+	return "/payments/" + fmt.Sprintf("%d", r.ID)
+}
+
 func (r Payment) GetRepresentation(halF bool) (interface{}, error) {
-	self := "/payments/" + fmt.Sprintf("%d", r.ID)
-	s, _ := r.Student.GetRepresentation(false)
 	if !halF {
-		return &SelfAndData{
-			self,
-			struct {
-				Payment
-				*StudentRepr
-			}{r, s.(*StudentRepr)}}, nil
+		return r, nil
 	} else {
+		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
-		h.AddNewLink("student", s.(*StudentRepr).Self)
+		h.AddNewLink("student", Student{ID: *r.Student}.GetSelfLink())
 		return h, nil
 	}
+}
+
+func (r Grade) GetSelfLink() string {
+	return "/grades/" + fmt.Sprintf("%d", r.ID)
 }
 
 func (r Grade) GetRepresentation(halF bool) (interface{}, error) {
-	self := "/grades/" + fmt.Sprintf("%d", r.ID)
-	s, _ := r.Student.GetRepresentation(false)
-	t, _ := r.Teacher.GetRepresentation(false)
 	if !halF {
-		return &SelfAndData{
-			self,
-			struct {
-				Grade
-				*StudentRepr `json:"student"`
-				*TeacherRepr `json:"teacher"`
-			}{r, s.(*StudentRepr), t.(*TeacherRepr)},
-		}, nil
+		return r, nil
 	} else {
+		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
-		h.AddNewLink("student", s.(*StudentRepr).Self)
-		h.AddNewLink("teacher", t.(*TeacherRepr).Self)
+		h.AddNewLink("student", Student{ID: *r.Student}.GetSelfLink())
+		h.AddNewLink("teacher", Teacher{ID: *r.Teacher}.GetSelfLink())
 		return h, nil
 	}
 }
 
+func (r TimeTable) GetSelfLink() string {
+	return "/lectures/" + fmt.Sprintf("%d", r.ID)
+}
+
 func (r TimeTable) GetRepresentation(halF bool) (interface{}, error) {
-	self := "/lectures/" + fmt.Sprintf("%d", r.ID)
-	class, _ := r.Class.GetRepresentation(false)
+	self := r.GetSelfLink()
 	if !halF {
-		return &SelfAndData{
-			self,
-			struct {
-				TimeTable
-				*ClassRepr `json:"class"`
-			}{r, class.(*ClassRepr)},
-		}, nil
+		return r, nil
 	} else {
 		h := hal.NewResource(r, self)
-		h.AddNewLink("class", class.(*ClassRepr).Self)
+		h.AddNewLink("class", Class{ID: *r.Class}.GetSelfLink())
 		return h, nil
 	}
 }

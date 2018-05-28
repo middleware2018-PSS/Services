@@ -42,19 +42,19 @@ func (r *postgresRepository) CreateAppointment(appointment models.Appointment, w
 	case ParentUser:
 		query = "if $1 in (select parent from back2school.isParent where student = $2) INSERT INTO back2school.appointments " +
 			" (student, teacher, location, time) VALUES ($3, $4, $5, $6) "
-		args = append(args, who, appointment.Student.ID, appointment.Teacher.ID, appointment.Location, appointment.Time)
+		args = append(args, who, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time)
 	case TeacherUser:
-		if appointment.Teacher.ID == who {
+		if *appointment.Teacher == who {
 			query = "INSERT INTO back2school.appointments " +
 				" (student, teacher, location, time) VALUES ($1, $2, $3, $4) "
-			args = append(args, appointment.Student.ID, who, appointment.Location, appointment.Time)
+			args = append(args, appointment.Student, who, appointment.Location, appointment.Time)
 		} else {
 			return 0, ErrorNotAuthorized
 		}
 	case AdminUser:
 		query = "INSERT INTO back2school.appointments " +
 			" (student, teacher, location, time) VALUES ($1, $2, $3, $4) "
-		args = append(args, appointment.Student.ID, appointment.Teacher.ID, appointment.Location, appointment.Time)
+		args = append(args, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time)
 	default:
 		return 0, ErrorNotAuthorized
 	}
@@ -161,13 +161,13 @@ func (r *postgresRepository) CreateGrade(grade models.Grade, who int, whoKind st
 	var args []interface{}
 	switch whoKind {
 	case TeacherUser:
-		if grade.Teacher.ID == who {
+		if *grade.Teacher == who {
 			query = "if ($5, $1, $3) in " +
 				"(select t.teacher, t.subject, e.student from back2school.teaches as t natural join back2school.enrolled as e ) " +
 				" insert into back2school.grades " +
 				" (student, grade, subject, date, teacher) " +
 				" VALUES ($1, $2, $3, $4, $5) "
-			args = append(args, grade.Student.ID, grade.Grade, grade.Subject, grade.Date, grade.Teacher.ID)
+			args = append(args, grade.Student, grade.Grade, grade.Subject, grade.Date, grade.Teacher)
 		} else {
 			return 0, ErrorNotAuthorized
 		}
@@ -175,7 +175,7 @@ func (r *postgresRepository) CreateGrade(grade models.Grade, who int, whoKind st
 		query = "insert into back2school.grades " +
 			" (student, grade, subject, date, teacher) " +
 			" VALUES ($1, $2, $3, $4, $5) "
-		args = append(args, grade.Student.ID, grade.Grade, grade.Subject, grade.Date, grade.Teacher.ID)
+		args = append(args, grade.Student, grade.Grade, grade.Subject, grade.Date, grade.Teacher)
 	default:
 		return 0, ErrorNotAuthorized
 	}
@@ -194,7 +194,7 @@ func (r *postgresRepository) CreatePayment(payment models.Payment, who int, whoK
 		query := "insert into back2school.payments " +
 			" (amount, student, payed, reason, emitted) " +
 			" VALUES ($1, $2, $3, $4, $5) "
-		return r.exec(query, payment.Amount, payment.Student.ID, payment.Payed, payment.Reason, payment.Emitted)
+		return r.exec(query, payment.Amount, payment.Student, payment.Payed, payment.Reason, payment.Emitted)
 	} else {
 		return 0, ErrorNotAuthorized
 	}

@@ -87,7 +87,6 @@ func main() {
 	}
 
 	g := gin.Default()
-
 	g.POST("/login", LoginHandler(&authMiddleware))
 
 	api := g.Group("", authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
@@ -433,12 +432,19 @@ func getOffsetLimit(f func(int, int, int, string) ([]interface{}, error)) func(c
 }
 
 func halList(c *gin.Context, res *[]interface{}, err error, next string, prev string) {
-	halRes := hal.NewResource(models.List{Previous: prev, Next: next}, c.Request.RequestURI)
+	halRes := hal.NewResource(struct{}{}, c.Request.RequestURI)
 	uri := strings.Split(c.Request.RequestURI, "/")
 	embeddedLink := uri[len(uri)-1]
 	for _, el := range *res {
-		el.(*hal.Resource).Links = hal.LinkRelations{"self": el.(*hal.Resource).Links["self"]}
+		// el.(*hal.Resource).Links = hal.LinkRelations{"self": el.(*hal.Resource).Links["self"]}
 		halRes.Embed(hal.Relation(embeddedLink), el.(*hal.Resource))
+	}
+
+	if next != "" {
+		halRes.AddNewLink("next", next)
+	}
+	if prev != "" {
+		halRes.AddNewLink("prev", prev)
 	}
 	handleErr(err, halRes, c)
 }
@@ -533,13 +539,7 @@ func ToRepresentation(res interface{}, c *gin.Context, halF bool) (interface{}, 
 	if r, ok := res.(models.Repr); ok {
 		return r.GetRepresentation(halF)
 	} else {
-		return &struct {
-			Self string      `json:"self",xml:"self"`
-			Data interface{} `json:"data",xml:"data"`
-		}{
-			c.Request.RequestURI,
-			res,
-		}, nil
+		return res, nil
 	}
 }
 
