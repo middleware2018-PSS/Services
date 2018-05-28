@@ -1,6 +1,9 @@
 package repository
 
-import "github.com/middleware2018-PSS/Services/src/models"
+import (
+	"github.com/middleware2018-PSS/Services/src/models"
+	"golang.org/x/crypto/bcrypt"
+)
 
 // @Summary Update teacher's data
 // @Param id path int true "Teacher ID"
@@ -236,4 +239,14 @@ func (r *postgresRepository) UpdateLecture(lecture models.TimeTable, who int, wh
 		return ErrorNotAuthorized
 	}
 	return r.execUpdate(query, args...)
+}
+
+// @Summary Update Account
+// @Param class body models.Account true "data"
+// @Tags Accounts
+// @Router /accounts [put]
+func (r *postgresRepository) UpdateAccount(account models.Account, who int, whoKind string, cost int) error {
+	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), cost)
+	query := `UPDATE back2school.accounts SET "user" = $1, "password" = $2 where id = $3 and kind = $4" `
+	return r.execUpdate(query, account.Username, encryptedPassword, who, whoKind)
 }

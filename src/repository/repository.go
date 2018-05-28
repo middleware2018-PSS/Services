@@ -116,4 +116,5 @@ type Repository interface {
 	DeleteLecture(id int, who int, whoKind string) (interface{}, error)
 	UpdateLecture(models.TimeTable, int, string) error
 	CreateLecture(lecture models.TimeTable, who int, whoKind string) (int, error)
+	UpdateAccount(account models.Account, who int, whoKind string, cost int) error
 }

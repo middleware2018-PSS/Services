@@ -14,6 +14,24 @@
     "host": "localhost:5000",
     "paths": {
         "/accounts": {
+            "put": {
+                "tags": [
+                    "Accounts"
+                ],
+                "summary": "Update Account",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Account"
+                        }
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Accounts"
@@ -1833,6 +1851,19 @@
         }
     },
     "definitions": {
+        "models.Account": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "Password"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "John"
+                }
+            }
+        },
         "models.Appointment": {
             "type": "object",
             "properties": {

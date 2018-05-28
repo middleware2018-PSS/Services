@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	jwt "github.com/appleboy/gin-jwt"
+	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	_ "github.com/middleware2018-PSS/Services/src/docs"
@@ -100,6 +100,18 @@ func main() {
 		if err := c.Bind(&user); err == nil {
 			_, whokind := idKind(c)
 			if err := con.CreateAccount(user.Username, user.Password, user.ID, user.Role, COST, whokind); err != nil {
+				c.AbortWithStatus(http.StatusNotAcceptable)
+			} else {
+				c.AbortWithStatus(http.StatusCreated)
+			}
+		}
+
+	})
+	api.PUT("/accounts", func(c *gin.Context) {
+		var user models.Account
+		if err := c.Bind(&user); err == nil {
+			who, whokind := idKind(c)
+			if err := con.UpdateAccount(user, who, whokind, COST); err != nil {
 				c.AbortWithStatus(http.StatusNotAcceptable)
 			} else {
 				c.AbortWithStatus(http.StatusCreated)

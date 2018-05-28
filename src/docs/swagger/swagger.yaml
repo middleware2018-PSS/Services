@@ -1,4 +1,13 @@
 definitions:
+  models.Account:
+    properties:
+      password:
+        example: Password
+        type: string
+      username:
+        example: John
+        type: string
+    type: object
   models.Appointment:
     properties:
       location:
@@ -184,6 +193,18 @@ paths:
           $ref: '#/definitions/models.User'
           type: object
       summary: Create an account
+      tags:
+      - Accounts
+    put:
+      parameters:
+      - description: data
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/models.Account'
+          type: object
+      summary: Update Account
       tags:
       - Accounts
   /accounts/{id}:
