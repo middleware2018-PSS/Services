@@ -2,8 +2,9 @@ package models
 
 import (
 	"fmt"
-	"github.com/phisco/hal"
 	"time"
+
+	"github.com/phisco/hal"
 )
 
 type (
@@ -136,9 +137,7 @@ func (r Parent) GetSelfLink() string {
 }
 
 func (r Parent) GetRepresentation(halF bool) (interface{}, error) {
-	if !halF {
-		return r, nil
-	} else {
+	if halF {
 		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		h.AddNewLink("children", self+"/students")
@@ -147,6 +146,7 @@ func (r Parent) GetRepresentation(halF bool) (interface{}, error) {
 		h.AddNewLink("notifications", self+"/notifications")
 		return h, nil
 	}
+	return r, nil
 }
 
 func (r Teacher) GetSelfLink() string {
@@ -154,9 +154,7 @@ func (r Teacher) GetSelfLink() string {
 }
 
 func (r Teacher) GetRepresentation(halF bool) (interface{}, error) {
-	if !halF {
-		return r, nil
-	} else {
+	if halF {
 		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		h.AddNewLink("lectures", self+"/lectures")
@@ -166,33 +164,32 @@ func (r Teacher) GetRepresentation(halF bool) (interface{}, error) {
 		h.AddNewLink("classes", self+"/classes")
 		return h, nil
 	}
+	return r, nil
 }
 func (r Student) GetSelfLink() string {
 	return "/students/" + fmt.Sprintf("%d", r.ID)
 }
 func (r Student) GetRepresentation(halF bool) (interface{}, error) {
-	if !halF {
-		return r, nil
-	} else {
+	if halF {
 		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		h.AddNewLink("grades", self+"/grades")
 		return h, nil
 	}
+	return r, nil
 }
 
 func (r Class) GetSelfLink() string {
 	return "/classes/" + fmt.Sprintf("%d", r.ID)
 }
 func (r Class) GetRepresentation(halF bool) (interface{}, error) {
-	if !halF {
-		return r, nil
-	} else {
+	if halF {
 		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		h.AddNewLink("students", self+"/students")
 		return h, nil
 	}
+	return r, nil
 }
 
 func (r Notification) GetSelfLink() string {
@@ -200,13 +197,12 @@ func (r Notification) GetSelfLink() string {
 }
 
 func (r Notification) GetRepresentation(halF bool) (interface{}, error) {
-	if !halF {
-		return r, nil
-	} else {
+	if halF {
 		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		return h, nil
 	}
+	return r, nil
 }
 
 func (r Appointment) GetSelfLink() string {
@@ -214,15 +210,14 @@ func (r Appointment) GetSelfLink() string {
 }
 
 func (r Appointment) GetRepresentation(halF bool) (interface{}, error) {
-	if !halF {
-		return r, nil
-	} else {
+	if halF {
 		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		h.AddNewLink("student", Student{ID: *r.Student}.GetSelfLink())
 		h.AddNewLink("teacher", Teacher{ID: *r.Teacher}.GetSelfLink())
 		return h, nil
 	}
+	return r, nil
 }
 
 func (r Payment) GetSelfLink() string {
@@ -230,14 +225,13 @@ func (r Payment) GetSelfLink() string {
 }
 
 func (r Payment) GetRepresentation(halF bool) (interface{}, error) {
-	if !halF {
-		return r, nil
-	} else {
+	if halF {
 		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		h.AddNewLink("student", Student{ID: *r.Student}.GetSelfLink())
 		return h, nil
 	}
+	return r, nil
 }
 
 func (r Grade) GetSelfLink() string {
@@ -245,15 +239,14 @@ func (r Grade) GetSelfLink() string {
 }
 
 func (r Grade) GetRepresentation(halF bool) (interface{}, error) {
-	if !halF {
-		return r, nil
-	} else {
+	if halF {
 		self := r.GetSelfLink()
 		h := hal.NewResource(r, self)
 		h.AddNewLink("student", Student{ID: *r.Student}.GetSelfLink())
 		h.AddNewLink("teacher", Teacher{ID: *r.Teacher}.GetSelfLink())
 		return h, nil
 	}
+	return r, nil
 }
 
 func (r TimeTable) GetSelfLink() string {
@@ -262,11 +255,10 @@ func (r TimeTable) GetSelfLink() string {
 
 func (r TimeTable) GetRepresentation(halF bool) (interface{}, error) {
 	self := r.GetSelfLink()
-	if !halF {
-		return r, nil
-	} else {
+	if halF {
 		h := hal.NewResource(r, self)
 		h.AddNewLink("class", Class{ID: *r.Class}.GetSelfLink())
 		return h, nil
 	}
+	return r, nil
 }
