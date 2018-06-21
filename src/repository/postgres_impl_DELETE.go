@@ -3,7 +3,7 @@ package repository
 // @Summary Delete Account
 // @Param id path int true "Account ID"
 // @Tags Accounts
-// @Router /accounts/{id} [delete]
+// @Router /accounts/{username} [delete]
 // @Security ApiKeyAuth
 func (r *postgresRepository) DeleteAccount(username string, whoKind string) (interface{}, error) {
 	if whoKind == AdminUser {

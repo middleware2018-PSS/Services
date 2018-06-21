@@ -19,9 +19,10 @@ definitions:
       location:
         example: Aula Magna
         type: string
-      student:
-        $ref: '#/definitions/models.Teacher'
-        type: object
+      studentID:
+        type: integer
+      teacherID:
+        type: integer
       time:
         type: string
     type: object
@@ -42,21 +43,19 @@ definitions:
         type: string
       grade:
         type: integer
-      student:
-        $ref: '#/definitions/models.Student'
-        type: object
+      studentID:
+        type: integer
       subject:
         example: science
         type: string
-      teacher:
-        $ref: '#/definitions/models.Teacher'
-        type: object
+      teacherID:
+        type: integer
     type: object
   models.List:
     properties:
       data:
         items:
-          type: '&{%!s(token.Pos=5638) %!s(*ast.FieldList=&{5647 [] 5648}) %!s(bool=false)}'
+          type: '&{%!s(token.Pos=4155) %!s(*ast.FieldList=&{4164 [] 4165}) %!s(bool=false)}'
         type: array
       next:
         type: string
@@ -104,9 +103,8 @@ definitions:
         type: boolean
       reason:
         type: string
-      student:
-        $ref: '#/definitions/models.Student'
-        type: object
+      studentID:
+        type: integer
     type: object
   models.Student:
     properties:
@@ -132,9 +130,8 @@ definitions:
     type: object
   models.TimeTable:
     properties:
-      class:
-        $ref: '#/definitions/models.Class'
-        type: object
+      classID:
+        type: integer
       end:
         type: string
       info:
@@ -239,7 +236,7 @@ paths:
       summary: Update Account
       tags:
       - Accounts
-  /accounts/{id}:
+  /accounts/{username}:
     delete:
       parameters:
       - description: Account ID

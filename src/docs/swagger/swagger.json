@@ -97,7 +97,7 @@
                 ]
             }
         },
-        "/accounts/{id}": {
+        "/accounts/{username}": {
             "delete": {
                 "security": [
                     {
@@ -2215,9 +2215,11 @@
                     "type": "string",
                     "example": "Aula Magna"
                 },
-                "student": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.Teacher"
+                "studentID": {
+                    "type": "integer"
+                },
+                "teacherID": {
+                    "type": "integer"
                 },
                 "time": {
                     "type": "string"
@@ -2250,17 +2252,15 @@
                 "grade": {
                     "type": "integer"
                 },
-                "student": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.Student"
+                "studentID": {
+                    "type": "integer"
                 },
                 "subject": {
                     "type": "string",
                     "example": "science"
                 },
-                "teacher": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.Teacher"
+                "teacherID": {
+                    "type": "integer"
                 }
             }
         },
@@ -2270,7 +2270,7 @@
                 "data": {
                     "type": "array",
                     "items": {
-                        "type": "\u0026{%!s(token.Pos=5638) %!s(*ast.FieldList=\u0026{5647 [] 5648}) %!s(bool=false)}"
+                        "type": "\u0026{%!s(token.Pos=4155) %!s(*ast.FieldList=\u0026{4164 [] 4165}) %!s(bool=false)}"
                     }
                 },
                 "next": {
@@ -2344,9 +2344,8 @@
                 "reason": {
                     "type": "string"
                 },
-                "student": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.Student"
+                "studentID": {
+                    "type": "integer"
                 }
             }
         },
@@ -2387,9 +2386,8 @@
         "models.TimeTable": {
             "type": "object",
             "properties": {
-                "class": {
-                    "type": "object",
-                    "$ref": "#/definitions/models.Class"
+                "classID": {
+                    "type": "integer"
                 },
                 "end": {
                     "type": "string"
