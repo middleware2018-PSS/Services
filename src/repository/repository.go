@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+
 	"github.com/middleware2018-PSS/Services/src/models"
 )
 
@@ -13,10 +14,16 @@ const (
 	TeacherUser = "Teacher"
 )
 
+func init() {
+	allowedKind = map[string]bool{AdminUser: true, ParentUser: true, TeacherUser: true}
+}
+
 var (
-	ErrNoResult        = errors.New("No results found.")
-	ErrorNotBlocking   = errors.New("Something went wrong but no worriez.")
-	ErrorNotAuthorized = errors.New("No authorization for this resource")
+	allowedKind          map[string]bool
+	ErrNoResult          = errors.New("No results found.")
+	ErrorNotBlocking     = errors.New("Something went wrong but no worriez.")
+	ErrorNotAuthorized   = errors.New("No authorization for this resource")
+	ErrorNoKindSpecified = errors.New("No \"kind\" has been specified")
 )
 
 type Repository interface {

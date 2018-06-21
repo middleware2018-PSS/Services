@@ -1,9 +1,10 @@
 package repository
 
 import (
+	"log"
+
 	"github.com/middleware2018-PSS/Services/src/models"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 )
 
 // @Summary Create an account
@@ -13,6 +14,9 @@ import (
 // @Security ApiKeyAuth
 func (r *postgresRepository) CreateAccount(username string, password string, id int, kind string, cost int, whoKind string) error {
 	if whoKind == AdminUser {
+		if !allowedKind[kind] {
+			return ErrorNoKindSpecified
+		}
 		query := `INSERT INTO back2school.accounts ("user", "password", id, kind) VALUES ($1, $2, $3, $4)`
 		cryptedPass, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 		if err != nil {
