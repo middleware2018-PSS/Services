@@ -3,22 +3,24 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/appleboy/gin-jwt"
-	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq"
-	_ "github.com/middleware2018-PSS/Services/src/docs"
-	"github.com/middleware2018-PSS/Services/src/models"
-	"github.com/middleware2018-PSS/Services/src/repository"
-	"github.com/phisco/hal"
-	"github.com/pkg/errors"
-	"github.com/spf13/viper"
-	"github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	_ "github.com/middleware2018-PSS/Services/docs"
+	"github.com/middleware2018-PSS/Services/models"
+	"github.com/middleware2018-PSS/Services/repository"
+
+	"github.com/appleboy/gin-jwt"
+	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
+	"github.com/phisco/hal"
+	"github.com/pkg/errors"
+	"github.com/spf13/viper"
+	"github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 var (
@@ -58,12 +60,21 @@ func main() {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 
-	db, err := sql.Open("postgres", viper.GetString("DBparams"))
+	// Check database connection string
+	log.Println(viper.GetString("DBparams"))
 
+	db, err := sql.Open("postgres", viper.GetString("DBparams"))
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	err = db.Ping()
+	if err != nil {
+		fmt.Errorf("Cannot connect to database: %s \n", err)
+	}
+
 	defer db.Close()
+
 	var con repository.Repository
 	con = repository.NewPostgresRepository(db)
 
