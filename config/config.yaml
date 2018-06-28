@@ -1,6 +1,4 @@
-DBuser : postgres
-DB : postgres
 Realm : test
 PrivateKeyFile : config/back2school.rsa
 PublicKeyFile : config/back2school.rsa.pub
-DBparams : "user=postgres dbname=postgres sslmode=disable"
+DBparams : "user=postgres dbname=postgres host=db sslmode=disable"
