@@ -3,7 +3,7 @@ package repository
 import (
 	"errors"
 
-	"github.com/middleware2018-PSS/Services/src/models"
+	"github.com/middleware2018-PSS/Services/models"
 )
 
 const (

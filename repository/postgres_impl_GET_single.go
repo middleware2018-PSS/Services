@@ -1,6 +1,6 @@
 package repository
 
-import "github.com/middleware2018-PSS/Services/src/models"
+import "github.com/middleware2018-PSS/Services/models"
 
 // @Summary Get a appointment by id
 // @Param id path int true "Appointment ID"

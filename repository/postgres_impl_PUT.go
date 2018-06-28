@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/middleware2018-PSS/Services/src/models"
+	"github.com/middleware2018-PSS/Services/models"
 	"golang.org/x/crypto/bcrypt"
 )
 

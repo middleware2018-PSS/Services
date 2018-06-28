@@ -2,8 +2,9 @@ package repository
 
 import (
 	"database/sql"
-	_ "github.com/middleware2018-PSS/Services/src/docs"
-	"github.com/middleware2018-PSS/Services/src/models"
+
+	_ "github.com/middleware2018-PSS/Services/docs"
+	"github.com/middleware2018-PSS/Services/models"
 )
 
 type Subjects struct {
