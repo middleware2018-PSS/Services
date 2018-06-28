@@ -196,9 +196,9 @@ func (r *postgresRepository) CreateGrade(grade models.Grade, who int, whoKind st
 func (r *postgresRepository) CreatePayment(payment models.Payment, who int, whoKind string) (int, error) {
 	if whoKind == AdminUser {
 		query := "insert into back2school.payments " +
-			" (amount, student, payed, reason, emitted) " +
+			" (amount, student, paid, reason, emitted) " +
 			" VALUES ($1, $2, $3, $4, $5) "
-		return r.exec(query, payment.Amount, payment.Student, payment.Payed, payment.Reason, payment.Emitted)
+		return r.exec(query, payment.Amount, payment.Student, payment.Paid, payment.Reason, payment.Emitted)
 	} else {
 		return 0, ErrorNotAuthorized
 	}

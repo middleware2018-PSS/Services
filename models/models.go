@@ -77,7 +77,7 @@ type (
 	Payment struct {
 		ID      int        `json:"-" xml:"id" example:"1"`
 		Amount  *int       `json:"amount,omitempty" xml:"amount"`
-		Payed   *bool      `json:"payed,omitempty" xml:"payed"`
+		Paid    *bool      `json:"paid,omitempty" xml:"paid"`
 		Emitted *time.Time `json:"emitted,omitempty" xml:"emitted"`
 		Reason  *string    `json:"reason,omitempty" xml:"reason"`
 		Student *int       `json:"studentID,omitempty" xml:"student"`

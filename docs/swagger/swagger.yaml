@@ -99,7 +99,7 @@ definitions:
         type: integer
       emitted:
         type: string
-      payed:
+      paid:
         type: boolean
       reason:
         type: string

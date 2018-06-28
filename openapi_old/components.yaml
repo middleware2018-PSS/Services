@@ -190,7 +190,7 @@ Payment:
     amount:
       type: integer
       example: 1500
-    payed:
+    paid:
       type: boolean
       example: false
     emitted:

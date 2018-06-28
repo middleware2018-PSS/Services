@@ -264,7 +264,7 @@ func (r *postgresRepository) PaymentsByParent(id int, limit int, offset int, who
 	switch whoKind {
 	case ParentUser:
 		if id == who {
-			query = "select p.id, p.amount, p.student, p.payed, p.reason, p.emitted " +
+			query = "select p.id, p.amount, p.student, p.paid, p.reason, p.emitted " +
 				"from back2school.payments as p natural join back2school.isParent " +
 				"where parent = $1 " +
 				"order by p.emitted desc"
@@ -273,7 +273,7 @@ func (r *postgresRepository) PaymentsByParent(id int, limit int, offset int, who
 			return nil, ErrorNotAuthorized
 		}
 	case AdminUser:
-		query = "select p.id, p.amount, p.student, p.payed, p.reason, p.emitted " +
+		query = "select p.id, p.amount, p.student, p.paid, p.reason, p.emitted " +
 			"from back2school.payments as p natural join back2school.isParent " +
 			"where parent = $1 " +
 			"order by p.emitted desc"
@@ -284,7 +284,7 @@ func (r *postgresRepository) PaymentsByParent(id int, limit int, offset int, who
 	}
 	return r.listByParams(query, func(rows *sql.Rows) (interface{}, error) {
 		payment := models.Payment{}
-		err := rows.Scan(&payment.ID, &payment.Amount, payment.Student, &payment.Payed, &payment.Reason, &payment.Emitted)
+		err := rows.Scan(&payment.ID, &payment.Amount, payment.Student, &payment.Paid, &payment.Reason, &payment.Emitted)
 		return payment, err
 	}, limit, offset, args...)
 }
@@ -397,19 +397,19 @@ func (r *postgresRepository) PaymentByID(id int, who int, whoKind string) (inter
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query = "SELECT id, amount, payed, emitted, reason " +
+		query = "SELECT id, amount, paid, emitted, reason " +
 			"FROM back2school.payments natural join back2school.isParent" +
 			" WHERE id = $1 and parent = $2 "
 		args = append(args, id, who)
 	case AdminUser:
-		query = "SELECT id, amount, payed, emitted, reason " +
+		query = "SELECT id, amount, paid, emitted, reason " +
 			"FROM back2school.payments WHERE id = $1 "
 		args = append(args, id)
 
 	default:
 		return nil, ErrorNotAuthorized
 	}
-	err := r.QueryRow(query, args...).Scan(payment.ID, payment.Amount, payment.Payed, payment.Emitted, payment.Reason)
+	err := r.QueryRow(query, args...).Scan(payment.ID, payment.Amount, payment.Paid, payment.Emitted, payment.Reason)
 	return switchResult(payment, err)
 }
 
@@ -425,22 +425,22 @@ func (r *postgresRepository) Payments(limit int, offset int, who int, whoKind st
 	var args []interface{}
 	switch whoKind {
 	case ParentUser:
-		query = "select id, amount, student, payed, reason, emitted " +
+		query = "select id, amount, student, paid, reason, emitted " +
 			"from back2school.payments natural join back2school.isParent " +
 			" where parent = $1 " +
-			"order by payed asc, emitted asc "
+			"order by paid asc, emitted asc "
 		args = append(args, who)
 	case AdminUser:
-		query = "select id, amount, student, payed, reason, emitted " +
+		query = "select id, amount, student, paid, reason, emitted " +
 			"from back2school.payments " +
-			"order by payed asc, emitted asc "
+			"order by paid asc, emitted asc "
 	default:
 		return nil, ErrorNotAuthorized
 	}
 	return r.listByParams(query,
 		func(rows *sql.Rows) (interface{}, error) {
 			payment := models.Payment{}
-			err := rows.Scan(&payment.ID, &payment.Amount, payment.Student, &payment.Payed, &payment.Reason, &payment.Emitted)
+			err := rows.Scan(&payment.ID, &payment.Amount, payment.Student, &payment.Paid, &payment.Reason, &payment.Emitted)
 			return payment, err
 		}, limit, offset, args...)
 }

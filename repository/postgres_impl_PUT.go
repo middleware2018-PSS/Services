@@ -208,15 +208,15 @@ func (r *postgresRepository) UpdatePayment(payment models.Payment, who int, whoK
 	switch whoKind {
 	case ParentUser:
 		query = "if $7 in (select parent from back2school.isParent where student = $2) UPDATE back2school.grades " +
-			"SET amount = $1, student = $2, payed = $3, reason = $4, emitted = $5 " +
+			"SET amount = $1, student = $2, paid = $3, reason = $4, emitted = $5 " +
 			" where id = $6 "
-		args = append(args, payment.Amount, payment.Student, payment.Payed, payment.Reason, payment.Emitted, payment.ID, who)
+		args = append(args, payment.Amount, payment.Student, payment.Paid, payment.Reason, payment.Emitted, payment.ID, who)
 
 	case AdminUser:
 		query = "UPDATE back2school.grades " +
-			"SET amount = $1, student = $2, payed = $3, reason = $4, emitted = $5 " +
+			"SET amount = $1, student = $2, paid = $3, reason = $4, emitted = $5 " +
 			" where id = $6 "
-		args = append(args, payment.Amount, payment.Student, payment.Payed, payment.Reason, payment.Emitted, payment.ID)
+		args = append(args, payment.Amount, payment.Student, payment.Paid, payment.Reason, payment.Emitted, payment.ID)
 	default:
 		return ErrorNotAuthorized
 	}

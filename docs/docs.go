@@ -2348,7 +2348,7 @@ var doc = `{
                 "emitted": {
                     "type": "string"
                 },
-                "payed": {
+                "paid": {
                     "type": "boolean"
                 },
                 "reason": {

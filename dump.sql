@@ -326,7 +326,7 @@ CREATE TABLE back2school.payments (
     id integer NOT NULL,
     amount integer,
     student integer,
-    payed boolean DEFAULT false,
+    paid boolean DEFAULT false,
     reason text DEFAULT ''::text,
     emitted timestamp without time zone DEFAULT now()
 );
@@ -650,7 +650,7 @@ COPY back2school.parents (id, name, surname, mail, info) FROM stdin;
 -- Data for Name: payments; Type: TABLE DATA; Schema: back2school; Owner: postgres
 --
 
-COPY back2school.payments (id, amount, student, payed, reason, emitted) FROM stdin;
+COPY back2school.payments (id, amount, student, paid, reason, emitted) FROM stdin;
 1	100	1	f		2018-05-06 17:07:46.55
 2	100	2	t		2018-05-06 17:07:48.518
 3	\N	\N	f	\N	2018-05-06 17:09:32.253582
