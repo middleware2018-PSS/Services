@@ -68,11 +68,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = db.Ping()
-	if err != nil {
-		fmt.Errorf("Cannot connect to database: %s \n", err)
-	}
-
 	defer db.Close()
 
 	var con repository.Repository
