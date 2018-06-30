@@ -93,6 +93,14 @@ func main() {
 	}
 
 	g := gin.Default()
+
+	// If you receive a GET to root, redirect to swagger docs
+	g.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, c.Request.URL.Host+"swagger/index.html")
+		//c.Request.URL.Path = "/swagger/index.html"
+		//g.HandleContext(c)
+	})
+
 	g.POST("/login", LoginHandler(&authMiddleware))
 
 	api := g.Group("", authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
