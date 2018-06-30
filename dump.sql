@@ -68,7 +68,7 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE back2school.accounts (
-    "user" text NOT NULL,
+    username text NOT NULL,
     password text NOT NULL,
     kind text NOT NULL,
     id integer NOT NULL
@@ -564,7 +564,7 @@ ALTER TABLE ONLY back2school.timetable ALTER COLUMN id SET DEFAULT nextval('back
 -- Data for Name: accounts; Type: TABLE DATA; Schema: back2school; Owner: postgres
 --
 
-COPY back2school.accounts ("user", password, kind, id) FROM stdin;
+COPY back2school.accounts (username, password, kind, id) FROM stdin;
 a	$2a$04$3gNENZCutU4.6JtklLNB7OmEvxn5Tr6KSSo8zXKbqojifwlJscEF6	Admin	2
 pippo	$2a$04$3gNENZCutU4.6JtklLNB7OmEvxn5Tr6KSSo8zXKbqojifwlJscEF6	Parent	3
 admin	$2a$04$3gNENZCutU4.6JtklLNB7OmEvxn5Tr6KSSo8zXKbqojifwlJscEF6	Admin	1
@@ -787,7 +787,7 @@ ALTER TABLE ONLY back2school.accounts
 --
 
 ALTER TABLE ONLY back2school.accounts
-    ADD CONSTRAINT accounts_user_pk PRIMARY KEY ("user");
+    ADD CONSTRAINT accounts_user_pk PRIMARY KEY (username);
 
 
 --
@@ -906,7 +906,7 @@ ALTER TABLE ONLY back2school.timetable
 -- Name: accounts_user_uindex; Type: INDEX; Schema: back2school; Owner: postgres
 --
 
-CREATE UNIQUE INDEX accounts_user_uindex ON back2school.accounts USING btree ("user");
+CREATE UNIQUE INDEX accounts_user_uindex ON back2school.accounts USING btree (username);
 
 
 --

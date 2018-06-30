@@ -256,7 +256,13 @@ func (r *postgresRepository) UpdateLecture(lecture models.TimeTable, who int, wh
 // @Router /accounts [put]
 // @Security ApiKeyAuth
 func (r *postgresRepository) UpdateAccount(account models.Account, who int, whoKind string, cost int) error {
+	var query string
+	var args []interface{}
+
 	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), cost)
-	query := `UPDATE back2school.accounts SET "user" = $1, "password" = $2 where id = $3 and kind = $4" `
-	return r.execUpdate(query, account.Username, encryptedPassword, who, whoKind)
+
+	query = "UPDATE back2school.accounts SET username = $1, password = $2 WHERE id = $3 AND kind = $4"
+	args = append(args, account.Username, encryptedPassword, who, whoKind)
+
+	return r.execUpdate(query, args...)
 }

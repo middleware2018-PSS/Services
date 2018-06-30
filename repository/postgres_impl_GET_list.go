@@ -899,7 +899,7 @@ func (r *postgresRepository) Lectures(limit int, offset int, who int, whoKind st
 // @Security ApiKeyAuth
 func (r *postgresRepository) Accounts(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	if whoKind == AdminUser {
-		query := `select "user", kind, id from back2school.accounts`
+		query := `select username, kind, id from back2school.accounts`
 		return r.listByParams(query, func(rows *sql.Rows) (interface{}, error) {
 			account := models.Account{}
 			err := rows.Scan(&account.Username, &account.Kind, &account.ID)

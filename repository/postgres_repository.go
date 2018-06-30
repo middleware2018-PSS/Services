@@ -3,8 +3,9 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 	"log"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type postgresRepository struct {
@@ -17,7 +18,7 @@ func NewPostgresRepository(DB *sql.DB) *postgresRepository {
 }
 
 func (r *postgresRepository) CheckUser(userID string, password string) (int, string, bool) {
-	query := `select id, kind, password from back2school.accounts where "user" = $1`
+	query := `select id, kind, password from back2school.accounts where username = $1`
 	var id int
 	var kind string
 	var saltedPass []byte

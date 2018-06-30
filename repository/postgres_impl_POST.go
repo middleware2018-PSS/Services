@@ -17,7 +17,7 @@ func (r *postgresRepository) CreateAccount(username string, password string, id 
 		if !allowedKind[kind] {
 			return ErrorNoKindSpecified
 		}
-		query := `INSERT INTO back2school.accounts ("user", "password", id, kind) VALUES ($1, $2, $3, $4)`
+		query := `INSERT INTO back2school.accounts (username, "password", id, kind) VALUES ($1, $2, $3, $4)`
 		cryptedPass, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 		if err != nil {
 			return err

@@ -7,7 +7,7 @@ package repository
 // @Security ApiKeyAuth
 func (r *postgresRepository) DeleteAccount(username string, whoKind string) (interface{}, error) {
 	if whoKind == AdminUser {
-		query := "DELETE FROM back2school.accounts where user = $1"
+		query := "DELETE FROM back2school.accounts where username = $1"
 		return r.exec(query, username)
 	} else {
 		return nil, ErrorNotAuthorized
