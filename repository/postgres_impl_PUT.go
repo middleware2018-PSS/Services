@@ -258,11 +258,22 @@ func (r *postgresRepository) UpdateLecture(lecture models.TimeTable, who int, wh
 func (r *postgresRepository) UpdateAccount(account models.Account, who int, whoKind string, cost int) error {
 	var query string
 	var args []interface{}
-
-	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), cost)
-
-	query = "UPDATE back2school.accounts SET username = $1, password = $2 WHERE id = $3 AND kind = $4"
-	args = append(args, account.Username, encryptedPassword, who, whoKind)
-
+	switch whoKind {
+	case TeacherUser, ParentUser:
+		if account.Kind != whoKind || account.ID != who {
+			return ErrorNotAuthorized
+		}
+		encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), cost)
+		query = "UPDATE back2school.accounts SET password = $1 " +
+			"WHERE username = $2 AND id = $3 AND kind = $4"
+		args = append(args, string(encryptedPassword), account.Username, account.ID, account.Kind)
+	case AdminUser:
+		encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), cost)
+		query = "UPDATE back2school.accounts SET password = $1 " +
+			"WHERE username = $2 AND id = $3 AND kind = $4"
+		args = append(args, string(encryptedPassword), account.Username, account.ID, account.Kind)
+	default:
+		return ErrorNotAuthorized
+	}
 	return r.execUpdate(query, args...)
 }
