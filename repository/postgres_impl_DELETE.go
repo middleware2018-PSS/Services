@@ -5,13 +5,10 @@ package repository
 // @Tags Accounts
 // @Router /accounts/{username} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteAccount(username string, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		query := "DELETE FROM back2school.accounts where username = $1"
-		return r.exec(query, username)
-	} else {
-		return nil, ErrorNotAuthorized
-	}
+func (r *postgresRepository) DeleteAccount(username string) (interface{}, error) {
+	query := "DELETE FROM back2school.accounts where username = $1"
+	return r.exec(query, username)
+
 }
 
 // @Summary Delete Parent
@@ -19,13 +16,9 @@ func (r *postgresRepository) DeleteAccount(username string, whoKind string) (int
 // @Tags Parents
 // @Router /parents/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteParent(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		query := "DELETE FROM back2school.parents where id = $1"
-		return r.exec(query, id)
-	} else {
-		return nil, ErrorNotAuthorized
-	}
+func (r *postgresRepository) DeleteParent(id int) (interface{}, error) {
+	query := "DELETE FROM back2school.parents where id = $1"
+	return r.exec(query, id)
 }
 
 // @Summary Delete Teacher
@@ -33,13 +26,9 @@ func (r *postgresRepository) DeleteParent(id int, who int, whoKind string) (inte
 // @Tags Teachers
 // @Router /teachers/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteTeacher(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		query := "DELETE FROM back2school.teachers where id = $1"
-		return r.exec(query, id)
-	} else {
-		return nil, ErrorNotAuthorized
-	}
+func (r *postgresRepository) DeleteTeacher(id int) (interface{}, error) {
+	query := "DELETE FROM back2school.teachers where id = $1"
+	return r.exec(query, id)
 }
 
 // @Summary Delete Appointment
@@ -47,13 +36,9 @@ func (r *postgresRepository) DeleteTeacher(id int, who int, whoKind string) (int
 // @Tags Appointments
 // @Router /appointments/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteAppointment(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		query := "DELETE FROM back2school.appointments where id = $1"
-		return r.exec(query, id)
-	} else {
-		return nil, ErrorNotAuthorized
-	}
+func (r *postgresRepository) DeleteAppointment(id int) (interface{}, error) {
+	query := "DELETE FROM back2school.appointments where id = $1"
+	return r.exec(query, id)
 }
 
 // @Summary Delete Student
@@ -61,13 +46,9 @@ func (r *postgresRepository) DeleteAppointment(id int, who int, whoKind string) 
 // @Tags Students
 // @Router /students/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteStudent(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		query := "DELETE FROM back2school.students where id = $1"
-		return r.exec(query, id)
-	} else {
-		return nil, ErrorNotAuthorized
-	}
+func (r *postgresRepository) DeleteStudent(id int) (interface{}, error) {
+	query := "DELETE FROM back2school.students where id = $1"
+	return r.exec(query, id)
 }
 
 // @Summary Delete Notification
@@ -75,13 +56,9 @@ func (r *postgresRepository) DeleteStudent(id int, who int, whoKind string) (int
 // @Tags Notifications
 // @Router /notifications/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteNotification(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		query := "DELETE FROM back2school.notification where id = $1"
-		return r.exec(query, id)
-	} else {
-		return nil, ErrorNotAuthorized
-	}
+func (r *postgresRepository) DeleteNotification(id int) (interface{}, error) {
+	query := "DELETE FROM back2school.notification where id = $1"
+	return r.exec(query, id)
 }
 
 // @Summary Delete Payment
@@ -89,13 +66,9 @@ func (r *postgresRepository) DeleteNotification(id int, who int, whoKind string)
 // @Tags Payments
 // @Router /payments/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeletePayment(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		query := "DELETE FROM back2school.payments where id = $1"
-		return r.exec(query, id)
-	} else {
-		return nil, ErrorNotAuthorized
-	}
+func (r *postgresRepository) DeletePayment(id int) (interface{}, error) {
+	query := "DELETE FROM back2school.payments where id = $1"
+	return r.exec(query, id)
 }
 
 // @Summary Delete Class
@@ -103,13 +76,10 @@ func (r *postgresRepository) DeletePayment(id int, who int, whoKind string) (int
 // @Tags Classes
 // @Router /classes/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteClass(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		query := "DELETE FROM back2school.classes where id = $1"
-		return r.exec(query, id)
-	} else {
-		return nil, ErrorNotAuthorized
-	}
+func (r *postgresRepository) DeleteClass(id int) (interface{}, error) {
+	query := "DELETE FROM back2school.classes where id = $1"
+	return r.exec(query, id)
+
 }
 
 // @Summary Delete Grade
@@ -117,13 +87,9 @@ func (r *postgresRepository) DeleteClass(id int, who int, whoKind string) (inter
 // @Tags Grades
 // @Router /grades/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteGrade(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		query := "DELETE FROM back2school.grades where id = $1"
-		return r.exec(query, id)
-	} else {
-		return nil, ErrorNotAuthorized
-	}
+func (r *postgresRepository) DeleteGrade(id int) (interface{}, error) {
+	query := "DELETE FROM back2school.grades where id = $1"
+	return r.exec(query, id)
 }
 
 // @Summary Delete Lecture
@@ -131,11 +97,7 @@ func (r *postgresRepository) DeleteGrade(id int, who int, whoKind string) (inter
 // @Tags Lectures
 // @Router /lectures/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteLecture(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		query := "DELETE FROM back2school.timetable where id = $1"
-		return r.exec(query, id)
-	} else {
-		return nil, ErrorNotAuthorized
-	}
+func (r *postgresRepository) DeleteLecture(id int) (interface{}, error) {
+	query := "DELETE FROM back2school.timetable where id = $1"
+	return r.exec(query, id)
 }

@@ -5,275 +5,159 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// @Summary Update teacher's data
-// @Param id path int true "Teacher ID"
-// @Param teacher body models.Teacher true "data"
-// @Tags Teachers
-// @Success 204 {object} models.Teacher
-// @Router /teachers/{id} [put]
-// @Security ApiKeyAuth
-func (r *postgresRepository) UpdateTeacher(teacher models.Teacher, who int, whoKind string) (err error) {
-	var query string
-	var args []interface{}
-	switch whoKind {
-	case TeacherUser:
-		if teacher.ID == who {
-			query = "UPDATE back2school.teachers " +
-				"SET name = $1, surname = $2, mail = $3, info = $4 " +
-				"where id = $5 "
-			args = append(args, teacher.Name, teacher.Surname, teacher.Mail, teacher.Info, who)
-		} else {
-			return ErrorNotAuthorized
-		}
-	case AdminUser:
-		query = "UPDATE back2school.teachers " +
-			"SET name = $1, surname = $2, mail = $3, info = $4 " +
-			"where id = $5 "
-		args = append(args, teacher.Name, teacher.Surname, teacher.Mail, teacher.Info, teacher.ID)
-	default:
-		return ErrorNotAuthorized
-	}
-	return r.execUpdate(query, args...)
-}
+func (r *postgresRepository) UpdateTeacherForTeacher(teacher models.Teacher, who int) (err error) {
 
-// @Summary Update parents's data
-// @Param id path int true "Parent ID"
-// @Param parent body models.Parent true "data"
-// @Tags Parents
-// @Success 201 {object} models.Parent
-// @Router /parents/{id} [put]
-// @Security ApiKeyAuth
-func (r *postgresRepository) UpdateParent(parent models.Parent, who int, whoKind string) (err error) {
-	var query string
-	var args []interface{}
-	switch whoKind {
-	case ParentUser:
-		if parent.ID == who {
-			query = "UPDATE back2school.parents " +
-				"SET name = $1, surname = $2, mail = $3, info = $4 " +
-				"where id = $5 "
-			args = append(args, parent.Name, parent.Surname, parent.Mail, parent.Info, who)
-		} else {
-			return ErrorNotAuthorized
-		}
-	case AdminUser:
-		query = "UPDATE back2school.parents " +
-			" SET name = $1, surname = $2, mail = $3, info = $4 " +
-			"where id = $5 "
-		args = append(args, parent.Name, parent.Surname, parent.Mail, parent.Info, parent.ID)
-	default:
-		return ErrorNotAuthorized
-	}
-
-	return r.execUpdate(query, args...)
-}
-
-// @Summary Update student's data
-// @Param id path int true "Student ID"
-// @Param student body models.Student true "data"
-// @Tags Students
-// @Success 201 {object} models.Student
-// @Router /students/{id} [put]
-// @Security ApiKeyAuth
-func (r *postgresRepository) UpdateStudent(student models.Student, who int, whoKind string) (err error) {
-	var query string
-	var args []interface{}
-	switch whoKind {
-	case ParentUser:
-		query = "IF $1 in (select parent from back2school.isParent where student = $2) UPDATE back2school.student " +
-			" ET name = $3, surname = $4, mail = $5, info = $6 " +
-			"where id = $7 "
-		args = append(args, who, student.ID, student.Name, student.Surname, student.Mail, student.Info, student.ID)
-	case AdminUser:
-		query = "UPDATE back2school.student " +
-			"SET name = $1, surname = $2, mail = $3, info = $4 " +
-			"where id = $5 "
-		args = append(args, student.Name, student.Surname, student.Mail, student.Info, student.ID)
-	default:
-		return ErrorNotAuthorized
-	}
-	return r.execUpdate(query, args...)
-}
-
-// @Summary Update appointment's data
-// @Param id path int true "Appointment ID"
-// @Param appointment body models.Appointment true "data"
-// @Tags Appointments
-// @Success 201 {object} models.Appointment
-// @Router /appointments/{id} [put]
-// @Security ApiKeyAuth
-func (r *postgresRepository) UpdateAppointment(appointment models.Appointment, who int, whoKind string) (err error) {
-	var query string
-	var args []interface{}
-	switch whoKind {
-	case ParentUser:
-		query = "if $1 in (select parent from back2school.isParent where student = $2) UPDATE back2school.appointments " +
-			"SET student = $3, teacher = $4, location = $5, time = $6 where id = $7 "
-		args = append(args, who, appointment.Student, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time, appointment.ID)
-	case TeacherUser:
-		if *appointment.Teacher == who {
-			query = "UPDATE back2school.appointments " +
-				"SET student = $1, teacher = $2, location = $3, time = $4 where id = $5 "
-			args = append(args, appointment.Student, who, appointment.Location, appointment.Time, appointment.ID)
-		}
-	case AdminUser:
-		query = "UPDATE back2school.appointments " +
-			"SET student = $1, teacher = $2, location = $3, time = $4 where id = $5 "
-		args = append(args, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time, appointment.ID)
-	default:
-		return ErrorNotAuthorized
-	}
-	return r.execUpdate(query, args...)
-}
-
-// @Summary Update Class's data
-// @Param id path int true "Class ID"
-// @Param parent body models.Class true "data"
-// @Tags Classes
-// @Success 201 {object} models.Class
-// @Router /classes/{id} [put]
-// @Security ApiKeyAuth
-func (r *postgresRepository) UpdateClass(class models.Class, who int, whoKind string) (err error) {
-	if whoKind == AdminUser {
-		query := "UPDATE back2school.classes " +
-			" SET year = $1, section = $2, info = $3, grade = $4 " +
-			" where id = $5 "
-		return r.execUpdate(query, class.Year, class.Section, class.Info, class.Grade, class.ID)
-	} else {
-		return ErrorNotAuthorized
-	}
+	query := "UPDATE back2school.teachers " +
+		"SET name = $1, surname = $2, mail = $3, info = $4 " +
+		"where id = $5 "
+	return r.execUpdate(query, teacher.Name, teacher.Surname, teacher.Mail, teacher.Info, who)
 
 }
 
-// @Summary Update notification
-// @Param id path int true "Notification ID"
-// @Param class body models.Notification true "data"
-// @Tags Notifications
-// @Router /notifications/{id} [put]
-// @Success 201 {object} models.Notification
-// @Security ApiKeyAuth
-func (r *postgresRepository) UpdateNotification(notification models.Notification, who int, whoKind string) error {
-	if whoKind == AdminUser {
-		query := "UPDATE back2school.notification " +
-			"SET receiver = $1, message = $2, time = $3, receiver_kind = $4 " +
-			" where id = $5 "
-		return r.execUpdate(query, notification.Receiver, notification.Message, notification.Time, notification.ReceiverKind, notification.ID)
-	} else {
-		return ErrorNotAuthorized
-	}
+func (r *postgresRepository) UpdateTeacherForAdmin(teacher models.Teacher) (err error) {
+	query := "UPDATE back2school.teachers " +
+		"SET name = $1, surname = $2, mail = $3, info = $4 " +
+		"where id = $5 "
+
+	return r.execUpdate(query, teacher.Name, teacher.Surname, teacher.Mail, teacher.Info, teacher.ID)
+}
+
+func (r *postgresRepository) UpdateParentForParent(parent models.Parent, who int) (err error) {
+
+	query := "UPDATE back2school.parents " +
+		"SET name = $1, surname = $2, mail = $3, info = $4 " +
+		"where id = $5 "
+
+	return r.execUpdate(query, parent.Name, parent.Surname, parent.Mail, parent.Info, who)
+}
+
+func (r *postgresRepository) UpdateParentForAdmin(parent models.Parent) (err error) {
+
+	query := "UPDATE back2school.parents " +
+		" SET name = $1, surname = $2, mail = $3, info = $4 " +
+		"where id = $5 "
+
+	return r.execUpdate(query, parent.Name, parent.Surname, parent.Mail, parent.Info, parent.ID)
+}
+
+func (r *postgresRepository) UpdateStudentForParent(student models.Student, who int) (err error) {
+
+	query := "IF $1 in (select parent from back2school.isParent where student = $2) UPDATE back2school.student " +
+		" ET name = $3, surname = $4, mail = $5, info = $6 " +
+		"where id = $7 "
+
+	return r.execUpdate(query, who, student.ID, student.Name, student.Surname, student.Mail, student.Info, student.ID)
+}
+
+func (r *postgresRepository) UpdateStudentForAdmin(student models.Student) (err error) {
+
+	query := "UPDATE back2school.student " +
+		"SET name = $1, surname = $2, mail = $3, info = $4 " +
+		"where id = $5 "
+
+	return r.execUpdate(query, student.Name, student.Surname, student.Mail, student.Info, student.ID)
 
 }
 
-// @Summary Update Grade
-// @Param id path int true "Grade ID"
-// @Param class body models.Grade true "data"
-// @Tags Grades
-// @Router /grades/{id} [put]
-// @Success 201 {object} models.Grade
-// @Security ApiKeyAuth
-func (r *postgresRepository) UpdateGrade(grade models.Grade, who int, whoKind string) error {
-	var query string
-	var args []interface{}
-	switch whoKind {
-	case TeacherUser:
-		if *grade.Teacher == who {
-			query = "UPDATE back2school.grades " +
-				"SET student = $1, grade = $2, subject = $3, date = $4, teacher = $5) " +
-				" where id = $6 "
-			args = append(args, grade.Student, grade.Grade, grade.Subject, grade.Date, grade.Teacher, grade.ID)
-		} else {
-			return ErrorNotAuthorized
-		}
-	case AdminUser:
-		query = "UPDATE back2school.grades " +
-			"SET student = $1, grade = $2, subject = $3, date = $4, teacher = $5) " +
-			" where id = $6 "
-		args = append(args, grade.Student, grade.Grade, grade.Subject, grade.Date, grade.Teacher)
-	default:
-		return ErrorNotAuthorized
-	}
-	return r.execUpdate(query, args...)
+func (r *postgresRepository) UpdateAppointmentForParent(appointment models.Appointment, who int) (err error) {
+
+	query := "if $1 in (select parent from back2school.isParent where student = $2) UPDATE back2school.appointments " +
+		"SET student = $3, teacher = $4, location = $5, time = $6 where id = $7 "
+
+	return r.execUpdate(query, who, appointment.Student, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time, appointment.ID)
+}
+func (r *postgresRepository) UpdateAppointmentForTeacher(appointment models.Appointment, who int) (err error) {
+	query := "UPDATE back2school.appointments " +
+		"SET student = $1, teacher = $2, location = $3, time = $4 where id = $5 "
+
+	return r.execUpdate(query, appointment.Student, who, appointment.Location, appointment.Time, appointment.ID)
+
 }
 
-// @Summary Update payment
-// @Param id path int true "Payment ID"
-// @Param class body models.Payment true "data"
-// @Tags Payments
-// @Router /payments/{id} [put]
-// @Success 201 {object} models.Payment
-// @Security ApiKeyAuth
-func (r *postgresRepository) UpdatePayment(payment models.Payment, who int, whoKind string) error {
-	var query string
-	var args []interface{}
-	switch whoKind {
-	case ParentUser:
-		query = "if $7 in (select parent from back2school.isParent where student = $2) UPDATE back2school.grades " +
-			"SET amount = $1, student = $2, paid = $3, reason = $4, emitted = $5 " +
-			" where id = $6 "
-		args = append(args, payment.Amount, payment.Student, payment.Paid, payment.Reason, payment.Emitted, payment.ID, who)
+func (r *postgresRepository) UpdateAppointmentForAdmin(appointment models.Appointment) (err error) {
 
-	case AdminUser:
-		query = "UPDATE back2school.grades " +
-			"SET amount = $1, student = $2, paid = $3, reason = $4, emitted = $5 " +
-			" where id = $6 "
-		args = append(args, payment.Amount, payment.Student, payment.Paid, payment.Reason, payment.Emitted, payment.ID)
-	default:
-		return ErrorNotAuthorized
-	}
-	return r.execUpdate(query, args...)
+	query := "UPDATE back2school.appointments " +
+		"SET student = $1, teacher = $2, location = $3, time = $4 where id = $5 "
+
+	return r.execUpdate(query, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time, appointment.ID)
 }
 
-// @Summary Update lecture
-// @Param id path int true "Lecture ID"
-// @Param class body models.TimeTable true "data"
-// @Tags Lectures
-// @Router /lectures/{id} [put]
-// @Success 201 {object} models.TimeTable
-// @Security ApiKeyAuth
-func (r *postgresRepository) UpdateLecture(lecture models.TimeTable, who int, whoKind string) error {
-	var query string
-	var args []interface{}
-	switch whoKind {
-	case TeacherUser:
-		query = "if $1 in (select teacher from back2school.teaches natural join timetable where id = $2) UPDATE back2school.timetable " +
-			"SET location = $3, start = $4, end = $5, info = $6 " +
-			" where id = $2"
-		args = append(args, who, lecture.ID, lecture.Location, lecture.Start, lecture.End, lecture.Info)
-	case AdminUser:
-		query = "UPDATE back2school.timetable " +
-			"SET location = $3, start = $4, end = $5, info = $6 " +
-			" where id = $2"
-		args = append(args, who, lecture.ID, lecture.Location, lecture.Start, lecture.End, lecture.Info)
-	default:
-		return ErrorNotAuthorized
-	}
-	return r.execUpdate(query, args...)
+func (r *postgresRepository) UpdateClassForAdmin(class models.Class) (err error) {
+	query := "UPDATE back2school.classes " +
+		" SET year = $1, section = $2, info = $3, grade = $4 " +
+		" where id = $5 "
+	return r.execUpdate(query, class.Year, class.Section, class.Info, class.Grade, class.ID)
+
 }
 
-// @Summary Update Account
-// @Param class body models.Account true "data"
-// @Tags Accounts
-// @Router /accounts [put]
-// @Security ApiKeyAuth
-func (r *postgresRepository) UpdateAccount(account models.Account, who int, whoKind string, cost int) error {
-	var query string
-	var args []interface{}
-	switch whoKind {
-	case TeacherUser, ParentUser:
-		if account.Kind != whoKind || account.ID != who {
-			return ErrorNotAuthorized
-		}
-		encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), cost)
-		query = "UPDATE back2school.accounts SET password = $1 " +
-			"WHERE username = $2 AND id = $3 AND kind = $4"
-		args = append(args, string(encryptedPassword), account.Username, account.ID, account.Kind)
-	case AdminUser:
-		encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), cost)
-		query = "UPDATE back2school.accounts SET password = $1 " +
-			"WHERE username = $2 AND id = $3 AND kind = $4"
-		args = append(args, string(encryptedPassword), account.Username, account.ID, account.Kind)
-	default:
-		return ErrorNotAuthorized
-	}
-	return r.execUpdate(query, args...)
+func (r *postgresRepository) UpdateNotificationForAdmin(notification models.Notification) error {
+	query := "UPDATE back2school.notification " +
+		"SET receiver = $1, message = $2, time = $3, receiver_kind = $4 " +
+		" where id = $5 "
+	return r.execUpdate(query, notification.Receiver, notification.Message, notification.Time, notification.ReceiverKind, notification.ID)
+}
+
+func (r *postgresRepository) UpdateGradeForTeacher(grade models.Grade) error {
+
+	query := "UPDATE back2school.grades " +
+		"SET student = $1, grade = $2, subject = $3, date = $4, teacher = $5) " +
+		" where id = $6 "
+
+	return r.execUpdate(query, grade.Student, grade.Grade, grade.Subject, grade.Date, grade.Teacher, grade.ID)
+}
+
+func (r *postgresRepository) UpdateGradeForAdmin(grade models.Grade) error {
+
+	query := "UPDATE back2school.grades " +
+		"SET student = $1, grade = $2, subject = $3, date = $4, teacher = $5) " +
+		" where id = $6 "
+
+	return r.execUpdate(query, grade.Student, grade.Grade, grade.Subject, grade.Date, grade.Teacher)
+
+}
+
+func (r *postgresRepository) UpdatePaymentForParent(payment models.Payment, who int) error {
+
+	query := "if $7 in (select parent from back2school.isParent where student = $2) UPDATE back2school.grades " +
+		"SET amount = $1, student = $2, paid = $3, reason = $4, emitted = $5 " +
+		" where id = $6 "
+
+	return r.execUpdate(query, payment.Amount, payment.Student, payment.Paid, payment.Reason, payment.Emitted, payment.ID, who)
+
+}
+
+func (r *postgresRepository) UpdatePaymentForAdmin(payment models.Payment) error {
+
+	query := "UPDATE back2school.grades " +
+		"SET amount = $1, student = $2, paid = $3, reason = $4, emitted = $5 " +
+		" where id = $6 "
+
+	return r.execUpdate(query, payment.Amount, payment.Student, payment.Paid, payment.Reason, payment.Emitted, payment.ID)
+}
+
+func (r *postgresRepository) UpdateLectureForTeacher(lecture models.TimeTable, who int) error {
+
+	query := "if $1 in (select teacher from back2school.teaches natural join timetable where id = $2) UPDATE back2school.timetable " +
+		"SET location = $3, start = $4, end = $5, info = $6 " +
+		" where id = $2"
+
+	return r.execUpdate(query, who, lecture.ID, lecture.Location, lecture.Start, lecture.End, lecture.Info)
+}
+
+func (r *postgresRepository) UpdateLectureForadmin(lecture models.TimeTable) error {
+
+	query := "UPDATE back2school.timetable " +
+		"SET location = $2, start = $3, end = $4, info = $5 " +
+		" where id = $1"
+
+	return r.execUpdate(query, lecture.ID, lecture.Location, lecture.Start, lecture.End, lecture.Info)
+}
+
+func (r *postgresRepository) UpdateAccount(account models.Account, cost int) error {
+
+	encryptedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), cost)
+	query := "UPDATE back2school.accounts SET password = $1 " +
+		"WHERE username = $2 AND id = $3 AND kind = $4"
+
+	return r.execUpdate(query, string(encryptedPassword), account.Username, account.ID, account.Kind)
 }

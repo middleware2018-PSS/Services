@@ -12,6 +12,10 @@ type postgresRepository struct {
 	*sql.DB
 }
 
+type PostgresRepository struct {
+	postgresRepository
+}
+
 func NewPostgresRepository(DB *sql.DB) *postgresRepository {
 	//TODO prepare all statement at startup
 	return &postgresRepository{DB}
