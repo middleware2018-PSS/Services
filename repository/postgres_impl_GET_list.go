@@ -275,25 +275,6 @@ func (r *Repository) AppointmentsByParentForAdmin(id int, limit int, offset int)
 		}, limit, offset, id)
 }
 
-func (r *Repository) PaymentByIDForParent(id int, who int) (interface{}, error) {
-	payment := &models.Payment{}
-	query := "SELECT id, amount, paid, emitted, reason " +
-		"FROM back2school.payments natural join back2school.isParent" +
-		" WHERE id = $1 and parent = $2 "
-
-	err := r.QueryRow(query, id, who).Scan(payment.ID, payment.Amount, payment.Paid, payment.Emitted, payment.Reason)
-	return switchResult(payment, err)
-}
-
-func (r *Repository) PaymentByIDForAdmins(id int) (interface{}, error) {
-	payment := &models.Payment{}
-	query := "SELECT id, amount, paid, emitted, reason " +
-		"FROM back2school.payments WHERE id = $1 "
-
-	err := r.QueryRow(query, id).Scan(payment.ID, payment.Amount, payment.Paid, payment.Emitted, payment.Reason)
-	return switchResult(payment, err)
-}
-
 func (r *Repository) PaymentsForParent(limit int, offset int, who int) ([]interface{}, error) {
 
 	query := "select id, amount, student, paid, reason, emitted " +
@@ -402,27 +383,6 @@ func (r *Repository) GradesByStudentForAdmins(id int, limit int, offset int) ([]
 			err := rows.Scan(&grade.ID, grade.Student, &grade.Subject, &grade.Date, &grade.Grade, grade.Teacher)
 			return grade, err
 		}, limit, offset, id)
-}
-
-func (r *Repository) TeacherByIDForTeacher(id int) (interface{}, error) {
-	teacher := models.Teacher{}
-	query := "SELECT id, name, surname, mail " +
-		"FROM back2school.teachers " +
-		"WHERE id = $1 "
-
-	err := r.QueryRow(query, id).Scan(&teacher.ID, &teacher.Name, &teacher.Surname, &teacher.Mail)
-	return switchResult(teacher, err)
-
-}
-
-func (r *Repository) TeacherByIDForAdmin(id int) (interface{}, error) {
-	teacher := models.Teacher{}
-	query := "SELECT id, name, surname, mail " +
-		"FROM back2school.teachers " +
-		"WHERE id = $1 "
-	err := r.QueryRow(query, id).Scan(&teacher.ID, &teacher.Name, &teacher.Surname, &teacher.Mail)
-	return switchResult(teacher, err)
-
 }
 
 func (r *Repository) TeachersForTeacher(who int) ([]interface{}, error) {
