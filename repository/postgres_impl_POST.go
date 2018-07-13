@@ -6,7 +6,7 @@ import (
 	"github.com/middleware2018-PSS/Services/models"
 )
 
-func (r *postgresRepository) CreateAccount(username string, password []byte, id int, kind string, cost int) error {
+func (r *Repository) CreateAccount(username string, password []byte, id int, kind string, cost int) error {
 
 	query := `INSERT INTO back2school.accounts (username, "password", id, kind) VALUES ($1, $2, $3, $4)`
 
@@ -18,7 +18,7 @@ func (r *postgresRepository) CreateAccount(username string, password []byte, id 
 
 }
 
-func (r *postgresRepository) CreateAppointmentForParent(appointment models.Appointment, who int) (id int, err error) {
+func (r *Repository) CreateAppointmentForParent(appointment models.Appointment, who int) (id int, err error) {
 
 	query := "if $1 in (select parent from back2school.isParent where student = $2) INSERT INTO back2school.appointments " +
 		" (student, teacher, location, time) VALUES ($3, $4, $5, $6) "
@@ -26,27 +26,27 @@ func (r *postgresRepository) CreateAppointmentForParent(appointment models.Appoi
 	return r.exec(query, who, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time)
 }
 
-func (r *postgresRepository) CreateAppointmentForTeacher(appointment models.Appointment, who int) (id int, err error) {
+func (r *Repository) CreateAppointmentForTeacher(appointment models.Appointment, who int) (id int, err error) {
 
 	query := "INSERT INTO back2school.appointments " +
 		" (student, teacher, location, time) VALUES ($1, $2, $3, $4) "
 	return r.exec(query, appointment.Student, who, appointment.Location, appointment.Time)
 }
 
-func (r *postgresRepository) CreateAppointmentForAdmin(appointment models.Appointment) (id int, err error) {
+func (r *Repository) CreateAppointmentForAdmin(appointment models.Appointment) (id int, err error) {
 
 	query := "INSERT INTO back2school.appointments " +
 		" (student, teacher, location, time) VALUES ($1, $2, $3, $4) "
 	return r.exec(query, appointment.Student, appointment.Teacher, appointment.Location, appointment.Time)
 }
 
-func (r *postgresRepository) CreateParentForAdmin(parent models.Parent) (int, error) {
+func (r *Repository) CreateParentForAdmin(parent models.Parent) (int, error) {
 	query := "INSERT INTO back2school.parents " +
 		"(name, surname, mail, info) VALUES ($1, $2, $3, $4) "
 	return r.exec(query, parent.Name, parent.Surname, parent.Mail, parent.Info)
 }
 
-func (r *postgresRepository) CreateTeacherForAdmin(teacher models.Teacher) (int, error) {
+func (r *Repository) CreateTeacherForAdmin(teacher models.Teacher) (int, error) {
 	query := "INSERT INTO back2school.teachers " +
 		" (name, surname, mail, info) " +
 		" VALUES ($1, $2, $3, $4) "
@@ -54,7 +54,7 @@ func (r *postgresRepository) CreateTeacherForAdmin(teacher models.Teacher) (int,
 
 }
 
-func (r *postgresRepository) CreateStudentForAdmin(student models.Student) (int, error) {
+func (r *Repository) CreateStudentForAdmin(student models.Student) (int, error) {
 	query := "INSERT INTO back2school.students " +
 		" (name, surname, mail, info) " +
 		" VALUES ($1, $2, $3, $4) "
@@ -62,14 +62,14 @@ func (r *postgresRepository) CreateStudentForAdmin(student models.Student) (int,
 
 }
 
-func (r *postgresRepository) CreateClassForAdmin(class models.Class) (int, error) {
+func (r *Repository) CreateClassForAdmin(class models.Class) (int, error) {
 	query := "INSERT INTO back2school.classes " +
 		" (year, section, info, grade) " +
 		" VALUES ($1, $2, $3, $4) "
 	return r.exec(query, class.Year, class.Section, class.Info, class.Grade)
 }
 
-func (r *postgresRepository) CreateNotificationForAdmin(notification models.Notification) (int, error) {
+func (r *Repository) CreateNotificationForAdmin(notification models.Notification) (int, error) {
 	query := "insert into back2school.classes " +
 		" (receiver, message, time, receiver_kind) " +
 		" VALUES ($1, $2, $3, $4) "
@@ -77,7 +77,7 @@ func (r *postgresRepository) CreateNotificationForAdmin(notification models.Noti
 
 }
 
-func (r *postgresRepository) CreateGradeForTeacher(grade models.Grade) (int, error) {
+func (r *Repository) CreateGradeForTeacher(grade models.Grade) (int, error) {
 
 	query := "if ($5, $1, $3) in " +
 		"(select t.teacher, t.subject, e.student from back2school.teaches as t natural join back2school.enrolled as e ) " +
@@ -88,7 +88,7 @@ func (r *postgresRepository) CreateGradeForTeacher(grade models.Grade) (int, err
 	return r.exec(query, grade.Student, grade.Grade, grade.Subject, grade.Date, grade.Teacher)
 }
 
-func (r *postgresRepository) CreateGradeForAdmin(grade models.Grade) (int, error) {
+func (r *Repository) CreateGradeForAdmin(grade models.Grade) (int, error) {
 	query := "insert into back2school.grades " +
 		" (student, grade, subject, date, teacher) " +
 		" VALUES ($1, $2, $3, $4, $5) "
@@ -96,7 +96,7 @@ func (r *postgresRepository) CreateGradeForAdmin(grade models.Grade) (int, error
 	return r.exec(query, grade.Student, grade.Grade, grade.Subject, grade.Date, grade.Teacher)
 }
 
-func (r *postgresRepository) CreatePaymentForAdmin(payment models.Payment) (int, error) {
+func (r *Repository) CreatePaymentForAdmin(payment models.Payment) (int, error) {
 	query := "insert into back2school.payments " +
 		" (amount, student, paid, reason, emitted) " +
 		" VALUES ($1, $2, $3, $4, $5) "
@@ -104,7 +104,7 @@ func (r *postgresRepository) CreatePaymentForAdmin(payment models.Payment) (int,
 
 }
 
-func (r *postgresRepository) CreateLectureForAdmin(lecture models.TimeTable) (int, error) {
+func (r *Repository) CreateLectureForAdmin(lecture models.TimeTable) (int, error) {
 	query := "insert into back2school.timetable " +
 		" (class, subject, location, start, end, info) " +
 		" VALUES ($1, $2, $3, $4, $5, $6) "

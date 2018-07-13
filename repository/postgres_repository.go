@@ -4,33 +4,24 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
-type postgresRepository struct {
+type Repository struct {
 	*sql.DB
 }
 
-type PostgresRepository struct {
-	postgresRepository
-}
-
-func NewPostgresRepository(DB *sql.DB) *postgresRepository {
+func NewPostgresRepository(DB *sql.DB) *Repository {
 	//TODO prepare all statement at startup
-	return &postgresRepository{DB}
+	return &Repository{DB}
 }
 
-func (r *postgresRepository) CheckUser(userID string, password string) (int, string, bool) {
+func (r *Repository) CheckUser(userID string, password string) (id int, kind string, saltedPass []byte, err error) {
 	query := `select id, kind, password from back2school.accounts where username = $1`
-	var id int
-	var kind string
-	var saltedPass []byte
-	err := r.QueryRow(query, userID).Scan(&id, &kind, &saltedPass)
-	return id, kind, err == nil && bcrypt.CompareHashAndPassword(saltedPass, []byte(password)) == nil
+	err = r.QueryRow(query, userID).Scan(&id, &kind, &saltedPass)
+	return id, kind, saltedPass, err
 }
 
-func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (interface{}, error), limit int, offset int, params ...interface{}) (list []interface{}, err error) {
+func (r *Repository) listByParams(query string, f func(*sql.Rows) (interface{}, error), limit int, offset int, params ...interface{}) (list []interface{}, err error) {
 	query = query + fmt.Sprintf(" limit $%d offset $%d", len(params)+1, len(params)+2)
 	params = append(params, limit, offset)
 	rows, err := r.Query(query, params...)
@@ -53,7 +44,7 @@ func (r *postgresRepository) listByParams(query string, f func(*sql.Rows) (inter
 	}
 }
 
-func (r *postgresRepository) exec(query string, params ...interface{}) (id int, err error) {
+func (r *Repository) exec(query string, params ...interface{}) (id int, err error) {
 	res, err := r.DB.Exec(query, params...)
 	if err != nil {
 		log.Print(err.Error())
@@ -65,7 +56,7 @@ func (r *postgresRepository) exec(query string, params ...interface{}) (id int, 
 	}
 }
 
-func (r *postgresRepository) execUpdate(query string, params ...interface{}) (err error) {
+func (r *Repository) execUpdate(query string, params ...interface{}) (err error) {
 	_, err = r.exec(query, params...)
 	return err
 }

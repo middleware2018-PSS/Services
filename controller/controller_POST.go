@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/middleware2018-PSS/Services/models"
+	"github.com/middleware2018-PSS/Services/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -13,7 +14,7 @@ import (
 // @Router /accounts [post]
 // @Security ApiKeyAuth
 func (c Controller) CreateAccount(username string, password string, id int, kind string, cost int, whoKind string) error {
-	if whoKind == AdminUser {
+	if whoKind == repository.AdminUser {
 		if !allowedKind[kind] {
 			return ErrorNoKindSpecified
 		}
@@ -40,15 +41,15 @@ func (c Controller) CreateAccount(username string, password string, id int, kind
 // @Security ApiKeyAuth
 func (c Controller) CreateAppointment(appointment models.Appointment, who int, whoKind string) (id int, err error) {
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.CreateAppointmentForParent(appointment, who)
-	case TeacherUser:
+	case repository.TeacherUser:
 		if *appointment.Teacher == who {
 			return c.repo.CreateAppointmentForTeacher(appointment, who)
 		} else {
 			return 0, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.CreateAppointmentForAdmin(appointment)
 	default:
 		return 0, ErrorNotAuthorized
@@ -63,7 +64,7 @@ func (c Controller) CreateAppointment(appointment models.Appointment, who int, w
 // @Router /parents [post]
 // @Security ApiKeyAuth
 func (c Controller) CreateParent(parent models.Parent, who int, whoKind string) (int, error) {
-	if whoKind == AdminUser {
+	if whoKind == repository.AdminUser {
 		return c.repo.CreateParentForAdmin(parent)
 	} else {
 		return 0, ErrorNotAuthorized
@@ -77,7 +78,7 @@ func (c Controller) CreateParent(parent models.Parent, who int, whoKind string) 
 // @Success 201 {object} models.Teacher
 // @Security ApiKeyAuth
 func (c Controller) CreateTeacher(teacher models.Teacher, who int, whoKind string) (int, error) {
-	if whoKind == AdminUser {
+	if whoKind == repository.AdminUser {
 		return c.repo.CreateTeacherForAdmin(teacher)
 	} else {
 		return 0, ErrorNotAuthorized
@@ -91,7 +92,7 @@ func (c Controller) CreateTeacher(teacher models.Teacher, who int, whoKind strin
 // @Success 201 {object} models.Student
 // @Security ApiKeyAuth
 func (c Controller) CreateStudent(student models.Student, who int, whoKind string) (int, error) {
-	if whoKind == AdminUser {
+	if whoKind == repository.AdminUser {
 		return c.repo.CreateStudentForAdmin(student)
 	} else {
 		return 0, ErrorNotAuthorized
@@ -106,7 +107,7 @@ func (c Controller) CreateStudent(student models.Student, who int, whoKind strin
 // @Success 201 {object} models.Class
 // @Security ApiKeyAuth
 func (c Controller) CreateClass(class models.Class, who int, whoKind string) (int, error) {
-	if whoKind == AdminUser {
+	if whoKind == repository.AdminUser {
 		return c.repo.CreateClassForAdmin(class)
 	} else {
 		return 0, ErrorNotAuthorized
@@ -121,7 +122,7 @@ func (c Controller) CreateClass(class models.Class, who int, whoKind string) (in
 // @Success 201 {object} models.Notification
 // @Security ApiKeyAuth
 func (c Controller) CreateNotification(notification models.Notification, who int, whoKind string) (int, error) {
-	if whoKind == AdminUser {
+	if whoKind == repository.AdminUser {
 		return c.repo.CreateNotificationForAdmin(notification)
 	} else {
 		return 0, ErrorNotAuthorized
@@ -137,13 +138,13 @@ func (c Controller) CreateNotification(notification models.Notification, who int
 // @Security ApiKeyAuth
 func (c Controller) CreateGrade(grade models.Grade, who int, whoKind string) (int, error) {
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		if *grade.Teacher == who {
 			return c.repo.CreateGradeForTeacher(grade)
 		} else {
 			return 0, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.CreateGradeForAdmin(grade)
 	default:
 		return 0, ErrorNotAuthorized
@@ -157,7 +158,7 @@ func (c Controller) CreateGrade(grade models.Grade, who int, whoKind string) (in
 // @Success 201 {object} models.Payment
 // @Security ApiKeyAuth
 func (c Controller) CreatePayment(payment models.Payment, who int, whoKind string) (int, error) {
-	if whoKind == AdminUser {
+	if whoKind == repository.AdminUser {
 		return c.repo.CreatePaymentForAdmin(payment)
 	} else {
 		return 0, ErrorNotAuthorized
@@ -171,7 +172,7 @@ func (c Controller) CreatePayment(payment models.Payment, who int, whoKind strin
 // @Success 201 {object} models.Payment
 // @Security ApiKeyAuth
 func (c Controller) CreateLecture(lecture models.TimeTable, who int, whoKind string) (int, error) {
-	if whoKind == AdminUser {
+	if whoKind == repository.AdminUser {
 		return c.repo.CreateLectureForAdmin(lecture)
 	} else {
 		return 0, ErrorNotAuthorized

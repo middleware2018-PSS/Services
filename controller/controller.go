@@ -5,22 +5,20 @@ import (
 
 	"github.com/middleware2018-PSS/Services/models"
 	"github.com/middleware2018-PSS/Services/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Controller struct {
-	repo repository.PostgresRepository
+	repo *repository.Repository
 }
 
 const (
-	USER        = "userID"
-	KIND        = "kind"
-	AdminUser   = "Admin"
-	ParentUser  = "Parent"
-	TeacherUser = "Teacher"
+	USER = "userID"
+	KIND = "kind"
 )
 
 func init() {
-	allowedKind = map[string]bool{AdminUser: true, ParentUser: true, TeacherUser: true}
+	allowedKind = map[string]bool{repository.AdminUser: true, repository.ParentUser: true, repository.TeacherUser: true}
 }
 
 var (
@@ -31,8 +29,13 @@ var (
 	ErrorNoKindSpecified = errors.New("No \"kind\" has been specified")
 )
 
-func NewController(r repository.Repository) Controller {
+func NewController(r *repository.Repository) Controller {
 	return Controller{r}
+}
+
+func (c *Controller) CheckUser(userID string, password string) (int, string, bool) {
+	id, kind, saltedPass, err := c.repo.CheckUser(userID, password)
+	return id, kind, err == nil && bcrypt.CompareHashAndPassword(saltedPass, []byte(password)) == nil
 }
 
 type AbstractController interface {

@@ -2,7 +2,7 @@ package repository
 
 import "github.com/middleware2018-PSS/Services/models"
 
-func (r *postgresRepository) AppointmentForParent(id int, who int) (interface{}, error) {
+func (r *Repository) AppointmentForParent(id int, who int) (interface{}, error) {
 	appointment := models.Appointment{}
 
 	query := "SELECT id, student, teacher, time, location " +
@@ -12,7 +12,7 @@ func (r *postgresRepository) AppointmentForParent(id int, who int) (interface{},
 		&appointment.ID, &appointment.Student, &appointment.Teacher, &appointment.Time, &appointment.Location)
 	return switchResult(appointment, err)
 }
-func (r *postgresRepository) AppointmentForTeacher(id int, who int) (interface{}, error) {
+func (r *Repository) AppointmentForTeacher(id int, who int) (interface{}, error) {
 	appointment := models.Appointment{}
 
 	query := "SELECT id, student, teacher, time, location " +
@@ -22,7 +22,7 @@ func (r *postgresRepository) AppointmentForTeacher(id int, who int) (interface{}
 		&appointment.ID, &appointment.Student, &appointment.Teacher, &appointment.Time, &appointment.Location)
 	return switchResult(appointment, err)
 }
-func (r *postgresRepository) AppointmentForAdmin(id int) (interface{}, error) {
+func (r *Repository) AppointmentForAdmin(id int) (interface{}, error) {
 	appointment := models.Appointment{}
 
 	query := "SELECT id, student, teacher, time, location " +
@@ -33,7 +33,7 @@ func (r *postgresRepository) AppointmentForAdmin(id int) (interface{}, error) {
 	return switchResult(appointment, err)
 }
 
-func (r *postgresRepository) GradeByIDForParent(id int, who int) (interface{}, error) {
+func (r *Repository) GradeByIDForParent(id int, who int) (interface{}, error) {
 	grade := models.Grade{}
 
 	query := "SELECT id, student, teacher, subject, date, grade " +
@@ -42,7 +42,7 @@ func (r *postgresRepository) GradeByIDForParent(id int, who int) (interface{}, e
 		&grade.ID, &grade.Student, &grade.Teacher, &grade.Subject, &grade.Date, &grade.Grade)
 	return switchResult(grade, err)
 }
-func (r *postgresRepository) GradeByIDForTeacher(id int, who int) (interface{}, error) {
+func (r *Repository) GradeByIDForTeacher(id int, who int) (interface{}, error) {
 	grade := models.Grade{}
 
 	query := "SELECT id, student, teacher, subject, date, grade " +
@@ -51,7 +51,7 @@ func (r *postgresRepository) GradeByIDForTeacher(id int, who int) (interface{}, 
 		&grade.ID, &grade.Student, &grade.Teacher, &grade.Subject, &grade.Date, &grade.Grade)
 	return switchResult(grade, err)
 }
-func (r *postgresRepository) GradeByIDForAdmin(id int) (interface{}, error) {
+func (r *Repository) GradeByIDForAdmin(id int) (interface{}, error) {
 	grade := models.Grade{}
 
 	query := "SELECT id, student, teacher, subject, date, grade " +
@@ -61,7 +61,7 @@ func (r *postgresRepository) GradeByIDForAdmin(id int) (interface{}, error) {
 	return switchResult(grade, err)
 }
 
-func (r *postgresRepository) ClassByIDForTeacher(id int, who int) (interface{}, error) {
+func (r *Repository) ClassByIDForTeacher(id int, who int) (interface{}, error) {
 	class := models.Class{}
 
 	query := "SELECT id, year, section, info, grade FROM back2school.classes join back2school.teaches on class = id" +
@@ -70,7 +70,7 @@ func (r *postgresRepository) ClassByIDForTeacher(id int, who int) (interface{}, 
 	err := r.QueryRow(query, id, who).Scan(&class.ID, &class.Year, &class.Section, &class.Info, &class.Grade)
 	return switchResult(class, err)
 }
-func (r *postgresRepository) ClassByIDForAdmin(id int) (interface{}, error) {
+func (r *Repository) ClassByIDForAdmin(id int) (interface{}, error) {
 	class := models.Class{}
 
 	query := "SELECT id, year, section, info, grade FROM back2school.classes " +
@@ -80,7 +80,7 @@ func (r *postgresRepository) ClassByIDForAdmin(id int) (interface{}, error) {
 	return switchResult(class, err)
 }
 
-func (r *postgresRepository) NotificationByIDForTeacher(id int, who int, whoKind string) (interface{}, error) {
+func (r *Repository) NotificationByIDForTeacher(id int, who int, whoKind string) (interface{}, error) {
 	n := models.Notification{}
 
 	query := "SELECT id, receiver, message, time, receiver_kind " +
@@ -91,7 +91,7 @@ func (r *postgresRepository) NotificationByIDForTeacher(id int, who int, whoKind
 		&n.Receiver, &n.Message, &n.Time, &n.ReceiverKind)
 	return switchResult(n, err)
 }
-func (r *postgresRepository) NotificationByIDForParent(id int, who int, whoKind string) (interface{}, error) {
+func (r *Repository) NotificationByIDForParent(id int, who int, whoKind string) (interface{}, error) {
 	n := models.Notification{}
 	query := "SELECT id, receiver, message, time, receiver_kind " +
 		"FROM back2school.notification WHERE id = $1 and receiver = $2 and receiver_kind = $3 "
@@ -100,7 +100,7 @@ func (r *postgresRepository) NotificationByIDForParent(id int, who int, whoKind 
 		&n.Receiver, &n.Message, &n.Time, &n.ReceiverKind)
 	return switchResult(n, err)
 }
-func (r *postgresRepository) NotificationByIDForAdmin(id int, who int, whoKind string) (interface{}, error) {
+func (r *Repository) NotificationByIDForAdmin(id int, who int, whoKind string) (interface{}, error) {
 	n := models.Notification{}
 	query := "SELECT id, receiver, message, time, receiver_kind " +
 		"FROM back2school.notification WHERE id = $1 "
@@ -110,7 +110,7 @@ func (r *postgresRepository) NotificationByIDForAdmin(id int, who int, whoKind s
 	return switchResult(n, err)
 }
 
-func (r *postgresRepository) ParentByID(id int) (interface{}, error) {
+func (r *Repository) ParentByID(id int) (interface{}, error) {
 	p := models.Parent{}
 
 	query := "SELECT id,	name, surname, mail, info " +
@@ -120,7 +120,7 @@ func (r *postgresRepository) ParentByID(id int) (interface{}, error) {
 	return switchResult(p, err)
 }
 
-func (r *postgresRepository) StudentByIDForParent(id int, who int) (student interface{}, err error) {
+func (r *Repository) StudentByIDForParent(id int, who int) (student interface{}, err error) {
 	s := models.Student{}
 
 	query := "SELECT id,	name, surname, mail, info  " +
@@ -131,7 +131,7 @@ func (r *postgresRepository) StudentByIDForParent(id int, who int) (student inte
 		&s.Name, &s.Surname, &s.Mail, &s.Info)
 	return switchResult(s, err)
 }
-func (r *postgresRepository) StudentByIDForAdmin(id int) (student interface{}, err error) {
+func (r *Repository) StudentByIDForAdmin(id int) (student interface{}, err error) {
 	s := models.Student{}
 
 	query := "SELECT id,	name, surname, mail, info  " +
@@ -142,7 +142,7 @@ func (r *postgresRepository) StudentByIDForAdmin(id int) (student interface{}, e
 	return switchResult(s, err)
 }
 
-func (r *postgresRepository) LectureByIDForParent(id int, who int) (interface{}, error) {
+func (r *Repository) LectureByIDForParent(id int, who int) (interface{}, error) {
 	lecture := models.TimeTable{}
 
 	query := "select id, class, subject, \"start\", \"end\", location, info " +
@@ -154,7 +154,7 @@ func (r *postgresRepository) LectureByIDForParent(id int, who int) (interface{},
 	return switchResult(lecture, err)
 }
 
-func (r *postgresRepository) LectureByIDForTeacher(id int, who int) (interface{}, error) {
+func (r *Repository) LectureByIDForTeacher(id int, who int) (interface{}, error) {
 	lecture := models.TimeTable{}
 
 	query := "select id, class, subject, \"start\", \"end\", location, info " +
@@ -166,7 +166,7 @@ func (r *postgresRepository) LectureByIDForTeacher(id int, who int) (interface{}
 	return switchResult(lecture, err)
 }
 
-func (r *postgresRepository) LectureByIDForAdmin(id int) (interface{}, error) {
+func (r *Repository) LectureByIDForAdmin(id int) (interface{}, error) {
 	lecture := models.TimeTable{}
 
 	query := "select id, class, subject, \"start\", \"end\", location, info " +

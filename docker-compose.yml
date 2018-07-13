@@ -8,5 +8,7 @@ services:
       - "db"
   db:
     image: "postgres:alpine"
+    ports: 
+      - "5432:5432"
     volumes:
       - "./dump.sql:/dump.sql"

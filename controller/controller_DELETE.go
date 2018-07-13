@@ -1,13 +1,15 @@
 package controller
 
+import "github.com/middleware2018-PSS/Services/repository"
+
 // @Summary Delete Account
 // @Param id path int true "Account ID"
 // @Tags Accounts
 // @Router /accounts/{username} [delete]
 // @Security ApiKeyAuth
 func (r Controller) DeleteAccount(username string, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		r.repo.DeleteAccount(username)
+	if whoKind == repository.AdminUser {
+		return r.repo.DeleteAccount(username)
 	} else {
 		return nil, ErrorNotAuthorized
 	}
@@ -19,8 +21,8 @@ func (r Controller) DeleteAccount(username string, whoKind string) (interface{},
 // @Router /parents/{id} [delete]
 // @Security ApiKeyAuth
 func (r Controller) DeleteParent(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		r.repo.DeleteParent(id)
+	if whoKind == repository.AdminUser {
+		return r.repo.DeleteParent(id)
 	} else {
 		return nil, ErrorNotAuthorized
 	}
@@ -32,8 +34,8 @@ func (r Controller) DeleteParent(id int, who int, whoKind string) (interface{}, 
 // @Router /teachers/{id} [delete]
 // @Security ApiKeyAuth
 func (r Controller) DeleteTeacher(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		r.repo.DeleteTeacher(id)
+	if whoKind == repository.AdminUser {
+		return r.repo.DeleteTeacher(id)
 	} else {
 		return nil, ErrorNotAuthorized
 	}
@@ -45,8 +47,8 @@ func (r Controller) DeleteTeacher(id int, who int, whoKind string) (interface{},
 // @Router /appointments/{id} [delete]
 // @Security ApiKeyAuth
 func (r Controller) DeleteAppointment(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		r.repo.DeleteAppointment(id)
+	if whoKind == repository.AdminUser {
+		return r.repo.DeleteAppointment(id)
 	} else {
 		return nil, ErrorNotAuthorized
 	}
@@ -58,8 +60,8 @@ func (r Controller) DeleteAppointment(id int, who int, whoKind string) (interfac
 // @Router /students/{id} [delete]
 // @Security ApiKeyAuth
 func (r Controller) DeleteStudent(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		r.repo.DeleteStudent(id)
+	if whoKind == repository.AdminUser {
+		return r.repo.DeleteStudent(id)
 	} else {
 		return nil, ErrorNotAuthorized
 	}
@@ -71,8 +73,8 @@ func (r Controller) DeleteStudent(id int, who int, whoKind string) (interface{},
 // @Router /notifications/{id} [delete]
 // @Security ApiKeyAuth
 func (r Controller) DeleteNotification(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		r.repo.DeleteNotification(id)
+	if whoKind == repository.AdminUser {
+		return r.repo.DeleteNotification(id)
 	} else {
 		return nil, ErrorNotAuthorized
 	}
@@ -84,8 +86,8 @@ func (r Controller) DeleteNotification(id int, who int, whoKind string) (interfa
 // @Router /payments/{id} [delete]
 // @Security ApiKeyAuth
 func (r Controller) DeletePayment(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		r.repo.DeletePayment(id)
+	if whoKind == repository.AdminUser {
+		return r.repo.DeletePayment(id)
 	} else {
 		return nil, ErrorNotAuthorized
 	}
@@ -97,8 +99,8 @@ func (r Controller) DeletePayment(id int, who int, whoKind string) (interface{},
 // @Router /classes/{id} [delete]
 // @Security ApiKeyAuth
 func (r Controller) DeleteClass(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		r.repo.DeleteClass(id)
+	if whoKind == repository.AdminUser {
+		return r.repo.DeleteClass(id)
 	} else {
 		return nil, ErrorNotAuthorized
 	}
@@ -110,8 +112,8 @@ func (r Controller) DeleteClass(id int, who int, whoKind string) (interface{}, e
 // @Router /grades/{id} [delete]
 // @Security ApiKeyAuth
 func (r Controller) DeleteGrade(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		r.repo.DeleteGrade(id)
+	if whoKind == repository.AdminUser {
+		return r.repo.DeleteGrade(id)
 	} else {
 		return nil, ErrorNotAuthorized
 	}
@@ -123,8 +125,8 @@ func (r Controller) DeleteGrade(id int, who int, whoKind string) (interface{}, e
 // @Router /lectures/{id} [delete]
 // @Security ApiKeyAuth
 func (r Controller) DeleteLecture(id int, who int, whoKind string) (interface{}, error) {
-	if whoKind == AdminUser {
-		r.repo.DeleteLecture(id)
+	if whoKind == repository.AdminUser {
+		return r.repo.DeleteLecture(id)
 	} else {
 		return nil, ErrorNotAuthorized
 	}

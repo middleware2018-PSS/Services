@@ -5,7 +5,7 @@ package repository
 // @Tags Accounts
 // @Router /accounts/{username} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteAccount(username string) (interface{}, error) {
+func (r *Repository) DeleteAccount(username string) (interface{}, error) {
 	query := "DELETE FROM back2school.accounts where username = $1"
 	return r.exec(query, username)
 
@@ -16,7 +16,7 @@ func (r *postgresRepository) DeleteAccount(username string) (interface{}, error)
 // @Tags Parents
 // @Router /parents/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteParent(id int) (interface{}, error) {
+func (r *Repository) DeleteParent(id int) (interface{}, error) {
 	query := "DELETE FROM back2school.parents where id = $1"
 	return r.exec(query, id)
 }
@@ -26,7 +26,7 @@ func (r *postgresRepository) DeleteParent(id int) (interface{}, error) {
 // @Tags Teachers
 // @Router /teachers/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteTeacher(id int) (interface{}, error) {
+func (r *Repository) DeleteTeacher(id int) (interface{}, error) {
 	query := "DELETE FROM back2school.teachers where id = $1"
 	return r.exec(query, id)
 }
@@ -36,7 +36,7 @@ func (r *postgresRepository) DeleteTeacher(id int) (interface{}, error) {
 // @Tags Appointments
 // @Router /appointments/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteAppointment(id int) (interface{}, error) {
+func (r *Repository) DeleteAppointment(id int) (interface{}, error) {
 	query := "DELETE FROM back2school.appointments where id = $1"
 	return r.exec(query, id)
 }
@@ -46,7 +46,7 @@ func (r *postgresRepository) DeleteAppointment(id int) (interface{}, error) {
 // @Tags Students
 // @Router /students/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteStudent(id int) (interface{}, error) {
+func (r *Repository) DeleteStudent(id int) (interface{}, error) {
 	query := "DELETE FROM back2school.students where id = $1"
 	return r.exec(query, id)
 }
@@ -56,7 +56,7 @@ func (r *postgresRepository) DeleteStudent(id int) (interface{}, error) {
 // @Tags Notifications
 // @Router /notifications/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteNotification(id int) (interface{}, error) {
+func (r *Repository) DeleteNotification(id int) (interface{}, error) {
 	query := "DELETE FROM back2school.notification where id = $1"
 	return r.exec(query, id)
 }
@@ -66,7 +66,7 @@ func (r *postgresRepository) DeleteNotification(id int) (interface{}, error) {
 // @Tags Payments
 // @Router /payments/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeletePayment(id int) (interface{}, error) {
+func (r *Repository) DeletePayment(id int) (interface{}, error) {
 	query := "DELETE FROM back2school.payments where id = $1"
 	return r.exec(query, id)
 }
@@ -76,7 +76,7 @@ func (r *postgresRepository) DeletePayment(id int) (interface{}, error) {
 // @Tags Classes
 // @Router /classes/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteClass(id int) (interface{}, error) {
+func (r *Repository) DeleteClass(id int) (interface{}, error) {
 	query := "DELETE FROM back2school.classes where id = $1"
 	return r.exec(query, id)
 
@@ -87,7 +87,7 @@ func (r *postgresRepository) DeleteClass(id int) (interface{}, error) {
 // @Tags Grades
 // @Router /grades/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteGrade(id int) (interface{}, error) {
+func (r *Repository) DeleteGrade(id int) (interface{}, error) {
 	query := "DELETE FROM back2school.grades where id = $1"
 	return r.exec(query, id)
 }
@@ -97,7 +97,7 @@ func (r *postgresRepository) DeleteGrade(id int) (interface{}, error) {
 // @Tags Lectures
 // @Router /lectures/{id} [delete]
 // @Security ApiKeyAuth
-func (r *postgresRepository) DeleteLecture(id int) (interface{}, error) {
+func (r *Repository) DeleteLecture(id int) (interface{}, error) {
 	query := "DELETE FROM back2school.timetable where id = $1"
 	return r.exec(query, id)
 }

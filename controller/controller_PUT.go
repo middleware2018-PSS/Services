@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/middleware2018-PSS/Services/models"
+	"github.com/middleware2018-PSS/Services/repository"
 )
 
 // @Summary Update teacher's data
@@ -13,13 +14,13 @@ import (
 // @Security ApiKeyAuth
 func (c Controller) UpdateTeacher(teacher models.Teacher, who int, whoKind string) (err error) {
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		if teacher.ID == who {
 			return c.repo.UpdateTeacherForTeacher(teacher, who)
 		} else {
 			return ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.UpdateTeacherForAdmin(teacher)
 	default:
 		return ErrorNotAuthorized
@@ -36,13 +37,13 @@ func (c Controller) UpdateTeacher(teacher models.Teacher, who int, whoKind strin
 func (c Controller) UpdateParent(parent models.Parent, who int, whoKind string) (err error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		if parent.ID == who {
 			return c.repo.UpdateParentForParent(parent, who)
 		} else {
 			return ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.UpdateParentForAdmin(parent)
 
 	default:
@@ -60,9 +61,9 @@ func (c Controller) UpdateParent(parent models.Parent, who int, whoKind string) 
 func (c Controller) UpdateStudent(student models.Student, who int, whoKind string) (err error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.UpdateStudentForParent(student, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.UpdateStudentForAdmin(student)
 	default:
 		return ErrorNotAuthorized
@@ -79,15 +80,15 @@ func (c Controller) UpdateStudent(student models.Student, who int, whoKind strin
 func (c Controller) UpdateAppointment(appointment models.Appointment, who int, whoKind string) (err error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.UpdateAppointmentForParent(appointment, who)
-	case TeacherUser:
+	case repository.TeacherUser:
 		if *appointment.Teacher == who {
 			return c.repo.UpdateAppointmentForTeacher(appointment, who)
 		} else {
 			return ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.UpdateAppointmentForAdmin(appointment)
 	default:
 		return ErrorNotAuthorized
@@ -102,7 +103,7 @@ func (c Controller) UpdateAppointment(appointment models.Appointment, who int, w
 // @Router /classes/{id} [put]
 // @Security ApiKeyAuth
 func (c Controller) UpdateClass(class models.Class, who int, whoKind string) (err error) {
-	if whoKind == AdminUser {
+	if whoKind == repository.AdminUser {
 		return c.repo.UpdateClassForAdmin(class)
 	} else {
 		return ErrorNotAuthorized
@@ -118,8 +119,8 @@ func (c Controller) UpdateClass(class models.Class, who int, whoKind string) (er
 // @Success 201 {object} models.Notification
 // @Security ApiKeyAuth
 func (c Controller) UpdateNotification(notification models.Notification, who int, whoKind string) error {
-	if whoKind == AdminUser {
-		c.repo.UpdateNotificationForAdmin(notification)
+	if whoKind == repository.AdminUser {
+		return c.repo.UpdateNotificationForAdmin(notification)
 	} else {
 		return ErrorNotAuthorized
 	}
@@ -136,13 +137,13 @@ func (c Controller) UpdateNotification(notification models.Notification, who int
 func (c Controller) UpdateGrade(grade models.Grade, who int, whoKind string) error {
 
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		if *grade.Teacher == who {
 			return c.repo.UpdateGradeForTeacher(grade)
 		} else {
 			return ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.UpdateGradeForAdmin(grade)
 	default:
 		return ErrorNotAuthorized
@@ -159,10 +160,10 @@ func (c Controller) UpdateGrade(grade models.Grade, who int, whoKind string) err
 func (c Controller) UpdatePayment(payment models.Payment, who int, whoKind string) error {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.UpdatePaymentForParent(payment, who)
 
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.UpdatePaymentForAdmin(payment)
 
 	default:
@@ -180,9 +181,9 @@ func (c Controller) UpdatePayment(payment models.Payment, who int, whoKind strin
 func (c Controller) UpdateLecture(lecture models.TimeTable, who int, whoKind string) error {
 
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		return c.repo.UpdateLectureForTeacher(lecture, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.UpdateLectureForadmin(lecture)
 	default:
 		return ErrorNotAuthorized
@@ -197,12 +198,12 @@ func (c Controller) UpdateLecture(lecture models.TimeTable, who int, whoKind str
 func (c Controller) UpdateAccount(account models.Account, who int, whoKind string, cost int) error {
 
 	switch whoKind {
-	case TeacherUser, ParentUser:
+	case repository.TeacherUser, repository.ParentUser:
 		if account.Kind != whoKind || account.ID != who {
 			return ErrorNotAuthorized
 		}
 		return c.repo.UpdateAccount(account, cost)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.UpdateAccount(account, cost)
 	default:
 		return ErrorNotAuthorized

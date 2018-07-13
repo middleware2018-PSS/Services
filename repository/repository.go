@@ -14,19 +14,11 @@ const (
 	TeacherUser = "Teacher"
 )
 
-func init() {
-	allowedKind = map[string]bool{AdminUser: true, ParentUser: true, TeacherUser: true}
-}
-
 var (
-	allowedKind          map[string]bool
-	ErrNoResult          = errors.New("No results found.")
-	ErrorNotBlocking     = errors.New("Something went wrong but no worriez.")
-	ErrorNotAuthorized   = errors.New("No authorization for this resource")
-	ErrorNoKindSpecified = errors.New("No \"kind\" has been specified")
+	ErrNoResult = errors.New("No results found.")
 )
 
-type Repository interface {
+type AbstractRepository interface {
 	ClassByID(id int) (interface{}, error)
 	GradeByID(id int) (interface{}, error)
 

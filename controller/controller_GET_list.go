@@ -2,6 +2,7 @@ package controller
 
 import (
 	_ "github.com/middleware2018-PSS/Services/docs"
+	"github.com/middleware2018-PSS/Services/repository"
 )
 
 type Subjects struct {
@@ -17,9 +18,9 @@ type Subjects struct {
 // @Security ApiKeyAuth
 func (c Controller) Classes(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		return c.repo.ClassesForTeachers(limit, offset, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.ClassesForAdmins(limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -36,9 +37,9 @@ func (c Controller) Classes(limit int, offset int, who int, whoKind string) ([]i
 // @Security ApiKeyAuth
 func (c Controller) StudentsByClass(id int, limit int, offset int, who int, whoKind string) (students []interface{}, err error) {
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		return c.repo.StudentsByClassForTeachers(id, limit, offset, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.StudentsByClassForAdmins(id, limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -57,9 +58,9 @@ func (c Controller) StudentsByClass(id int, limit int, offset int, who int, whoK
 func (c Controller) LectureByClass(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		return c.repo.LectureByClassForTeacherOrParents(id, limit, offset, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.LectureByClassForAdmins(id, limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -77,9 +78,9 @@ func (c Controller) LectureByClass(id int, limit int, offset int, who int, whoKi
 func (c Controller) Notifications(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 
 	switch whoKind {
-	case TeacherUser, ParentUser:
+	case repository.TeacherUser, repository.ParentUser:
 		return c.repo.NotificationsForTeacherOrParents(limit, offset, who, whoKind)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.NotificationsForAdmins(limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -96,9 +97,9 @@ func (c Controller) Notifications(limit int, offset int, who int, whoKind string
 func (c Controller) Grades(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.GradesForParent(limit, offset, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.GradesForAdmins(limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -115,9 +116,9 @@ func (c Controller) Grades(limit int, offset int, who int, whoKind string) ([]in
 func (c Controller) Parents(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.ParentsForParents(who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.ParentsForAdmins(limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -135,13 +136,13 @@ func (c Controller) Parents(limit int, offset int, who int, whoKind string) ([]i
 // @Security ApiKeyAuth
 func (c Controller) ChildrenByParent(id int, limit int, offset int, who int, whoKind string) (children []interface{}, err error) {
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		if id == who {
 			return c.repo.ChildrenByParentForParent(who, limit, offset)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.ChildrenByParentForAdmin(id, limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -160,13 +161,13 @@ func (c Controller) ChildrenByParent(id int, limit int, offset int, who int, who
 func (c Controller) PaymentsByParent(id int, limit int, offset int, who int, whoKind string) (payments []interface{}, err error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		if id == who {
 			return c.repo.PaymentsByParentForParent(id, limit, offset)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.PaymentsByParentForAdmin(id, limit, offset)
 
 	default:
@@ -186,13 +187,13 @@ func (c Controller) PaymentsByParent(id int, limit int, offset int, who int, who
 func (c Controller) NotificationsByParent(id int, limit int, offset int, who int, whoKind string) (list []interface{}, err error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		if id == who {
 			return c.repo.NotificationsByParentForParent(id, limit, offset)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.NotificationsByParentForAdmins(id, limit, offset)
 
 	default:
@@ -214,13 +215,13 @@ func (c Controller) NotificationsByParent(id int, limit int, offset int, who int
 func (c Controller) AppointmentsByParent(id int, limit int, offset int, who int, whoKind string) (appointments []interface{}, err error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		if id == who {
-			return c.repo.AppointmentsByParentForParent(id, limit, offset)
+			return c.repo.AppointmentsByParentForParent(id, limit, offset, who)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.AppointmentsByParentForAdmin(id, limit, offset)
 
 	default:
@@ -237,9 +238,9 @@ func (c Controller) AppointmentsByParent(id int, limit int, offset int, who int,
 // @Security ApiKeyAuth
 func (c Controller) PaymentByID(id int, who int, whoKind string) (interface{}, error) {
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.PaymentByIDForParent(id, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.PaymentByIDForAdmins(id)
 	default:
 		return nil, ErrorNotAuthorized
@@ -256,9 +257,9 @@ func (c Controller) PaymentByID(id int, who int, whoKind string) (interface{}, e
 func (c Controller) Payments(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.PaymentsForParent(limit, offset, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.PaymentsForAdmin(limit, offset)
 
 	default:
@@ -276,10 +277,10 @@ func (c Controller) Payments(limit int, offset int, who int, whoKind string) ([]
 func (c Controller) Appointments(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.AppointmentsForParents(limit, offset, who)
 
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.AppointmentsForAdmin(limit, offset)
 
 	default:
@@ -304,9 +305,9 @@ func (c Controller) Appointments(limit int, offset int, who int, whoKind string)
 func (c Controller) Students(limit int, offset int, who int, whoKind string) (student []interface{}, err error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.StudentsForParent(limit, offset, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.StudentsForAdmins(limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -325,9 +326,9 @@ func (c Controller) Students(limit int, offset int, who int, whoKind string) (st
 func (c Controller) GradesByStudent(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.GradesByStudentForParent(id, limit, offset, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.GradesByStudentForAdmins(id, limit, offset)
 
 	default:
@@ -345,13 +346,13 @@ func (c Controller) GradesByStudent(id int, limit int, offset int, who int, whoK
 // @Security ApiKeyAuth
 func (c Controller) TeacherByID(id int, who int, whoKind string) (interface{}, error) {
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		if id == who {
 			return c.repo.TeacherByIDForTeacher(id)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.TeacherByIDForAdmin(id)
 	default:
 		return nil, ErrorNotAuthorized
@@ -369,9 +370,9 @@ func (c Controller) TeacherByID(id int, who int, whoKind string) (interface{}, e
 func (c Controller) Teachers(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		return c.repo.TeachersForTeacher(who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.TeachersForAdmin(limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -389,13 +390,13 @@ func (c Controller) Teachers(limit int, offset int, who int, whoKind string) ([]
 func (c Controller) AppointmentsByTeacher(id int, limit int, offset int, who int, whoKind string) (appointments []interface{}, err error) {
 
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		if id == who {
 			return c.repo.AppointmentsByTeacherForTeacher(id, limit, offset, who)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.AppointmentsByTeacherForAdmin(id, limit, offset)
 
 	default:
@@ -414,13 +415,13 @@ func (c Controller) AppointmentsByTeacher(id int, limit int, offset int, who int
 func (c Controller) NotificationsByTeacher(id int, limit int, offset int, who int, whoKind string) (notifications []interface{}, err error) {
 
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		if id == who {
 			return c.repo.NotificationsByTeacherForTeacher(id, limit, offset, who, whoKind)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.NotificationsByTeacherForAdmin(id, limit, offset)
 
 	default:
@@ -439,13 +440,13 @@ func (c Controller) NotificationsByTeacher(id int, limit int, offset int, who in
 func (c Controller) SubjectsByTeacher(id int, limit int, offset int, who int, whoKind string) (notifications []interface{}, err error) {
 
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		if id == who {
 			return c.repo.SubjectsByTeacher(id, limit, offset)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.SubjectsByTeacher(id, limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -464,13 +465,13 @@ func (c Controller) SubjectsByTeacher(id int, limit int, offset int, who int, wh
 func (c Controller) ClassesBySubjectAndTeacher(teacher int, subject string, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		if teacher == who {
 			return c.repo.ClassesBySubjectAndTeacher(teacher, subject, limit, offset)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.ClassesBySubjectAndTeacher(teacher, subject, limit, offset)
 
 	default:
@@ -489,13 +490,13 @@ func (c Controller) ClassesBySubjectAndTeacher(teacher int, subject string, limi
 func (c Controller) LecturesByTeacher(id int, limit int, offset int, who int, whoKind string) (lectures []interface{}, err error) {
 
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		if id == who {
 			return c.repo.LecturesByTeacher(id, limit, offset)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.LecturesByTeacher(id, limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -513,13 +514,13 @@ func (c Controller) LecturesByTeacher(id int, limit int, offset int, who int, wh
 // @Security ApiKeyAuth
 func (c Controller) ClassesByTeacher(id int, limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		if id == who {
 			return c.repo.ClassesByTeacher(id, limit, offset)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.ClassesByTeacher(id, limit, offset)
 	default:
 		return nil, ErrorNotAuthorized
@@ -536,12 +537,12 @@ func (c Controller) ClassesByTeacher(id int, limit int, offset int, who int, who
 func (c Controller) Lectures(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.LecturesForParent(limit, offset, who)
-	case TeacherUser:
+	case repository.TeacherUser:
 		return c.repo.LecturesByTeacher(who, limit, offset)
 
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.LecturesForAdmin(limit, offset)
 
 	default:
@@ -557,7 +558,7 @@ func (c Controller) Lectures(limit int, offset int, who int, whoKind string) ([]
 // @Router /accounts [get]
 // @Security ApiKeyAuth
 func (c Controller) Accounts(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
-	if whoKind == AdminUser {
+	if whoKind == repository.AdminUser {
 		return c.repo.AccountsForAdmins(limit, offset)
 	} else {
 		return nil, ErrorNotAuthorized

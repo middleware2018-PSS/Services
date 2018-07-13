@@ -1,5 +1,7 @@
 package controller
 
+import "github.com/middleware2018-PSS/Services/repository"
+
 // @Summary Get a appointment by id
 // @Param id path int true "Appointment ID"
 // @Tags Appointments
@@ -8,11 +10,11 @@ package controller
 // @Security ApiKeyAuth
 func (c Controller) AppointmentByID(id int, who int, whoKind string) (interface{}, error) {
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.AppointmentForParent(id, who)
-	case TeacherUser:
+	case repository.TeacherUser:
 		return c.repo.AppointmentForTeacher(id, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.AppointmentForAdmin(id)
 	default:
 		return nil, ErrorNotAuthorized
@@ -27,11 +29,11 @@ func (c Controller) AppointmentByID(id int, who int, whoKind string) (interface{
 // @Security ApiKeyAuth
 func (c Controller) GradeByID(id int, who int, whoKind string) (interface{}, error) {
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.GradeByIDForParent(id, who)
-	case TeacherUser:
+	case repository.TeacherUser:
 		return c.repo.GradeByIDForTeacher(id, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.GradeByIDForAdmin(id)
 	default:
 		return nil, ErrorNotAuthorized
@@ -46,9 +48,9 @@ func (c Controller) GradeByID(id int, who int, whoKind string) (interface{}, err
 // @Security ApiKeyAuth
 func (c Controller) ClassByID(id int, who int, whoKind string) (interface{}, error) {
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		return c.repo.ClassByIDForTeacher(id, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.ClassByIDForAdmin(id)
 	default:
 		return nil, ErrorNotAuthorized
@@ -63,11 +65,11 @@ func (c Controller) ClassByID(id int, who int, whoKind string) (interface{}, err
 // @Security ApiKeyAuth
 func (c Controller) NotificationByID(id int, who int, whoKind string) (interface{}, error) {
 	switch whoKind {
-	case TeacherUser:
+	case repository.TeacherUser:
 		return c.repo.NotificationByIDForTeacher(id, who, whoKind)
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.NotificationByIDForParent(id, who, whoKind)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.NotificationByIDForAdmin(id, who, whoKind)
 	default:
 		return nil, ErrorNotAuthorized
@@ -84,13 +86,13 @@ func (c Controller) NotificationByID(id int, who int, whoKind string) (interface
 // @Security ApiKeyAuth
 func (c Controller) ParentByID(id int, who int, whoKind string) (interface{}, error) {
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		if id == who {
 			return c.repo.ParentByID(id)
 		} else {
 			return nil, ErrorNotAuthorized
 		}
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.ParentByID(id)
 	default:
 		return nil, ErrorNotAuthorized
@@ -106,9 +108,9 @@ func (c Controller) ParentByID(id int, who int, whoKind string) (interface{}, er
 // @Security ApiKeyAuth
 func (c Controller) StudentByID(id int, who int, whoKind string) (student interface{}, err error) {
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.StudentByIDForParent(id, who)
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.StudentByIDForAdmin(id)
 	default:
 		return nil, ErrorNotAuthorized
@@ -124,12 +126,12 @@ func (c Controller) StudentByID(id int, who int, whoKind string) (student interf
 func (c Controller) LectureByID(id int, who int, whoKind string) (interface{}, error) {
 
 	switch whoKind {
-	case ParentUser:
+	case repository.ParentUser:
 		return c.repo.LectureByIDForParent(id, who)
-	case TeacherUser:
+	case repository.TeacherUser:
 		return c.repo.LectureByIDForTeacher(id, who)
 
-	case AdminUser:
+	case repository.AdminUser:
 		return c.repo.LectureByIDForAdmin(id)
 
 	default:

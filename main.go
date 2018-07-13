@@ -16,6 +16,7 @@ import (
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"github.com/middleware2018-PSS/Services/controller"
 	"github.com/phisco/hal"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -50,8 +51,8 @@ const (
 // @name Authorization
 // @host localhost:5000
 func main() {
-	/*p, _ := bcrypt.GenerateFromPassword([]byte("password"), 4)
-	fmt.Printf("%s", p)*/
+	/* p, _ := bcrypt.GenerateFromPassword([]byte("password"), 10)
+	fmt.Printf("%s", p) */
 	viper.SetConfigName("config")
 	viper.AddConfigPath("config")
 
@@ -64,14 +65,14 @@ func main() {
 	log.Println(viper.GetString("DBparams"))
 
 	db, err := sql.Open("postgres", viper.GetString("DBparams"))
+	// err = db.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer db.Close()
 
-	var con repository.Repository
-	con = repository.NewPostgresRepository(db)
+	con := controller.NewController(repository.NewPostgresRepository(db))
 
 	authMiddleware := jwt.GinJWTMiddleware{
 		Realm:            viper.GetString("realm"),

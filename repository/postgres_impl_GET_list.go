@@ -11,7 +11,7 @@ type Subjects struct {
 	Subjects []string `json:"subjects" example:"science"`
 }
 
-func (r *postgresRepository) ClassesForTeachers(limit int, offset int, who int) ([]interface{}, error) {
+func (r *Repository) ClassesForTeachers(limit int, offset int, who int) ([]interface{}, error) {
 	query := "select id, year, section, info, grade " +
 		" from back2school.classes join back2school.teaches on class = id " +
 		" WHERE teacher = $1 " +
@@ -23,7 +23,7 @@ func (r *postgresRepository) ClassesForTeachers(limit int, offset int, who int) 
 	}, limit, offset, who)
 }
 
-func (r *postgresRepository) ClassesForAdmins(limit int, offset int) ([]interface{}, error) {
+func (r *Repository) ClassesForAdmins(limit int, offset int) ([]interface{}, error) {
 	query := "select id, year, section, info, grade " +
 		"from back2school.classes " +
 		"order by year desc, grade asc, section asc "
@@ -34,7 +34,7 @@ func (r *postgresRepository) ClassesForAdmins(limit int, offset int) ([]interfac
 	}, limit, offset)
 }
 
-func (r *postgresRepository) StudentsByClassForTeachers(id int, limit int, offset int, who int) (students []interface{}, err error) {
+func (r *Repository) StudentsByClassForTeachers(id int, limit int, offset int, who int) (students []interface{}, err error) {
 	query := "select distinct s.id, s.name, s.surname, s.mail, s.info " +
 		"from back2school.students as s join back2school.enrolled as e " +
 		" join back2school.teaches as t on s.id = e.student and t.class = e.class " +
@@ -47,7 +47,7 @@ func (r *postgresRepository) StudentsByClassForTeachers(id int, limit int, offse
 			return student, err
 		}, limit, offset, id, who)
 }
-func (r *postgresRepository) StudentsByClassForAdmins(id int, limit int, offset int) (students []interface{}, err error) {
+func (r *Repository) StudentsByClassForAdmins(id int, limit int, offset int) (students []interface{}, err error) {
 	query := "select distinct id, name, surname, mail, info " +
 		"from back2school.students join back2school.enrolled on student = id " +
 		"where class = $1 " +
@@ -60,7 +60,7 @@ func (r *postgresRepository) StudentsByClassForAdmins(id int, limit int, offset 
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) LectureByClassForTeacherOrParents(id int, limit int, offset int, who int) ([]interface{}, error) {
+func (r *Repository) LectureByClassForTeacherOrParents(id int, limit int, offset int, who int) ([]interface{}, error) {
 	query := "select id, class, subject, \"start\", \"end\", location, info " +
 		"from back2school.timetable natural join back2school.teaches " +
 		"where teacher = $1 and class = $2 " +
@@ -73,7 +73,7 @@ func (r *postgresRepository) LectureByClassForTeacherOrParents(id int, limit int
 			return lecture, err
 		}, limit, offset, who, id)
 }
-func (r *postgresRepository) LectureByClassForAdmins(id int, limit int, offset int) ([]interface{}, error) {
+func (r *Repository) LectureByClassForAdmins(id int, limit int, offset int) ([]interface{}, error) {
 	query := "select id, class, subject, \"start\", \"end\", location, info " +
 		"from back2school.timetable " +
 		"order by \"start\" desc "
@@ -86,7 +86,7 @@ func (r *postgresRepository) LectureByClassForAdmins(id int, limit int, offset i
 		}, limit, offset)
 }
 
-func (r *postgresRepository) NotificationsForTeacherOrParents(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
+func (r *Repository) NotificationsForTeacherOrParents(limit int, offset int, who int, whoKind string) ([]interface{}, error) {
 	query := "select id, receiver, message, time, receiver_kind " +
 		"from back2school.notification " +
 		" where receiver = $1 and receiver_kind = $2 " +
@@ -99,7 +99,7 @@ func (r *postgresRepository) NotificationsForTeacherOrParents(limit int, offset 
 		}, limit, offset, who, whoKind)
 }
 
-func (r *postgresRepository) NotificationsForAdmins(limit int, offset int) ([]interface{}, error) {
+func (r *Repository) NotificationsForAdmins(limit int, offset int) ([]interface{}, error) {
 	query := "select id, receiver, message, time, receiver_kind " +
 		"from back2school.notification " +
 		"order by time desc, receiver_kind desc "
@@ -111,7 +111,7 @@ func (r *postgresRepository) NotificationsForAdmins(limit int, offset int) ([]in
 		}, limit, offset)
 }
 
-func (r *postgresRepository) GradesForParent(limit int, offset int, who int) ([]interface{}, error) {
+func (r *Repository) GradesForParent(limit int, offset int, who int) ([]interface{}, error) {
 	query := "select id, student, grade, subject, date, teacher " +
 		"from back2school.grades natural join back2school.isParent " +
 		" where parent = $1" +
@@ -123,7 +123,7 @@ func (r *postgresRepository) GradesForParent(limit int, offset int, who int) ([]
 			return g, err
 		}, limit, offset, who)
 }
-func (r *postgresRepository) GradesForAdmins(limit int, offset int) ([]interface{}, error) {
+func (r *Repository) GradesForAdmins(limit int, offset int) ([]interface{}, error) {
 	query := "select id, student, grade, subject, date, teacher " +
 		"from back2school.grades " +
 		"order by date desc, teacher asc "
@@ -134,11 +134,11 @@ func (r *postgresRepository) GradesForAdmins(limit int, offset int) ([]interface
 			return g, err
 		}, limit, offset)
 }
-func (r *postgresRepository) ParentsForParents(who int) ([]interface{}, error) {
+func (r *Repository) ParentsForParents(who int) ([]interface{}, error) {
 	p, err := r.ParentByID(who)
 	return []interface{}{p}, err
 }
-func (r *postgresRepository) ParentsForAdmins(limit int, offset int) ([]interface{}, error) {
+func (r *Repository) ParentsForAdmins(limit int, offset int) ([]interface{}, error) {
 	query := "select id, name, surname, mail, info " +
 		"from back2school.parents " +
 		"order by name desc, surname desc "
@@ -149,7 +149,7 @@ func (r *postgresRepository) ParentsForAdmins(limit int, offset int) ([]interfac
 			return parent, err
 		}, limit, offset)
 }
-func (r *postgresRepository) ChildrenByParentForParent(id int, limit int, offset int) (children []interface{}, err error) {
+func (r *Repository) ChildrenByParentForParent(id int, limit int, offset int) (children []interface{}, err error) {
 
 	query := "SELECT distinct s.id, s.name, s.surname, s.mail, s.info " +
 		"FROM back2school.isparent join back2school.students as s on student = s.id " +
@@ -161,10 +161,10 @@ func (r *postgresRepository) ChildrenByParentForParent(id int, limit int, offset
 			student := models.Student{}
 			err := rows.Scan(&student.ID, &student.Name, &student.Surname, &student.Mail, &student.Info)
 			return student, err
-		}, limit, offset, who)
+		}, limit, offset, id)
 }
 
-func (r *postgresRepository) ChildrenByParentForAdmin(id int, limit int, offset int) (children []interface{}, err error) {
+func (r *Repository) ChildrenByParentForAdmin(id int, limit int, offset int) (children []interface{}, err error) {
 	query := "SELECT distinct s.id, s.name, s.surname, s.mail, s.info " +
 		"FROM back2school.isparent join back2school.students as s on student = s.id " +
 		"WHERE parent = $1 " +
@@ -178,7 +178,7 @@ func (r *postgresRepository) ChildrenByParentForAdmin(id int, limit int, offset 
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) PaymentsByParentForParent(id int, limit int, offset int) (payments []interface{}, err error) {
+func (r *Repository) PaymentsByParentForParent(id int, limit int, offset int) (payments []interface{}, err error) {
 	query := "select p.id, p.amount, p.student, p.paid, p.reason, p.emitted " +
 		"from back2school.payments as p natural join back2school.isParent " +
 		"where parent = $1 " +
@@ -192,7 +192,7 @@ func (r *postgresRepository) PaymentsByParentForParent(id int, limit int, offset
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) PaymentsByParentForAdmin(id int, limit int, offset int) (payments []interface{}, err error) {
+func (r *Repository) PaymentsByParentForAdmin(id int, limit int, offset int) (payments []interface{}, err error) {
 	query := "select p.id, p.amount, p.student, p.paid, p.reason, p.emitted " +
 		"from back2school.payments as p natural join back2school.isParent " +
 		"where parent = $1 " +
@@ -205,7 +205,7 @@ func (r *postgresRepository) PaymentsByParentForAdmin(id int, limit int, offset 
 	}, limit, offset, id)
 }
 
-func (r *postgresRepository) NotificationsByParentForParent(id int, limit int, offset int) (list []interface{}, err error) {
+func (r *Repository) NotificationsByParentForParent(id int, limit int, offset int) (list []interface{}, err error) {
 
 	query := "select * from ( " +
 		"select n.id, n.receiver, n.message, n.receiver_kind, n.time " +
@@ -223,9 +223,9 @@ func (r *postgresRepository) NotificationsByParentForParent(id int, limit int, o
 			err := rows.Scan(&notification.ID, &notification.Receiver, &notification.Message,
 				&notification.ReceiverKind, &notification.Time)
 			return notification, err
-		}, limit, offset, who)
+		}, limit, offset, id)
 }
-func (r *postgresRepository) NotificationsByParentForAdmins(id int, limit int, offset int) (list []interface{}, err error) {
+func (r *Repository) NotificationsByParentForAdmins(id int, limit int, offset int) (list []interface{}, err error) {
 
 	query := "select * from ( " +
 		"select n.id, n.receiver, n.message, n.receiver_kind, n.time " +
@@ -246,7 +246,7 @@ func (r *postgresRepository) NotificationsByParentForAdmins(id int, limit int, o
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) AppointmentsByParentForParent(id int, limit int, offset int) (appointments []interface{}, err error) {
+func (r *Repository) AppointmentsByParentForParent(id int, limit int, offset int, who int) (appointments []interface{}, err error) {
 
 	query := "select a.id, a.student, a.teacher, a.location, a.time " +
 		"from back2school.appointments as a natural join back2school.isparent  " +
@@ -261,7 +261,7 @@ func (r *postgresRepository) AppointmentsByParentForParent(id int, limit int, of
 		}, limit, offset, who)
 }
 
-func (r *postgresRepository) AppointmentsByParentForAdmin(id int, limit int, offset int) (appointments []interface{}, err error) {
+func (r *Repository) AppointmentsByParentForAdmin(id int, limit int, offset int) (appointments []interface{}, err error) {
 
 	query := "select a.id, a.student, a.teacher, a.location, a.time " +
 		"from back2school.appointments as a natural join back2school.isparent " +
@@ -275,7 +275,7 @@ func (r *postgresRepository) AppointmentsByParentForAdmin(id int, limit int, off
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) PaymentByIDForParent(id int, who int) (interface{}, error) {
+func (r *Repository) PaymentByIDForParent(id int, who int) (interface{}, error) {
 	payment := &models.Payment{}
 	query := "SELECT id, amount, paid, emitted, reason " +
 		"FROM back2school.payments natural join back2school.isParent" +
@@ -285,7 +285,7 @@ func (r *postgresRepository) PaymentByIDForParent(id int, who int) (interface{},
 	return switchResult(payment, err)
 }
 
-func (r *postgresRepository) PaymentByIDForAdmins(id int) (interface{}, error) {
+func (r *Repository) PaymentByIDForAdmins(id int) (interface{}, error) {
 	payment := &models.Payment{}
 	query := "SELECT id, amount, paid, emitted, reason " +
 		"FROM back2school.payments WHERE id = $1 "
@@ -294,7 +294,7 @@ func (r *postgresRepository) PaymentByIDForAdmins(id int) (interface{}, error) {
 	return switchResult(payment, err)
 }
 
-func (r *postgresRepository) PaymentsForParent(limit int, offset int, who int) ([]interface{}, error) {
+func (r *Repository) PaymentsForParent(limit int, offset int, who int) ([]interface{}, error) {
 
 	query := "select id, amount, student, paid, reason, emitted " +
 		"from back2school.payments natural join back2school.isParent " +
@@ -307,7 +307,7 @@ func (r *postgresRepository) PaymentsForParent(limit int, offset int, who int) (
 			return payment, err
 		}, limit, offset, who)
 }
-func (r *postgresRepository) PaymentsForAdmin(limit int, offset int) ([]interface{}, error) {
+func (r *Repository) PaymentsForAdmin(limit int, offset int) ([]interface{}, error) {
 
 	query := "select id, amount, student, paid, reason, emitted " +
 		"from back2school.payments " +
@@ -321,7 +321,7 @@ func (r *postgresRepository) PaymentsForAdmin(limit int, offset int) ([]interfac
 		}, limit, offset)
 }
 
-func (r *postgresRepository) AppointmentsForParents(limit int, offset int, who int) ([]interface{}, error) {
+func (r *Repository) AppointmentsForParents(limit int, offset int, who int) ([]interface{}, error) {
 
 	query := "select id, student, teacher, location, time " +
 		"from back2school.appointments natural join back2school.isParent " +
@@ -336,7 +336,7 @@ func (r *postgresRepository) AppointmentsForParents(limit int, offset int, who i
 		}, limit, offset, who)
 }
 
-func (r *postgresRepository) AppointmentsForAdmin(limit int, offset int) ([]interface{}, error) {
+func (r *Repository) AppointmentsForAdmin(limit int, offset int) ([]interface{}, error) {
 
 	query := "select id, student, teacher, location, time " +
 		"from back2school.appointments " +
@@ -350,7 +350,7 @@ func (r *postgresRepository) AppointmentsForAdmin(limit int, offset int) ([]inte
 		}, limit, offset)
 }
 
-func (r *postgresRepository) StudentsForParent(limit int, offset int, who int) (student []interface{}, err error) {
+func (r *Repository) StudentsForParent(limit int, offset int, who int) (student []interface{}, err error) {
 
 	query := "select id, name, surname, mail, info " +
 		"from back2school.students join back2school.isParent on id=student " +
@@ -363,7 +363,7 @@ func (r *postgresRepository) StudentsForParent(limit int, offset int, who int) (
 		return student, err
 	}, limit, offset, who)
 }
-func (r *postgresRepository) StudentsForAdmins(limit int, offset int) (student []interface{}, err error) {
+func (r *Repository) StudentsForAdmins(limit int, offset int) (student []interface{}, err error) {
 
 	query := "select id, name, surname, mail, info  " +
 		"from back2school.students " +
@@ -376,7 +376,7 @@ func (r *postgresRepository) StudentsForAdmins(limit int, offset int) (student [
 	}, limit, offset)
 }
 
-func (r *postgresRepository) GradesByStudentForParent(id int, limit int, offset int, who int) ([]interface{}, error) {
+func (r *Repository) GradesByStudentForParent(id int, limit int, offset int, who int) ([]interface{}, error) {
 
 	query := "SELECT id, student, subject, date, grade, teacher " +
 		"FROM back2school.grades natural join back2school.isParent " +
@@ -389,7 +389,7 @@ func (r *postgresRepository) GradesByStudentForParent(id int, limit int, offset 
 			return grade, err
 		}, limit, offset, id, who)
 }
-func (r *postgresRepository) GradesByStudentForAdmins(id int, limit int, offset int) ([]interface{}, error) {
+func (r *Repository) GradesByStudentForAdmins(id int, limit int, offset int) ([]interface{}, error) {
 
 	query := "SELECT id, student, subject, date, grade, teacher " +
 		"FROM back2school.grades " +
@@ -404,7 +404,7 @@ func (r *postgresRepository) GradesByStudentForAdmins(id int, limit int, offset 
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) TeacherByIDForTeacher(id int) (interface{}, error) {
+func (r *Repository) TeacherByIDForTeacher(id int) (interface{}, error) {
 	teacher := models.Teacher{}
 	query := "SELECT id, name, surname, mail " +
 		"FROM back2school.teachers " +
@@ -415,7 +415,7 @@ func (r *postgresRepository) TeacherByIDForTeacher(id int) (interface{}, error) 
 
 }
 
-func (r *postgresRepository) TeacherByIDForAdmin(id int) (interface{}, error) {
+func (r *Repository) TeacherByIDForAdmin(id int) (interface{}, error) {
 	teacher := models.Teacher{}
 	query := "SELECT id, name, surname, mail " +
 		"FROM back2school.teachers " +
@@ -425,11 +425,11 @@ func (r *postgresRepository) TeacherByIDForAdmin(id int) (interface{}, error) {
 
 }
 
-func (r *postgresRepository) TeachersForTeacher(who int) ([]interface{}, error) {
+func (r *Repository) TeachersForTeacher(who int) ([]interface{}, error) {
 	t, err := r.TeacherByIDForTeacher(who)
 	return []interface{}{t}, err
 }
-func (r *postgresRepository) TeachersForAdmin(limit int, offset int) ([]interface{}, error) {
+func (r *Repository) TeachersForAdmin(limit int, offset int) ([]interface{}, error) {
 
 	query := "select id, name, surname, mail, info  " +
 		"from back2school.teachers " +
@@ -442,7 +442,7 @@ func (r *postgresRepository) TeachersForAdmin(limit int, offset int) ([]interfac
 	}, limit, offset)
 }
 
-func (r *postgresRepository) AppointmentsByTeacherForTeacher(id int, limit int, offset int, who int) (appointments []interface{}, err error) {
+func (r *Repository) AppointmentsByTeacherForTeacher(id int, limit int, offset int, who int) (appointments []interface{}, err error) {
 	query := "SELECT id, student, teacher, location, time " +
 		"FROM back2school.appointments " +
 		"WHERE teacher = $1 " +
@@ -456,7 +456,7 @@ func (r *postgresRepository) AppointmentsByTeacherForTeacher(id int, limit int, 
 		}, limit, offset, who)
 }
 
-func (r *postgresRepository) AppointmentsByTeacherForAdmin(id int, limit int, offset int) (appointments []interface{}, err error) {
+func (r *Repository) AppointmentsByTeacherForAdmin(id int, limit int, offset int) (appointments []interface{}, err error) {
 
 	query := "SELECT id, student, teacher, location, time " +
 		"FROM back2school.appointments " +
@@ -471,7 +471,7 @@ func (r *postgresRepository) AppointmentsByTeacherForAdmin(id int, limit int, of
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) NotificationsByTeacherForTeacher(id int, limit int, offset int, who int, whoKind string) (notifications []interface{}, err error) {
+func (r *Repository) NotificationsByTeacherForTeacher(id int, limit int, offset int, who int, whoKind string) (notifications []interface{}, err error) {
 
 	query := "SELECT id, receiver, message, receiver_kind, time " +
 		"FROM back2school.notification " +
@@ -486,7 +486,7 @@ func (r *postgresRepository) NotificationsByTeacherForTeacher(id int, limit int,
 		}, limit, offset, who, whoKind)
 }
 
-func (r *postgresRepository) NotificationsByTeacherForAdmin(id int, limit int, offset int) (notifications []interface{}, err error) {
+func (r *Repository) NotificationsByTeacherForAdmin(id int, limit int, offset int) (notifications []interface{}, err error) {
 
 	query := "SELECT id, receiver, message, receiver_kind, time " +
 		"FROM back2school.notification " +
@@ -501,7 +501,7 @@ func (r *postgresRepository) NotificationsByTeacherForAdmin(id int, limit int, o
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) SubjectsByTeacher(id int, limit int, offset int) (notifications []interface{}, err error) {
+func (r *Repository) SubjectsByTeacher(id int, limit int, offset int) (notifications []interface{}, err error) {
 
 	query := "SELECT DISTINCT subject FROM back2school.teaches where teacher = $1 order by subject "
 
@@ -513,7 +513,7 @@ func (r *postgresRepository) SubjectsByTeacher(id int, limit int, offset int) (n
 		}, limit, offset, id)
 }
 
-func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int, subject string, limit int, offset int) ([]interface{}, error) {
+func (r *Repository) ClassesBySubjectAndTeacher(teacher int, subject string, limit int, offset int) ([]interface{}, error) {
 
 	query := "SELECT id, year, section, info, grade " +
 		"FROM back2school.teaches join back2school.classes on id = class " +
@@ -528,7 +528,7 @@ func (r *postgresRepository) ClassesBySubjectAndTeacher(teacher int, subject str
 		}, limit, offset, teacher, subject)
 }
 
-func (r *postgresRepository) LecturesByTeacher(id int, limit int, offset int) (lectures []interface{}, err error) {
+func (r *Repository) LecturesByTeacher(id int, limit int, offset int) (lectures []interface{}, err error) {
 
 	query := "SELECT id, class, subject, location, start, \"end\", info " +
 		"from back2school.timetable natural join back2school.teaches as t " +
@@ -541,10 +541,10 @@ func (r *postgresRepository) LecturesByTeacher(id int, limit int, offset int) (l
 			err := rows.Scan(&lecture.ID, lecture.Class, &lecture.Subject, &lecture.Location, &lecture.Start, &lecture.End, &lecture.Info)
 			return lecture, err
 
-		}, limit, offset, who)
+		}, limit, offset, id)
 }
 
-func (r *postgresRepository) ClassesByTeacher(id int, limit int, offset int) ([]interface{}, error) {
+func (r *Repository) ClassesByTeacher(id int, limit int, offset int) ([]interface{}, error) {
 	type Class struct {
 		models.Class
 		Subject models.Subject `json:"subject,omitempty"`
@@ -559,10 +559,10 @@ func (r *postgresRepository) ClassesByTeacher(id int, limit int, offset int) ([]
 			class := Class{}
 			err := rows.Scan(&class.ID, &class.Year, &class.Section, &class.Info, &class.Grade, &class.Subject)
 			return class, err
-		}, limit, offset, who)
+		}, limit, offset, id)
 }
 
-func (r *postgresRepository) LecturesForParent(limit int, offset int, who int) ([]interface{}, error) {
+func (r *Repository) LecturesForParent(limit int, offset int, who int) ([]interface{}, error) {
 
 	query := "select id, class, subject, \"start\", \"end\", location, info " +
 		"from back2school.timetable natural join back2school.enrolled natural join back2school.isParent " +
@@ -576,7 +576,7 @@ func (r *postgresRepository) LecturesForParent(limit int, offset int, who int) (
 	}, limit, offset, who)
 }
 
-func (r *postgresRepository) LecturesForAdmin(limit int, offset int) ([]interface{}, error) {
+func (r *Repository) LecturesForAdmin(limit int, offset int) ([]interface{}, error) {
 	query := "select id, class, subject, \"start\", \"end\", location, info " +
 		"from back2school.timetable " +
 		"order by \"start\" desc "
@@ -588,7 +588,7 @@ func (r *postgresRepository) LecturesForAdmin(limit int, offset int) ([]interfac
 	}, limit, offset)
 }
 
-func (r *postgresRepository) AccountsForAdmins(limit int, offset int) ([]interface{}, error) {
+func (r *Repository) AccountsForAdmins(limit int, offset int) ([]interface{}, error) {
 	query := `select username, kind, id from back2school.accounts`
 	return r.listByParams(query, func(rows *sql.Rows) (interface{}, error) {
 		account := models.Account{}
